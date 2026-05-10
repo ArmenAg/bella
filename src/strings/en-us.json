@@ -1,0 +1,1553 @@
+{
+  "$schema": "Centralized UI string catalog. Keep production UI text here.",
+  "app": {
+    "name": "Bella Care Tracker",
+    "tagline": "Private family-controlled health record."
+  },
+  "nav": {
+    "dashboard": "Dashboard",
+    "flareMode": "Flare Mode",
+    "painBook": "Pain log",
+    "logBook": "Notes",
+    "timeline": "Timeline",
+    "diagnosticTree": "Diagnostic Tree",
+    "decisions": "Decisions",
+    "schedule": "Schedule",
+    "medications": "Medications",
+    "proceduresTests": "Procedures & Tests",
+    "sourceLibrary": "Source Library",
+    "exportPacket": "Export Packet",
+    "settings": "Settings",
+    "openMenu": "Open menu",
+    "closeMenu": "Close menu",
+    "primary": "Primary",
+    "secondary": "Tools",
+    "review": "Review",
+    "config": "Config"
+  },
+  "actions": {
+    "startFlare": "Start flare",
+    "newPainEntry": "New pain entry",
+    "newLogEntry": "New log entry",
+    "save": "Save",
+    "saving": "Saving…",
+    "cancel": "Cancel",
+    "delete": "Delete",
+    "deleting": "Deleting…",
+    "edit": "Edit",
+    "uploading": "Uploading…",
+    "upload": "Upload",
+    "addAttachment": "Add attachment",
+    "removeAttachment": "Remove",
+    "retry": "Retry",
+    "continue": "Continue",
+    "back": "Back",
+    "iUnderstand": "I understand",
+    "replayDisclosure": "Replay privacy disclosure",
+    "viewAll": "View all",
+    "add": "Add",
+    "remove": "Remove",
+    "clear": "Clear"
+  },
+  "common": {
+    "loading": "Loading…",
+    "notImplemented": "This view is part of a later phase.",
+    "comingSoon": "Coming soon",
+    "errorTitle": "Something went wrong",
+    "errorBody": "We could not complete this action. Please try again.",
+    "soft_delete_reason_label": "Reason for removing this record",
+    "soft_delete_reason_placeholder": "e.g. duplicate entry, mistaken capture",
+    "destructive_confirm": "This will move the record into the trash. You can restore it from Settings.",
+    "destructive_confirm_action": "Yes, remove",
+    "required": "Required",
+    "optional": "Optional",
+    "selectOne": "Select one",
+    "search": "Search",
+    "none": "—"
+  },
+  "onboarding": {
+    "heading": "Privacy and what this is",
+    "intro": "A short note before you start logging.",
+    "bullets": {
+      "scope": "This is a family-controlled personal health record. It is not a HIPAA-covered clinical system.",
+      "private": "Records are private to invited family users. There are no public links and no third-party analytics on medical text or events.",
+      "softDelete": "Records are soft-deleted by default. Destructive deletion requires confirmation and a reason.",
+      "export": "The family can export every record at any time."
+    },
+    "tldr": "We capture what you live. We do not diagnose, treat, or share. You can leave the platform with everything, anytime.",
+    "acknowledge": "I understand and want to continue",
+    "ackPersistedTodo": "Acknowledgement is currently stored in this browser. A backend record will replace this in a later phase."
+  },
+  "settings": {
+    "title": "Settings",
+    "subtitle": "Profile, access, privacy, and export entry points.",
+    "sections": {
+      "profile": "Profile",
+      "family": "Family users",
+      "security": "Security",
+      "privacy": "Privacy",
+      "data": "Your data"
+    },
+    "profile": {
+      "emailLabel": "Email",
+      "roleLabel": "Role",
+      "readOnlyNotice": "Your role is read-only. Capture, edit, and delete actions are not shown."
+    },
+    "family": {
+      "placeholder": "Family user list and invitations are part of a later phase.",
+      "currentUser": "You"
+    },
+    "security": {
+      "mfaLabel": "Multi-factor authentication",
+      "mfaPlaceholder": "MFA configuration is part of a later phase.",
+      "sessionLabel": "Active sessions",
+      "sessionPlaceholder": "Session management is part of a later phase."
+    },
+    "privacy": {
+      "replayLabel": "Privacy disclosure",
+      "replayDescription": "View what was shown when this account was first set up."
+    },
+    "data": {
+      "exportLabel": "Export packet",
+      "exportPlaceholder": "Bulk export will be available once the export generator ships.",
+      "trashLabel": "Trash",
+      "trashPlaceholder": "Soft-deleted records can be reviewed and restored here in a later phase."
+    },
+    "roleNames": {
+      "primary": "Primary",
+      "caregiver": "Caregiver",
+      "viewer": "Viewer",
+      "clinician_readonly": "Clinician (read-only)"
+    }
+  },
+  "painBook": {
+    "title": "Pain log",
+    "subtitle": "The daily breviary. Short, fast entries.",
+    "newCta": "New pain entry",
+    "list": {
+      "empty": {
+        "title": "No pain entries yet",
+        "body": "Capture today's baseline or your most recent flare. Entries are short by design."
+      },
+      "filterAll": "All",
+      "filterFlares": "Flares only",
+      "regionCount": "{count} region",
+      "regionCountPlural": "{count} regions",
+      "attachmentsLabel": "Has attachments"
+    },
+    "form": {
+      "newTitle": "New pain entry",
+      "editTitle": "Edit pain entry",
+      "savedToast": "Entry saved",
+      "summarySection": "Entry",
+      "painSection": "Pain",
+      "contextSection": "Context",
+      "responseSection": "What you tried",
+      "attachmentsSection": "Attachments",
+      "type": "Entry type",
+      "occurredAt": "When did it start?",
+      "endedAt": "When did it end?",
+      "title": "Title",
+      "titlePlaceholder": "Short label for this entry",
+      "titleAutoPlaceholder": "Auto-generated if blank",
+      "painCurrent": "Pain now",
+      "painPeak": "Peak pain",
+      "painAverage": "Average pain",
+      "painScale": "0 = none, 10 = worst imaginable",
+      "bodyRegions": "Body regions",
+      "qualities": "Pain qualities",
+      "triggers": "Triggers",
+      "bellaTriggers": "Bella-specific triggers",
+      "generalTriggers": "Other triggers",
+      "functionImpact": "Function impact",
+      "functionImpactPlaceholder": "e.g. couldn't drive, missed work",
+      "interventionsTried": "Interventions tried",
+      "interventionsTriedPlaceholder": "e.g. ice, gabapentin 300mg, rested",
+      "response": "Response",
+      "responsePlaceholder": "What helped, what didn't.",
+      "notes": "Notes",
+      "notesPlaceholder": "What did this feel like? What changed?",
+      "attachments": "Attachments",
+      "isFlare": "This is a flare",
+      "flareStatus": "Flare status",
+      "flareStatusActive": "Active",
+      "flareStatusEnded": "Ended",
+      "flareStatusCancelled": "Cancelled",
+      "recoveryMinutes": "Recovery time (minutes)",
+      "recoveryMinutesPlaceholder": "e.g. 90",
+      "addChip": "Add",
+      "chipPlaceholder": "Type and add",
+      "pendingUploads": "An upload is still in progress. Wait for it to finish before saving.",
+      "deleteTitle": "Remove this pain entry?",
+      "noBodyRegions": "No body regions available.",
+      "noSymptoms": "No pain qualities available.",
+      "noTriggers": "No triggers available.",
+      "attachmentsEditNote": "Existing attachments do not yet appear here. New uploads will attach to this entry.",
+      "disclosure": {
+        "painExtras": "Add peak / average",
+        "painExtrasHint": "Peak, average, and recovery time",
+        "context": "Context",
+        "contextHint": "Body regions, pain qualities, triggers",
+        "response": "What you tried",
+        "responseHint": "Function impact, interventions, response",
+        "notes": "Notes",
+        "notesHint": "Free text — what changed, what helped",
+        "attachments": "Attachments",
+        "attachmentsHint": "Photos, PDFs, videos"
+      }
+    },
+    "types": {
+      "baseline": "Baseline",
+      "flare": "Flare",
+      "recovery": "Recovery",
+      "procedure_related": "Procedure-related",
+      "medication_related": "Medication-related",
+      "freeform": "Freeform",
+      "vasomotor": "Vasomotor"
+    }
+  },
+  "logBook": {
+    "title": "Notes",
+    "subtitle": "Freeform episodes that don't fit a structured template.",
+    "newCta": "New log entry",
+    "list": {
+      "empty": {
+        "title": "No log entries yet",
+        "body": "Use this for arm freezes, color or temperature changes, ED visits, cognitive episodes, medication reactions, or anything that doesn't slot into the Pain Book."
+      },
+      "regionCount": "{count} region",
+      "regionCountPlural": "{count} regions",
+      "attachmentsLabel": "Has attachments"
+    },
+    "form": {
+      "newTitle": "New log entry",
+      "editTitle": "Edit log entry",
+      "savedToast": "Log saved",
+      "summarySection": "Entry",
+      "contextSection": "Context",
+      "attachmentsSection": "Attachments",
+      "title": "Title",
+      "titlePlaceholder": "e.g. Arm froze after BP cuff",
+      "titleAutoPlaceholder": "Auto-generated if blank",
+      "occurredAt": "When did this happen?",
+      "endedAt": "When did it end?",
+      "notes": "What happened?",
+      "notesPlaceholder": "Describe the episode in your own words. Times, what changed, what you did.",
+      "bodyRegions": "Body regions",
+      "symptoms": "Symptoms",
+      "triggers": "Triggers",
+      "bellaTriggers": "Bella-specific triggers",
+      "generalTriggers": "Other triggers",
+      "attachments": "Attachments",
+      "pendingUploads": "An upload is still in progress. Wait for it to finish before saving.",
+      "deleteTitle": "Remove this log entry?",
+      "noBodyRegions": "No body regions available.",
+      "noSymptoms": "No symptoms available.",
+      "noTriggers": "No triggers available.",
+      "attachmentsEditNote": "Existing attachments do not yet appear here. New uploads will attach to this entry.",
+      "disclosure": {
+        "context": "Context",
+        "contextHint": "Body regions, symptoms, triggers",
+        "notes": "What happened?",
+        "notesHint": "Free text — describe the episode",
+        "attachments": "Attachments",
+        "attachmentsHint": "Photos, PDFs, videos"
+      }
+    }
+  },
+  "upload": {
+    "dropHint": "Drag a file here, or",
+    "browse": "browse",
+    "orMobile": "Take a photo or pick a file",
+    "fileTypes": "Photos, videos, or PDFs up to 50 MB.",
+    "uploading": "Uploading {name}",
+    "uploadFailed": "Upload failed",
+    "fileTooLarge": "File is too large. Max 50 MB.",
+    "fileTypeUnsupported": "File type is not supported.",
+    "captureDescriptionLabel": "Description",
+    "captureDescriptionPlaceholder": "Optional context for this attachment.",
+    "preview": "Preview",
+    "noPreview": "No preview available."
+  },
+  "empty": {
+    "comingSoon": "Coming soon",
+    "comingSoonBody": "This view is part of a later phase. The data model is ready in the backend; the UI lands once its tickets begin."
+  },
+  "errors": {
+    "generic": "We could not complete this action. Please try again.",
+    "validation": "Please review the highlighted fields.",
+    "unauthorized": "You need to sign in to continue.",
+    "forbidden": "Your role doesn't have permission to do this.",
+    "notFound": "We couldn't find that record.",
+    "tooLarge": "The file is too large.",
+    "unsupportedMedia": "That file type isn't supported.",
+    "session": "Your session has expired. Sign in again to continue."
+  },
+  "auth": {
+    "signedOutTitle": "Sign in to continue",
+    "signedOutBody": "Bella Care Tracker is private. Use a magic link from your invited email to sign in. Single-user mode is available for local development."
+  },
+  "commandPalette": {
+    "title": "Command palette",
+    "description": "Jump to any page or quickly create an entry.",
+    "triggerLabel": "Search",
+    "openShortcutLabel": "⌘K",
+    "openSearch": "Open search",
+    "placeholder": "Search pages or actions…",
+    "inputAriaLabel": "Search pages or actions",
+    "listAriaLabel": "Command palette results",
+    "sectionPages": "Pages",
+    "sectionCreate": "Create",
+    "empty": "No matches"
+  },
+  "flareMode": {
+    "skeletonTitle": "Flare Mode",
+    "skeletonBody": "The active-flare flow lands in a later phase. For now, capture flares as a Pain Book entry with type \"Flare\"."
+  },
+  "flare": {
+    "title": "Flare Mode",
+    "subtitle": "The emergency liturgy. One tap, fixed steps, repeatable in any state.",
+    "banner": {
+      "openLabel": "Open active flare",
+      "fallbackTitle": "Active flare",
+      "startedAt": "Started",
+      "checkpointSingular": "checkpoint",
+      "checkpointPlural": "checkpoints",
+      "peakLabel": "Peak"
+    },
+    "noActive": {
+      "title": "No active flare",
+      "body": "Tap Start flare to capture pain, body regions, triggers, and symptoms now. You can add checkpoints and end the flare later.",
+      "startCta": "Start flare"
+    },
+    "errors": {
+      "noBodyRegions": "No body regions are available yet.",
+      "noTriggers": "No triggers are available yet.",
+      "noSymptoms": "No symptoms are available yet.",
+      "needsActiveFlare": "There is no active flare to update.",
+      "noWriteRole": "Your role can't capture flare events. Ask a primary or caregiver."
+    },
+    "start": {
+      "title": "Start flare",
+      "subtitle": "Two taps. Add detail later.",
+      "occurredAt": "Started at",
+      "titleField": "Title",
+      "titlePlaceholder": "Short label for this flare",
+      "painCurrent": "Pain now",
+      "painPeak": "Peak so far",
+      "bellaTriggers": "Bella-specific triggers",
+      "generalTriggers": "Other triggers",
+      "primaryTrigger": "Primary trigger",
+      "bodyRegions": "Body regions",
+      "symptoms": "Symptoms",
+      "notes": "Notes",
+      "notesPlaceholder": "What did you feel? What happened?",
+      "submit": "Start flare",
+      "submitting": "Starting…"
+    },
+    "active": {
+      "summaryTitle": "Active flare",
+      "startedAt": "Started",
+      "peak": "Peak",
+      "now": "Now",
+      "regions": "Regions",
+      "triggers": "Triggers",
+      "checkpointsTitle": "Checkpoints",
+      "noCheckpoints": "No checkpoints yet. Capture one below.",
+      "addCheckpoint": "Add checkpoint",
+      "addCheckpointSubtitle": "Quick capture of pain, body, symptoms, and notes.",
+      "endFlare": "End flare",
+      "edit": "Edit flare details",
+      "editSubtitle": "Adjust title, regions, triggers, and notes.",
+      "saveChanges": "Save changes",
+      "savingChanges": "Saving…",
+      "vasomotorSheetTitle": "New photo comparison",
+      "vasomotorSheetDescription": "Linked to this flare. Captures left/right photos, temperatures, and color.",
+      "vasomotorAdd": "Add photo comparison + temperature"
+    },
+    "checkpoint": {
+      "title": "New checkpoint",
+      "type": "Checkpoint",
+      "checkpointAt": "Time",
+      "painScore": "Pain score",
+      "notes": "Notes",
+      "notesPlaceholder": "Pain quality, what changed, what you tried.",
+      "submit": "Add checkpoint",
+      "submitting": "Adding…",
+      "linkVasomotor": "Add photo comparison + temperature",
+      "skipVasomotor": "Just notes for now",
+      "checkpointTypes": {
+        "start": "Start",
+        "30m": "30 min",
+        "60m": "60 min",
+        "120m": "2 hr",
+        "6h": "6 hr",
+        "12h": "12 hr",
+        "24h": "24 hr",
+        "48h": "48 hr",
+        "custom": "Custom"
+      }
+    },
+    "end": {
+      "title": "End flare",
+      "subtitle": "Capture recovery so the summary is honest.",
+      "endedAt": "Ended at",
+      "painCurrent": "Pain now",
+      "recoveryMinutes": "Recovery time (minutes)",
+      "recoveryMinutesPlaceholder": "e.g. 90",
+      "recoveryHelp": "How long until pain returned to baseline?",
+      "response": "What helped?",
+      "responsePlaceholder": "Interventions tried, what helped or didn't.",
+      "notes": "Closing notes",
+      "submit": "End flare",
+      "submitting": "Ending…",
+      "summaryTitle": "Flare summary",
+      "summarySaved": "Saved as a timeline event.",
+      "duration": "Duration",
+      "checkpointCount": "Checkpoints",
+      "peakPain": "Peak pain",
+      "currentPain": "Pain at end",
+      "recoveryLabel": "Recovery",
+      "openCta": "End flare"
+    },
+    "summary": {
+      "title": "Flare summary",
+      "subtitle": "What happened, in one place.",
+      "started": "Started",
+      "ended": "Ended",
+      "duration": "Duration",
+      "peak": "Peak pain",
+      "current": "Pain at end",
+      "recovery": "Recovery time",
+      "regions": "Regions",
+      "triggers": "Triggers",
+      "checkpointsTitle": "Checkpoints",
+      "responseTitle": "Response",
+      "notesTitle": "Notes",
+      "ongoing": "Ongoing"
+    }
+  },
+  "vasomotor": {
+    "title": "Photo comparison",
+    "subtitle": "Side-by-side color and temperature documentation. Pair only — no diagnostic claim.",
+    "newCta": "New comparison",
+    "list": {
+      "empty": {
+        "title": "No comparisons yet",
+        "body": "Capture left/right photos and temperatures during a flare or baseline check. The delta is computed for you."
+      },
+      "filterContext": "Context",
+      "filterAll": "All",
+      "filterSite": "Site",
+      "deltaLabel": "Δ",
+      "openComparison": "Open comparison",
+      "leftLabel": "L",
+      "rightLabel": "R",
+      "leftAlt": "Left side photo",
+      "rightAlt": "Right side photo",
+      "noPhotoLeft": "No left photo",
+      "noPhotoRight": "No right photo",
+      "linkedToFlare": "Linked to flare"
+    },
+    "form": {
+      "newTitle": "New photo comparison",
+      "editTitle": "Edit comparison",
+      "savedToast": "Comparison saved",
+      "site": "Site",
+      "sitePlaceholder": "knees, thighs, feet, wrists, hands, arms, custom…",
+      "context": "Context",
+      "measuredAt": "Measured at",
+      "leftPhoto": "Left photo",
+      "rightPhoto": "Right photo",
+      "leftTemp": "Left temperature (°C)",
+      "rightTemp": "Right temperature (°C)",
+      "leftColor": "Left color",
+      "rightColor": "Right color",
+      "colorPlaceholder": "pale, pink, dusky, mottled…",
+      "lightingNotes": "Lighting / camera notes",
+      "lightingPlaceholder": "e.g. overhead LED, indirect daylight",
+      "notes": "Notes",
+      "notesPlaceholder": "Anything else worth recording.",
+      "deltaComputed": "Computed delta (right − left)",
+      "deltaPending": "Add both temperatures to compute delta.",
+      "linkEntry": "Link to active flare",
+      "linkEntryHelp": "Attach this comparison to the current flare entry.",
+      "linkEntryNone": "Not linked",
+      "linkEntryActiveFlare": "Active flare",
+      "linkEntryNoFlare": "No active flare to link to.",
+      "delete": "Remove comparison",
+      "deleteTitle": "Remove this comparison?",
+      "submit": "Save",
+      "submitting": "Saving…",
+      "siteSuggestions": ["knees", "thighs", "feet", "wrists", "hands", "arms"],
+      "pendingUploads": "An upload is still in progress. Wait for it to finish before saving.",
+      "missingSite": "Add a site name (knees, thighs, feet, etc.).",
+      "tempStep": "0.1",
+      "leftTempPlaceholder": "e.g. 32.4",
+      "rightTempPlaceholder": "e.g. 33.1",
+      "leftColorPlaceholder": "pale, pink, dusky, mottled…",
+      "rightColorPlaceholder": "pale, pink, dusky, mottled…",
+      "missingPhotosNote": "Photos are optional, but capture both sides when you can.",
+      "photoLeftHint": "Use rear camera, even lighting, both sides framed the same.",
+      "photoRightHint": "Match the framing of the left photo. Same distance, same angle."
+    },
+    "contexts": {
+      "baseline": "Baseline",
+      "active_flare": "Active flare",
+      "recovery": "Recovery",
+      "after_pressure_trigger": "After pressure trigger",
+      "after_medication": "After medication",
+      "after_procedure": "After procedure",
+      "custom": "Custom"
+    }
+  },
+  "timeline": {
+    "title": "Timeline",
+    "subtitle": "Every meaningful event in chronological order. The spine the rest of the app hangs from.",
+    "subtitleTimeline": "The visual story: pain over time, with medications, procedures, consults, and decisions on parallel tracks.",
+    "subtitleFeed": "The chronological list: every captured event, filterable and paginated.",
+    "views": {
+      "timeline": "Timeline",
+      "feed": "Feed"
+    },
+    "viewToggleAriaLabel": "Switch view",
+    "list": {
+      "empty": {
+        "title": "Timeline is empty",
+        "body": "Capture pain entries, flares, photos, decisions, or appointments. They will land here in chronological order."
+      },
+      "loadMore": "Load more",
+      "loadingMore": "Loading…",
+      "capWarning": "Timeline source queries hit the 1000-row safety cap. Results may be incomplete."
+    },
+    "filters": {
+      "title": "Filters",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "itemType": "Type",
+      "itemTypeAll": "All types",
+      "bodyRegion": "Body region",
+      "symptom": "Symptom",
+      "trigger": "Trigger",
+      "branch": "Diagnostic branch",
+      "flareOnly": "Flares only",
+      "mediaOnly": "Has media",
+      "any": "Any",
+      "clear": "Clear filters",
+      "apply": "Apply",
+      "showFilters": "Filters",
+      "hideFilters": "Hide filters",
+      "activeCount": "{count} active"
+    },
+    "itemTypes": {
+      "injury": "Injury",
+      "procedure": "Procedure",
+      "imaging": "Imaging",
+      "test_lab": "Test / lab",
+      "consult": "Consult",
+      "medication_change": "Medication change",
+      "flare": "Flare",
+      "pain_entry": "Pain entry",
+      "log_entry": "Log entry",
+      "uploaded_media": "Media",
+      "decision": "Decision",
+      "appointment": "Appointment",
+      "diagnosis_update": "Diagnosis update",
+      "source": "Source",
+      "export_packet": "Export packet",
+      "vasomotor_measurement": "Photo comparison"
+    },
+    "evidenceCount": "{count} evidence",
+    "row": {
+      "regions": "{count} regions",
+      "regionsSingular": "{count} region",
+      "symptoms": "{count} symptoms",
+      "symptomsSingular": "{count} symptom",
+      "triggers": "{count} triggers",
+      "triggersSingular": "{count} trigger",
+      "attachmentsLabel": "Has attachments"
+    }
+  },
+  "diagnoses": {
+    "title": "Diagnostic tree",
+    "subtitle": "Status, evidence direction, and what would change each branch. The app does not diagnose.",
+    "newCta": "New branch",
+    "list": {
+      "empty": {
+        "title": "No branches yet",
+        "body": "Add a diagnostic branch to start tracking what is suspected, supported, weakened, or ruled out."
+      },
+      "rootGroup": "Branches",
+      "childGroup": "Sub-branches"
+    },
+    "filters": {
+      "status": "Status",
+      "confidence": "Confidence",
+      "all": "All"
+    },
+    "statuses": {
+      "unreviewed": "Unreviewed",
+      "suspected": "Suspected",
+      "supported": "Supported",
+      "weakened": "Weakened",
+      "ruled_out": "Ruled out",
+      "confirmed": "Confirmed",
+      "monitoring": "Monitoring"
+    },
+    "confidences": {
+      "unknown": "Unknown",
+      "low": "Low",
+      "moderate": "Moderate",
+      "high": "High"
+    },
+    "directions": {
+      "supports": "Supports",
+      "weakens": "Weakens",
+      "neutral": "Neutral",
+      "pending": "Pending"
+    },
+    "node": {
+      "summary": "Summary",
+      "whyConsidered": "Why considered",
+      "evidenceFor": "Evidence for",
+      "evidenceAgainst": "Evidence against",
+      "testsNeeded": "Tests needed",
+      "treatmentImplications": "Treatment implications",
+      "openQuestions": "Open questions",
+      "lastReviewed": "Last reviewed",
+      "evidenceList": "Linked evidence",
+      "noEvidence": "No linked evidence yet.",
+      "addEvidence": "Add evidence link",
+      "removeEvidence": "Remove",
+      "deleteTitle": "Remove this branch?",
+      "merge": "Merge",
+      "split": "Split",
+      "advancedNote": "Merge and split are part of a later phase."
+    },
+    "form": {
+      "newTitle": "New branch",
+      "editTitle": "Edit branch",
+      "title": "Branch title",
+      "parent": "Parent branch",
+      "parentNone": "(top level)",
+      "status": "Status",
+      "confidence": "Confidence",
+      "summary": "Summary",
+      "whyConsidered": "Why considered",
+      "evidenceFor": "Evidence for",
+      "evidenceAgainst": "Evidence against",
+      "testsNeeded": "Tests needed",
+      "treatmentImplications": "Treatment implications",
+      "openQuestions": "Open questions",
+      "openQuestionsPlaceholder": "Press Enter to add",
+      "lastReviewedAt": "Last reviewed",
+      "submit": "Save",
+      "submitting": "Saving…",
+      "branchSection": "Branch",
+      "narrativeSection": "Narrative",
+      "advancedSection": "Advanced"
+    },
+    "evidence": {
+      "linkedType": "Source",
+      "linkedId": "Reference",
+      "linkedIdPlaceholder": "Paste the linked record's ID (UUID).",
+      "direction": "Direction",
+      "note": "Note",
+      "notePlaceholder": "Optional. Why does this support, weaken, or stay neutral?",
+      "submit": "Add link",
+      "submitting": "Adding…",
+      "removing": "Removing…",
+      "limitationNote": "Evidence links are saved and loaded for this branch.",
+      "addedLocallyBadge": "Added in this session",
+      "linkedTypes": {
+        "entry": "Entry",
+        "event": "Event",
+        "attachment": "Attachment",
+        "source": "Source",
+        "decision": "Decision",
+        "vasomotor_measurement": "Photo comparison",
+        "medication_response": "Medication response",
+        "diagnosis": "Diagnosis"
+      }
+    }
+  },
+  "decisions": {
+    "title": "Decisions",
+    "subtitle": "Open questions, options, and what would change them. The decision-maker is the family, not the app.",
+    "newCta": "New decision",
+    "list": {
+      "empty": {
+        "title": "No open decisions",
+        "body": "Add a decision that's pending. Capture the question, options, and what would change it."
+      },
+      "emptyAll": {
+        "title": "No decisions yet",
+        "body": "Capture an open question. Track options, risks, and what would change the call."
+      },
+      "openOnly": "Open only",
+      "all": "All",
+      "ownerLabel": "Owner",
+      "targetLabel": "Target",
+      "noQuestion": "No question recorded.",
+      "groupCount": "{count} item",
+      "groupCountPlural": "{count} items",
+      "emptyGroup": "Nothing here."
+    },
+    "statuses": {
+      "open": "Open",
+      "waiting_on_test": "Waiting on test",
+      "waiting_on_clinician": "Waiting on clinician",
+      "decided": "Decided",
+      "rejected": "Rejected",
+      "revisiting": "Revisiting"
+    },
+    "groups": {
+      "active": "Active",
+      "waiting": "Waiting",
+      "resolved": "Resolved"
+    },
+    "form": {
+      "newTitle": "New decision",
+      "editTitle": "Edit decision",
+      "summarySection": "Decision",
+      "questionSection": "Question and options",
+      "evidenceSection": "Evidence and risks",
+      "ownershipSection": "Ownership",
+      "outcomeSection": "Outcome",
+      "evidenceLinksSection": "Linked evidence",
+      "evidenceLinksPlaceholder": "Evidence linking lands in a later phase.",
+      "title": "Title",
+      "titlePlaceholder": "Short label for this decision",
+      "status": "Status",
+      "question": "Question",
+      "questionPlaceholder": "What needs to be decided, in plain language?",
+      "options": "Options",
+      "optionsLabel": "Option label",
+      "optionsLabelPlaceholder": "Short option name",
+      "optionsNotes": "Notes",
+      "optionsNotesPlaceholder": "What does this option look like in practice?",
+      "addOption": "Add option",
+      "removeOption": "Remove option",
+      "noOptions": "No options yet.",
+      "evidenceFor": "Evidence for",
+      "evidenceAgainst": "Evidence against",
+      "risks": "Risks",
+      "whatWouldChange": "What would change this",
+      "owner": "Owner",
+      "ownerPlaceholder": "e.g. Bella, caregiver, Dr. ___",
+      "targetDate": "Target date",
+      "finalDecision": "Final decision",
+      "finalDecisionPlaceholder": "Filled in when the decision is made.",
+      "rationale": "Rationale",
+      "rationalePlaceholder": "Why this call, given what we know.",
+      "deleteTitle": "Remove this decision?",
+      "submit": "Save",
+      "submitting": "Saving…"
+    }
+  },
+  "schedule": {
+    "title": "Schedule",
+    "subtitle": "Appointments, visit prep, and follow-up tasks.",
+    "tabs": {
+      "appointments": "Appointments",
+      "tasks": "Tasks"
+    },
+    "appointments": {
+      "newCta": "New appointment",
+      "filters": {
+        "upcoming": "Upcoming",
+        "all": "All",
+        "completed": "Completed"
+      },
+      "empty": {
+        "upcoming": "No upcoming appointments.",
+        "all": "No appointments yet.",
+        "completed": "No completed appointments."
+      },
+      "row": {
+        "questionsCount": "{count} question",
+        "questionsCountPlural": "{count} questions",
+        "followUpsCount": "{count} follow-up",
+        "followUpsCountPlural": "{count} follow-ups",
+        "noPurpose": "No purpose recorded."
+      },
+      "form": {
+        "newTitle": "New appointment",
+        "editTitle": "Edit appointment",
+        "summarySection": "Visit",
+        "prepSection": "Visit prep",
+        "afterVisitSection": "After visit",
+        "dateTime": "When",
+        "purpose": "Purpose",
+        "purposePlaceholder": "Why this visit matters, in one line.",
+        "provider": "Provider",
+        "providerPlaceholder": "e.g. Dr. ___",
+        "specialty": "Specialty",
+        "specialtyPlaceholder": "e.g. Pain medicine, neurology",
+        "location": "Location",
+        "locationPlaceholder": "Address or clinic name",
+        "locationUrl": "Location URL",
+        "locationUrlPlaceholder": "https://…",
+        "prepNotes": "Prep notes",
+        "prepNotesPlaceholder": "Symptom timeline, recent changes, anything to bring up.",
+        "questions": "Questions to ask",
+        "questionsPlaceholder": "Press Enter to add",
+        "filesToShow": "Files / photos to show",
+        "filesToShowPlaceholder": "Press Enter to add",
+        "decisionsNeeded": "Decisions needed",
+        "decisionsNeededPlaceholder": "Press Enter to add",
+        "afterVisitSummary": "After-visit summary",
+        "afterVisitSummaryPlaceholder": "What did the clinician say? What changed?",
+        "followUpTasks": "Follow-up tasks",
+        "followUpTasksPlaceholder": "Press Enter to add",
+        "status": "Status",
+        "deleteTitle": "Remove this appointment?",
+        "submit": "Save",
+        "submitting": "Saving…"
+      },
+      "statuses": {
+        "scheduled": "Scheduled",
+        "completed": "Completed",
+        "cancelled": "Cancelled"
+      }
+    },
+    "tasks": {
+      "newCta": "New task",
+      "empty": {
+        "open": "No open tasks.",
+        "all": "No tasks yet."
+      },
+      "filters": {
+        "openOnly": "Open only",
+        "all": "All"
+      },
+      "row": {
+        "noDue": "No due date",
+        "linkedAppointment": "Linked to appointment",
+        "linkedDecision": "Linked to decision",
+        "linkedDiagnosis": "Linked to branch",
+        "linkedSource": "Linked to source"
+      },
+      "form": {
+        "newTitle": "New task",
+        "editTitle": "Edit task",
+        "summarySection": "Task",
+        "linksSection": "Linked records",
+        "title": "Title",
+        "titlePlaceholder": "Short label for this task",
+        "status": "Status",
+        "priority": "Priority",
+        "dueAt": "Due",
+        "notes": "Notes",
+        "notesPlaceholder": "Detail, blockers, what \"done\" looks like.",
+        "appointment": "Linked appointment",
+        "decision": "Linked decision",
+        "diagnosis": "Linked branch",
+        "source": "Linked source",
+        "noneOption": "(none)",
+        "deleteTitle": "Remove this task?",
+        "submit": "Save",
+        "submitting": "Saving…"
+      },
+      "statuses": {
+        "open": "Open",
+        "in_progress": "In progress",
+        "blocked": "Blocked",
+        "done": "Done",
+        "cancelled": "Cancelled"
+      },
+      "priorities": {
+        "low": "Low",
+        "normal": "Normal",
+        "high": "High",
+        "urgent": "Urgent"
+      }
+    }
+  },
+  "medications": {
+    "title": "Medications",
+    "subtitle": "Current and past medications, plus how each one actually performed.",
+    "newCta": "New medication",
+    "tabs": {
+      "current": "Current",
+      "past": "Past",
+      "responses": "Responses"
+    },
+    "list": {
+      "empty": {
+        "current": "No current medications.",
+        "past": "No past medications.",
+        "responses": "No medication responses recorded yet."
+      },
+      "noNamePlaceholder": "Untitled medication",
+      "unknownMedication": "Unlinked response",
+      "painDelta": "Pain {before} → {after}",
+      "painDeltaBefore": "Pain before {value}",
+      "painDeltaAfter": "Pain after {value}"
+    },
+    "form": {
+      "newTitle": "New medication",
+      "editTitle": "Edit medication",
+      "detailsSection": "Details",
+      "effectSection": "How it has helped",
+      "effectSectionHint": "Mark only what you can speak to. Leave the rest blank.",
+      "notesSection": "Side effects and notes",
+      "name": "Name",
+      "namePlaceholder": "e.g. Gabapentin, Lidocaine 5% patch",
+      "dose": "Dose",
+      "dosePlaceholder": "e.g. 300 mg, one patch",
+      "route": "Route",
+      "routePlaceholder": "e.g. oral, topical, IV",
+      "frequency": "Frequency",
+      "frequencyPlaceholder": "e.g. three times daily, as needed",
+      "startDate": "Start date",
+      "stopDate": "Stop date",
+      "prescriber": "Prescriber",
+      "prescriberPlaceholder": "e.g. Dr. ___",
+      "reason": "Reason",
+      "reasonPlaceholder": "What this is for.",
+      "status": "Status",
+      "helpedPain": "Helped pain",
+      "helpedSleep": "Helped sleep",
+      "helpedAnxiety": "Helped anxiety",
+      "helpedFunction": "Helped function",
+      "sideEffects": "Side effects",
+      "sideEffectsPlaceholder": "What you have noticed since starting.",
+      "notes": "Notes",
+      "notesPlaceholder": "Anything else worth recording.",
+      "deleteTitle": "Remove this medication?",
+      "submit": "Save",
+      "submitting": "Saving…"
+    },
+    "statuses": {
+      "active": "Active",
+      "paused": "Paused",
+      "stopped": "Stopped",
+      "planned": "Planned"
+    },
+    "response": {
+      "newCta": "Log response",
+      "newTitle": "New medication response",
+      "editTitle": "Edit response",
+      "contextSection": "Context",
+      "painSection": "Pain over time",
+      "effectsSection": "Sedation, cognition, gait",
+      "outcomeSection": "Outcome",
+      "medication": "Medication",
+      "medicationNone": "Not linked",
+      "medicationHelp": "Optional. Link to a tracked medication.",
+      "linkedEntry": "Linked entry",
+      "linkedEntryNone": "Not linked",
+      "linkedEntryHelp": "Optional. Attach to a recent flare.",
+      "takenAt": "Taken at",
+      "reason": "Reason",
+      "reasonPlaceholder": "Why you took it.",
+      "painBefore": "Pain before",
+      "painAfter30m": "Pain at 30 min",
+      "painAfter60m": "Pain at 60 min",
+      "painAfter120m": "Pain at 120 min",
+      "sedationEffect": "Sedation",
+      "sedationEffectPlaceholder": "Drowsy, alert, no change…",
+      "cognitionEffect": "Cognition",
+      "cognitionEffectPlaceholder": "Foggy, sharper, no change…",
+      "gaitEffect": "Gait",
+      "gaitEffectPlaceholder": "Steadier, more unsteady, no change…",
+      "sideEffects": "Side effects",
+      "sideEffectsPlaceholder": "What you noticed.",
+      "helped": "Helped overall",
+      "helpedNone": "Not yet decided",
+      "notes": "Notes",
+      "notesPlaceholder": "Anything else worth recording.",
+      "deleteTitle": "Remove this response?",
+      "submit": "Save",
+      "submitting": "Saving…",
+      "helpedValues": {
+        "helped": "Helped",
+        "unclear": "Unclear",
+        "worsened": "Worsened"
+      }
+    }
+  },
+  "procedures": {
+    "title": "Procedures & tests",
+    "subtitle": "Capture the diagnostic question and what changed at baseline, immediate, 24h, 72h, 1 week, and 1 month.",
+    "newCta": "New procedure / test",
+    "list": {
+      "empty": {
+        "title": "Nothing recorded yet",
+        "body": "Add a procedure or test event to track its impact over time."
+      },
+      "filterAll": "All types",
+      "filtersLabel": "Type",
+      "noProvider": "No provider recorded",
+      "answeredLabel": "Answered"
+    },
+    "types": {
+      "procedure": "Procedure",
+      "imaging": "Imaging",
+      "test_lab": "Test / lab",
+      "consult": "Consult",
+      "procedure_test": "Procedure / test"
+    },
+    "answeredQuestion": {
+      "yes": "Yes",
+      "no": "No",
+      "partially": "Partially",
+      "unclear": "Unclear",
+      "none": "Not yet decided"
+    },
+    "form": {
+      "newTitle": "New procedure / test",
+      "editTitle": "Edit procedure / test",
+      "identitySection": "Identity",
+      "diagnosticSection": "Diagnostic question",
+      "diagnosticSectionHint": "Why was this done? What were we trying to learn?",
+      "impactSection": "Impact timeline",
+      "impactSectionHint": "What changed at each window. Leave blanks for what is not yet known.",
+      "aftermathSection": "Aftermath",
+      "type": "Type",
+      "occurredAt": "When",
+      "endedAt": "Ended at",
+      "title": "Title",
+      "titlePlaceholder": "Short label for this event",
+      "summary": "Summary",
+      "summaryPlaceholder": "One- or two-line description.",
+      "provider": "Provider",
+      "providerPlaceholder": "e.g. Dr. ___",
+      "location": "Location",
+      "locationPlaceholder": "Clinic, hospital, room.",
+      "source": "Linked source",
+      "sourceNone": "Not linked",
+      "sourceHelp": "Optional. Link to a visit note, imaging, or lab record.",
+      "diagnosticQuestion": "Diagnostic question",
+      "diagnosticQuestionPlaceholder": "What were we trying to learn? What outcome would falsify it?",
+      "baselineBefore": "Baseline before",
+      "baselineBeforePlaceholder": "Pain, function, and symptoms in the days before.",
+      "immediateEffect": "Immediate effect",
+      "immediateEffectPlaceholder": "What changed during or right after.",
+      "effect24h": "After 24 hours",
+      "effect24hPlaceholder": "What changed by the next day.",
+      "effect72h": "After 72 hours",
+      "effect72hPlaceholder": "What changed three days out.",
+      "effect1w": "After 1 week",
+      "effect1wPlaceholder": "What changed at one week.",
+      "effect1m": "After 1 month",
+      "effect1mPlaceholder": "What changed at one month.",
+      "newSymptoms": "New symptoms",
+      "newSymptomsPlaceholder": "Anything new since this event.",
+      "answeredQuestion": "Did it answer the question?",
+      "repeatRecommendation": "Repeat recommendation",
+      "repeatRecommendationPlaceholder": "Should this be repeated, modified, or skipped next time?",
+      "deleteTitle": "Remove this entry?",
+      "submit": "Save",
+      "submitting": "Saving…"
+    }
+  },
+  "sources": {
+    "title": "Source library",
+    "subtitle": "Visit notes, imaging, labs, generated reports, and literature. Linkable to events, branches, and decisions.",
+    "newCta": "New source",
+    "list": {
+      "empty": {
+        "title": "No sources yet",
+        "body": "Add visit notes, imaging reports, lab reports, generated summaries, or literature."
+      }
+    },
+    "filters": {
+      "type": "Type",
+      "typeAny": "Any type",
+      "tag": "Tag",
+      "tagPlaceholder": "Filter by tag",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "all": "All",
+      "apply": "Apply",
+      "clear": "Clear filters",
+      "activeCount": "{count} active"
+    },
+    "types": {
+      "visit_note": "Visit note",
+      "imaging_report": "Imaging",
+      "lab_report": "Lab",
+      "generated_report": "Generated report",
+      "literature": "Literature",
+      "upload": "Upload",
+      "other": "Other"
+    },
+    "form": {
+      "newTitle": "New source",
+      "editTitle": "Edit source",
+      "title": "Title",
+      "titlePlaceholder": "Short label for this source",
+      "sourceType": "Type",
+      "sourceDate": "Date",
+      "provider": "Provider",
+      "providerPlaceholder": "e.g. Dr. ___, Quest Labs",
+      "citation": "Citation / file path",
+      "citationPlaceholder": "Reference, page numbers, file path.",
+      "summary": "Summary",
+      "summaryPlaceholder": "What this source says, in your words.",
+      "tags": "Tags",
+      "tagsPlaceholder": "Press Enter to add",
+      "url": "URL",
+      "urlPlaceholder": "https://…",
+      "attachments": "Attached files",
+      "attachmentsNewNote": "Save the source first to attach files.",
+      "links": "Links",
+      "savedToast": "Source saved",
+      "deleteTitle": "Remove this source?",
+      "submit": "Save",
+      "submitting": "Saving…"
+    },
+    "links": {
+      "linkToEvent": "Link to event",
+      "linkToDiagnosis": "Link to branch",
+      "linkToDecision": "Link to decision",
+      "linkAdded": "Link saved.",
+      "linkDirection": "Direction",
+      "note": "Note",
+      "notePlaceholder": "Optional note describing the link.",
+      "eventId": "Event UUID",
+      "eventIdPlaceholder": "Paste a procedure / event UUID",
+      "selectEvent": "Select event",
+      "selectDiagnosis": "Select branch",
+      "selectDecision": "Select decision",
+      "submitLink": "Save link",
+      "submittingLink": "Saving…",
+      "noBranches": "No diagnostic branches yet.",
+      "noDecisions": "No decisions yet.",
+      "noLinks": "No linked records yet.",
+      "limitationNote": "Source links are saved and loaded for this source."
+    }
+  },
+  "exportsNs": {
+    "title": "Export packet",
+    "subtitle": "Generate a clinician-ready markdown packet, or a manifest of every record this family owns.",
+    "tabs": {
+      "clinician": "Clinician packet",
+      "bulk": "Bulk export"
+    },
+    "clinician": {
+      "intro": "Filter the data, preview the markdown, then download.",
+      "dateFrom": "From",
+      "dateTo": "To",
+      "branch": "Diagnostic branch",
+      "branchAny": "Any branch",
+      "bodyRegion": "Body region",
+      "bodyRegionAny": "Any region",
+      "flaresOnly": "Flares only",
+      "includePhotos": "Include photo references",
+      "includeProcedureSummaries": "Include procedure summaries",
+      "clinicianQuestions": "Questions for the clinician",
+      "clinicianQuestionsPlaceholder": "Press Enter to add",
+      "generate": "Generate packet",
+      "generating": "Generating…",
+      "preview": "Preview",
+      "download": "Download markdown",
+      "noPreview": "Generate a packet to preview the markdown.",
+      "fileName": "bella-clinician-packet.md",
+      "savedToast": "Packet ready to download.",
+      "attachmentsLabel": "Included attachments",
+      "filtersLabel": "Filters used",
+      "filtersDateRange": "Date range",
+      "filtersBranch": "Branch",
+      "filtersRegion": "Region",
+      "filtersFlares": "Flares only",
+      "filtersPhotos": "Photos",
+      "filtersProcedures": "Procedure summaries",
+      "filtersDeleted": "Soft-deleted included",
+      "filtersQuestions": "Questions",
+      "anyValue": "Any",
+      "yes": "Yes",
+      "no": "No"
+    },
+    "bulk": {
+      "intro": "Manifest-first archive. Zip assembly is deferred — see the limitations note returned by the backend.",
+      "format": "Format",
+      "formatJson": "JSON",
+      "formatCsv": "CSV",
+      "includeFiles": "Include uploaded file manifest",
+      "includePackets": "Include generated packets",
+      "includeDeleted": "Include soft-deleted records",
+      "includeDeletedRoleNote": "Available to primary or caregiver roles only.",
+      "generate": "Generate archive",
+      "generating": "Generating…",
+      "summary": "Archive summary",
+      "tablesLabel": "Tables",
+      "filesLabel": "Files",
+      "packetsLabel": "Packets",
+      "limitations": "Limitations",
+      "restoreNotes": "Restore notes",
+      "downloadJson": "Download JSON manifest",
+      "fileName": "bella-bulk-export.json",
+      "noLimitations": "No limitations reported.",
+      "noRestoreNotes": "No restore notes provided."
+    }
+  },
+  "dashboard": {
+    "title": "Dashboard",
+    "subtitle": "What needs attention now.",
+    "placeholderBody": "The dashboard composition lands once timeline, vasomotor, and decision data are wired. Use the navigation to capture entries in the meantime.",
+    "sections": {
+      "activeFlare": "Active flare",
+      "today": "Today",
+      "todayAppointments": "Appointments",
+      "todayTasks": "Tasks",
+      "upcoming": "Upcoming appointments",
+      "openDecisions": "Open decisions",
+      "recentFlares": "Recent flares",
+      "recentComparisons": "Recent photo comparisons",
+      "currentMeds": "Current medications",
+      "tasksDue": "Tasks due",
+      "painOverTime": "Pain over time",
+      "trends": "Trends"
+    },
+    "noActiveFlare": "No active flare. Capture starts here when one begins.",
+    "openActiveFlare": "Open active flare",
+    "viewAll": "View all",
+    "overdue": "Overdue",
+    "overduePrefix": "Overdue · ",
+    "trendsToggle": {
+      "show": "Show trends",
+      "hide": "Hide trends"
+    },
+    "painSeries": {
+      "peak": "Peak",
+      "current": "Current"
+    },
+    "metricsRange": {
+      "label": "Range",
+      "last7": "Last 7 days",
+      "last30": "Last 30 days",
+      "last90": "Last 90 days"
+    },
+    "counts": {
+      "appointments": "{count} upcoming",
+      "decisions": "{count} open",
+      "tasks": "{count} open"
+    },
+    "tasks": {
+      "noDue": "No due date",
+      "due": "Due {when}"
+    },
+    "empty": {
+      "appointments": "No upcoming appointments.",
+      "decisions": "No open decisions.",
+      "flares": "No flares in this range.",
+      "comparisons": "No photo comparisons yet.",
+      "medications": "No active medications.",
+      "tasks": "No tasks due.",
+      "today": "Nothing scheduled or due right now.",
+      "painOverTime": "Trends are populated as entries are logged.",
+      "trends": "Not enough data yet for trends."
+    }
+  },
+  "charts": {
+    "flaresPerWeek": "Flares per week",
+    "recoveryTime": "Recovery time",
+    "triggerFrequency": "Trigger frequency",
+    "painByRegion": "Pain by body region",
+    "vasomotorDeltas": "Photo-comparison deltas",
+    "medicationResponse": "Medication response",
+    "axes": {
+      "week": "Week",
+      "count": "Count",
+      "minutes": "Minutes",
+      "delta": "Δ °C",
+      "pain": "Pain (peak)"
+    },
+    "empty": "Not enough data yet.",
+    "summary": {
+      "averageRecovery": "Average recovery",
+      "medianRecovery": "Median recovery",
+      "flareCount": "Flares",
+      "noData": "—"
+    },
+    "legend": {
+      "helped": "Helped",
+      "unclear": "Unclear",
+      "worsened": "Worsened"
+    },
+    "unknownMedication": "Unlinked",
+    "unknownTrigger": "Unknown trigger",
+    "unknownRegion": "Unknown region"
+  },
+  "timelineSeries": {
+    "title": "Multi-track timeline",
+    "subtitle": "Pain over time as the spine. Medications, procedures, consults, diagnostic milestones, and decisions on parallel tracks.",
+    "interpretationCaveat": "This view shows what was captured. It does not infer cause from co-occurrence.",
+    "loading": "Loading timeline…",
+    "empty": {
+      "title": "Not enough data yet",
+      "body": "Capture a few pain entries, medications, or events. They will land on this timeline."
+    },
+    "zoom": {
+      "groupLabel": "Zoom presets",
+      "all": "All",
+      "fiveYears": "5y",
+      "oneYear": "1y",
+      "sixMonths": "6mo",
+      "threeMonths": "3mo"
+    },
+    "tracks": {
+      "showLabel": "Show",
+      "pain": "Pain",
+      "medications": "Medications",
+      "procedures": "Procedures",
+      "consults": "Consults",
+      "diagnosticMilestones": "Diagnostic milestones",
+      "decisions": "Decisions",
+      "flareBands": "Flare bands",
+      "allHidden": "All event tracks are hidden. Re-enable some in the Show menu.",
+      "svgLabel": "Event tracks aligned to the pain track timeline."
+    },
+    "pain": {
+      "current": "Current",
+      "peak": "Peak",
+      "average": "Average",
+      "empty": "No pain entries in this window."
+    },
+    "sidePanel": {
+      "title": "Day detail",
+      "hint": "Click a marker or bar to see what happened on that day.",
+      "empty": "Pick a day",
+      "noEvents": "No events on this day.",
+      "close": "Close day detail",
+      "painSummary": "Pain values",
+      "flareBadge": "Flare started",
+      "flareKind": "Flare",
+      "medStarted": "Medication started",
+      "medEnded": "Medication ended",
+      "decisionTarget": "Decision target",
+      "decisionDecided": "Decision recorded"
+    }
+  },
+  "agent": {
+    "navLabel": "Agent Mode",
+    "title": "Agent Mode",
+    "subtitle": "A scoped copilot. It can read your family record and propose drafts for your review. It cannot finalize medical records.",
+    "boundary": "Agent drafts require human approval before becoming records.",
+    "boundaryShort": "Drafts await your review.",
+    "threads": {
+      "title": "Threads",
+      "newButton": "New thread",
+      "newButtonShort": "New",
+      "creating": "Starting…",
+      "untitled": "Untitled thread",
+      "empty": {
+        "title": "No threads yet",
+        "body": "Start a thread to ask the agent about your records or to draft new entries for review."
+      },
+      "loading": "Loading threads…",
+      "errorTitle": "Couldn't load threads",
+      "activeBadge": "Active",
+      "archivedBadge": "Archived",
+      "failedBadge": "Failed",
+      "openMenu": "Open thread list",
+      "archive": "Archive thread",
+      "archiveConfirmTitle": "Archive this thread?",
+      "archiveConfirmBody": "Archived threads stay readable but are hidden from the main list. You can switch the filter to see them later.",
+      "archiveAction": "Archive",
+      "archiving": "Archiving…",
+      "filterActive": "Active",
+      "filterArchived": "Archived",
+      "filterAll": "All",
+      "messageCount": "{count} messages",
+      "messageCountSingular": "{count} message",
+      "lastActivity": "Last activity"
+    },
+    "newThread": {
+      "title": "Start a new agent thread",
+      "titleLabel": "Title",
+      "titlePlaceholder": "Optional. e.g. \"Review last flare for visit packet\".",
+      "create": "Start thread",
+      "creating": "Starting…",
+      "cancel": "Cancel"
+    },
+    "chat": {
+      "emptyThreadTitle": "What would you like the agent to do?",
+      "emptyThreadBody": "Try: \"Summarize the last two flares,\" or \"Draft a procedure event for the May 6 hydrodissection.\" The agent uses read-only tools and can propose drafts only.",
+      "noThreadTitle": "Pick a thread",
+      "noThreadBody": "Choose an existing thread on the left, or start a new one.",
+      "loadingMessages": "Loading messages…",
+      "loadError": "Couldn't load this thread.",
+      "userYou": "You",
+      "agentName": "Agent",
+      "toolNote": "tool call",
+      "thinking": "Thinking…",
+      "running": "Working on a response. This can take a few seconds while the agent reads records and drafts.",
+      "boundary": "The agent may search records, summarize them, and propose drafts. It cannot create or modify real records.",
+      "failedAssistant": "The assistant turn failed.",
+      "tryAgain": "Try again",
+      "composerPlaceholder": "Ask the agent. Press ⌘+Enter or Ctrl+Enter to send.",
+      "send": "Send",
+      "sending": "Sending…",
+      "sendError": "Couldn't send that message.",
+      "messagesHidden": "Some system messages are hidden from this view."
+    },
+    "rail": {
+      "tabs": {
+        "drafts": "Drafts",
+        "audit": "Audit",
+        "context": "Context"
+      },
+      "openInReview": "Open in review",
+      "openAllInReview": "Open all in review"
+    },
+    "drafts": {
+      "panelTitle": "Proposed drafts",
+      "panelHint": "Drafts the agent has proposed in this thread. None of them are saved to your record yet.",
+      "empty": "No drafts proposed in this thread yet.",
+      "loadError": "Couldn't load drafts.",
+      "needsReview": "Needs human review",
+      "proposed": "Proposed draft",
+      "committedBadge": "Committed",
+      "rejectedBadge": "Rejected",
+      "failedBadge": "Failed",
+      "confidenceLabel": "Confidence",
+      "warningsLabel": "Warnings",
+      "missingLabel": "Missing fields",
+      "validationLabel": "Validation issues",
+      "evidenceLabel": "Evidence",
+      "payloadLabel": "Proposed payload",
+      "showPayload": "Show payload",
+      "hidePayload": "Hide payload",
+      "deepLink": "Review and decide",
+      "untitled": "Untitled draft"
+    },
+    "tools": {
+      "panelTitle": "Tool call audit",
+      "panelHint": "Every tool call the agent makes is recorded here. Backend-side, never client-side.",
+      "empty": "No tool calls recorded in this thread yet.",
+      "loadError": "Couldn't load the audit log.",
+      "showIO": "Show input/output",
+      "hideIO": "Hide input/output",
+      "inputLabel": "Input",
+      "outputLabel": "Output",
+      "errorLabel": "Error",
+      "noOutput": "No output recorded.",
+      "noInput": "No input recorded.",
+      "statuses": {
+        "pending": "Pending",
+        "running": "Running",
+        "succeeded": "Succeeded",
+        "failed": "Failed",
+        "cancelled": "Cancelled"
+      }
+    },
+    "targetTypes": {
+      "entry": "Pain / log entry",
+      "procedure_event": "Procedure / test event",
+      "source": "Source",
+      "medication": "Medication",
+      "medication_response": "Medication response",
+      "appointment": "Appointment",
+      "task": "Task",
+      "decision": "Decision"
+    }
+  },
+  "importNs": {
+    "navLabel": "Import Review",
+    "title": "Import Review",
+    "subtitle": "Approve, reject, or revise AI-proposed drafts. Drafts only become records after you commit them here.",
+    "boundary": "Committing turns a proposed draft into a real medical record. This is the only place that happens.",
+    "deepLinkBackToAgent": "Back to Agent",
+    "sessions": {
+      "title": "Import sessions",
+      "loadError": "Couldn't load import sessions.",
+      "empty": {
+        "title": "No drafts to review",
+        "body": "Agent and import drafts land here for your approval before they become records."
+      },
+      "filters": {
+        "all": "All",
+        "ready": "Ready for review",
+        "drafting": "Drafting",
+        "committed": "Committed",
+        "rejected": "Rejected",
+        "failed": "Failed"
+      },
+      "statuses": {
+        "drafting": "Drafting",
+        "ready_for_review": "Ready for review",
+        "committed": "Committed",
+        "failed": "Failed",
+        "rejected": "Rejected"
+      },
+      "untitled": "Untitled import"
+    },
+    "drafts": {
+      "loadError": "Couldn't load drafts.",
+      "empty": "No drafts in this session.",
+      "panelTitle": "Drafts",
+      "confidenceLabel": "Confidence",
+      "warningsLabel": "Warnings",
+      "missingLabel": "Missing fields",
+      "validationLabel": "Validation issues",
+      "evidenceLabel": "Evidence",
+      "payloadLabel": "Proposed payload",
+      "showPayload": "Show payload",
+      "hidePayload": "Hide payload",
+      "statuses": {
+        "proposed": "Proposed",
+        "committed": "Committed",
+        "rejected": "Rejected",
+        "failed": "Failed"
+      },
+      "committedNote": "Committed on {date}.",
+      "rejectedNote": "Rejected. Reason: {reason}",
+      "failedNote": "Commit failed."
+    },
+    "actions": {
+      "commit": "Commit draft",
+      "committing": "Committing…",
+      "reject": "Reject",
+      "rejecting": "Rejecting…",
+      "edit": "Edit payload",
+      "saveEdit": "Save changes",
+      "savingEdit": "Saving…",
+      "cancelEdit": "Cancel"
+    },
+    "commit": {
+      "title": "Commit this draft as a record?",
+      "body": "This will create a real {target} in your family record. Soft-delete is still available, but creation is final.",
+      "confirm": "Yes, commit",
+      "cancel": "Cancel"
+    },
+    "reject": {
+      "title": "Reject this draft?",
+      "reasonLabel": "Reason",
+      "reasonPlaceholder": "Why is this draft being rejected? (required)",
+      "confirm": "Reject draft",
+      "cancel": "Cancel"
+    },
+    "edit": {
+      "title": "Edit proposed payload",
+      "hint": "Edit the JSON below. The draft is re-validated when you save.",
+      "jsonInvalid": "Payload is not valid JSON.",
+      "jsonOk": "Payload is valid JSON."
+    },
+    "readOnly": "Your role can review drafts but not commit them.",
+    "evidenceSpansSingular": "1 evidence span",
+    "evidenceSpansPlural": "{count} evidence spans",
+    "warningCountSingular": "1 warning",
+    "warningCountPlural": "{count} warnings",
+    "missingCountSingular": "1 missing field",
+    "missingCountPlural": "{count} missing fields",
+    "targetTypes": {
+      "entry": "Pain / log entry",
+      "procedure_event": "Procedure / test event",
+      "source": "Source",
+      "medication": "Medication",
+      "medication_response": "Medication response",
+      "appointment": "Appointment",
+      "task": "Task",
+      "decision": "Decision"
+    },
+    "confidences": {
+      "high": "High confidence",
+      "medium": "Medium",
+      "low": "Low"
+    }
+  }
+}

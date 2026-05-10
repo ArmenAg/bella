@@ -1,0 +1,554 @@
+import OpenAI from "openai";
+import type { SupabaseClient } from "@supabase/supabase-js";
+import {
+  agentSearchRecordTypeSchema,
+  aiImportConfidenceSchema,
+  aiImportTargetTypeSchema,
+  decisionStatusSchema,
+  entryTypeSchema,
+  medicationStatusSchema,
+  procedureEventTypeSchema,
+  sourceTypeSchema,
+  timelineItemTypeSchema,
+  type AgentCaseSnapshot,
+  type AgentMessage,
+  type AgentThread,
+} from "@/server/contracts";
+import {
+  agentToolMetadata,
+  executeAgentTool,
+  type AgentToolContext,
+} from "./agent-tools";
+
+export const AGENT_SYSTEM_PROMPT_VERSION = "ai-agent-v1";
+const DEFAULT_AGENT_MODEL = "gpt-5.4-mini";
+const MAX_TOOL_TURNS = 6;
+const MAX_TOOL_OUTPUT_CHARS = 40000;
+
+type AgentResponseOutputItem = {
+  type?: string;
+  name?: string;
+  call_id?: string;
+  arguments?: string;
+  parsed_arguments?: unknown;
+  content?: unknown;
+};
+
+type JsonSchema = Record<string, unknown>;
+
+export type AgentModelResponse = {
+  id?: string;
+  output?: AgentResponseOutputItem[];
+  output_text?: string;
+  usage?: {
+    input_tokens?: number;
+    output_tokens?: number;
+  };
+};
+
+export type AgentResponsesClient = {
+  parse: (params: Record<string, unknown>) => Promise<AgentModelResponse>;
+};
+
+export type AgentRunnerToolCall = {
+  name: string;
+  call_id: string | null;
+  input: unknown;
+  output: unknown | null;
+  status: "succeeded" | "failed";
+  error_message: string | null;
+};
+
+export type AgentRunnerResult = {
+  content: string;
+  response_id: string | null;
+  token_input: number | null;
+  token_output: number | null;
+  tool_calls: AgentRunnerToolCall[];
+};
+
+type ToolCallStartEvent = {
+  tool_name: string;
+  tool_call_id: string | null;
+  input: unknown;
+};
+
+type ToolCallEndEvent = ToolCallStartEvent & {
+  status: "succeeded" | "failed";
+  output: unknown | null;
+  error_message: string | null;
+};
+
+export type AgentRunnerHooks = {
+  onToolCallStart?: (
+    event: ToolCallStartEvent,
+  ) => Promise<{ id: string } | void>;
+  onToolCallEnd?: (
+    started: { id: string } | void,
+    event: ToolCallEndEvent,
+  ) => Promise<void>;
+};
+
+export type AgentRunnerInput = {
+  thread: AgentThread;
+  messages: AgentMessage[];
+  caseSnapshot: AgentCaseSnapshot;
+  model?: string;
+  supabase?: SupabaseClient;
+  client?: AgentResponsesClient;
+  executeTool?: (toolName: string, input: unknown) => Promise<unknown>;
+  hooks?: AgentRunnerHooks;
+  maxToolTurns?: number;
+};
+
+function modelFromEnv() {
+  return (
+    process.env.AI_AGENT_MODEL ||
+    process.env.AI_IMPORT_MODEL ||
+    process.env.OPENAI_MODEL ||
+    DEFAULT_AGENT_MODEL
+  );
+}
+
+export function resolveAgentModel(model?: string) {
+  return model?.trim() || modelFromEnv();
+}
+
+export function createOpenAIResponsesClient(): AgentResponsesClient {
+  if (!process.env.OPENAI_API_KEY) {
+    throw new Error("OPENAI_API_KEY is required for the AI agent runtime");
+  }
+
+  const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+
+  return {
+    parse: (params) =>
+      openai.responses.parse(
+        params as Parameters<typeof openai.responses.parse>[0],
+      ) as Promise<AgentModelResponse>,
+  };
+}
+
+const stringSchema: JsonSchema = { type: "string" };
+const booleanSchema: JsonSchema = { type: "boolean" };
+const integerSchema = (minimum = 1, maximum = 25): JsonSchema => ({
+  type: "integer",
+  minimum,
+  maximum,
+});
+const uuidSchema: JsonSchema = {
+  type: "string",
+  format: "uuid",
+};
+const jsonObjectSchema: JsonSchema = {
+  type: "object",
+  additionalProperties: true,
+};
+const stringArraySchema: JsonSchema = {
+  type: "array",
+  items: stringSchema,
+};
+const evidenceSpanArraySchema: JsonSchema = {
+  type: "array",
+  items: {
+    type: "object",
+    additionalProperties: false,
+    properties: {
+      field: stringSchema,
+      quote: stringSchema,
+    },
+    required: ["field", "quote"],
+  },
+};
+
+function enumSchema(values: readonly string[]): JsonSchema {
+  return {
+    type: "string",
+    enum: values,
+  };
+}
+
+function objectSchema(
+  properties: Record<string, JsonSchema>,
+  required: string[] = [],
+): JsonSchema {
+  return {
+    type: "object",
+    additionalProperties: false,
+    properties,
+    required,
+  };
+}
+
+function withPagination(properties: Record<string, JsonSchema> = {}) {
+  return {
+    cursor: stringSchema,
+    page_size: integerSchema(),
+    ...properties,
+  };
+}
+
+const agentToolParameterSchemas: Record<string, JsonSchema> = {
+  get_case_snapshot: objectSchema({}),
+  search_records: objectSchema(
+    {
+      query: stringSchema,
+      types: {
+        type: "array",
+        items: enumSchema(agentSearchRecordTypeSchema.options),
+      },
+      date_from: stringSchema,
+      date_to: stringSchema,
+      page_size: integerSchema(),
+    },
+    ["query"],
+  ),
+  search_timeline: objectSchema(
+    {
+      query: stringSchema,
+      page_size: integerSchema(),
+      date_from: stringSchema,
+      date_to: stringSchema,
+      item_type: enumSchema(timelineItemTypeSchema.options),
+    },
+    ["query"],
+  ),
+  list_entries: objectSchema(
+    withPagination({
+      date_from: stringSchema,
+      date_to: stringSchema,
+      type: enumSchema(entryTypeSchema.options),
+      flare_only: booleanSchema,
+      body_region_id: uuidSchema,
+      symptom_id: uuidSchema,
+      trigger_id: uuidSchema,
+    }),
+  ),
+  get_entry: objectSchema({ id: uuidSchema }, ["id"]),
+  list_sources: objectSchema(
+    withPagination({
+      source_type: enumSchema(sourceTypeSchema.options),
+      tag: stringSchema,
+      date_from: stringSchema,
+      date_to: stringSchema,
+    }),
+  ),
+  get_source: objectSchema({ id: uuidSchema }, ["id"]),
+  list_source_links: objectSchema({ source_id: uuidSchema }, ["source_id"]),
+  list_procedure_events: objectSchema(
+    withPagination({
+      date_from: stringSchema,
+      date_to: stringSchema,
+      type: enumSchema(procedureEventTypeSchema.options),
+      source_id: uuidSchema,
+    }),
+  ),
+  get_procedure_event: objectSchema({ id: uuidSchema }, ["id"]),
+  list_medications: objectSchema(
+    withPagination({
+      status: enumSchema(medicationStatusSchema.options),
+    }),
+  ),
+  get_medication: objectSchema({ id: uuidSchema }, ["id"]),
+  list_medication_responses: objectSchema(
+    withPagination({
+      medication_id: uuidSchema,
+      entry_id: uuidSchema,
+      date_from: stringSchema,
+      date_to: stringSchema,
+    }),
+  ),
+  get_medication_response: objectSchema({ id: uuidSchema }, ["id"]),
+  list_decisions: objectSchema(
+    withPagination({
+      status: enumSchema(decisionStatusSchema.options),
+      open_only: booleanSchema,
+      target_date_from: stringSchema,
+      target_date_to: stringSchema,
+    }),
+  ),
+  get_decision: objectSchema({ id: uuidSchema }, ["id"]),
+  create_draft: objectSchema(
+    {
+      target_type: enumSchema(aiImportTargetTypeSchema.options),
+      proposed_payload: jsonObjectSchema,
+      confidence: enumSchema(aiImportConfidenceSchema.options),
+      missing_fields: stringArraySchema,
+      evidence_spans: evidenceSpanArraySchema,
+      warnings: stringArraySchema,
+    },
+    ["target_type", "proposed_payload"],
+  ),
+  update_draft: objectSchema(
+    {
+      id: uuidSchema,
+      target_type: enumSchema(aiImportTargetTypeSchema.options),
+      proposed_payload: jsonObjectSchema,
+      confidence: enumSchema(aiImportConfidenceSchema.options),
+      missing_fields: stringArraySchema,
+      evidence_spans: evidenceSpanArraySchema,
+      warnings: stringArraySchema,
+    },
+    ["id"],
+  ),
+  reject_draft: objectSchema(
+    {
+      id: uuidSchema,
+      reason: stringSchema,
+    },
+    ["id", "reason"],
+  ),
+};
+
+export function buildAgentResponseTools() {
+  return agentToolMetadata.map((tool) => ({
+    type: "function",
+    name: tool.name,
+    description: tool.description,
+    parameters: agentToolParameterSchemas[tool.name] ?? objectSchema({}),
+    strict: false,
+  }));
+}
+
+function truncateJsonForPrompt(value: unknown, maxChars: number) {
+  const json = JSON.stringify(value, null, 2);
+  if (json.length <= maxChars) {
+    return json;
+  }
+
+  return `${json.slice(0, maxChars)}\n...<truncated>`;
+}
+
+export function buildAgentSystemPrompt(caseSnapshot: AgentCaseSnapshot) {
+  return [
+    "You are the Bella Care Tracker AI agent for a private family medical record app.",
+    "Your job is to help the family find records, reason from linked evidence, maintain timelines, and prepare reviewable import drafts.",
+    "",
+    "Hard rules:",
+    "- You may read family-scoped records only through the provided tools.",
+    "- You may create, update, or reject AI import drafts only through the draft tools.",
+    "- You must never state or imply that a real medical record has been created, updated, deleted, diagnosed, or committed.",
+    "- A human approval flow is the only path from draft to real record creation.",
+    "- Do not ask the user to trust unstated assumptions. Say what evidence you used and what is missing.",
+    "- Do not provide emergency, diagnosis, or treatment instructions as medical authority. For urgent or clinical decisions, recommend clinician review.",
+    "- Prefer calibrated language: established, documented, likely, uncertain, missing, contradicted.",
+    "",
+    "When adding data:",
+    "- Use draft tools. Put uncertain required fields in missing_fields and evidence snippets in evidence_spans.",
+    "- If the user gives unstructured text, create draft records that are specific and reviewable.",
+    "- Never invent dates, providers, body-region IDs, symptom IDs, trigger IDs, or record IDs.",
+    "",
+    "Current bounded case snapshot:",
+    truncateJsonForPrompt(caseSnapshot, 12000),
+  ].join("\n");
+}
+
+function messagesForResponsesApi(messages: AgentMessage[]) {
+  return messages
+    .filter(
+      (message) =>
+        message.status === "complete" &&
+        (message.role === "user" || message.role === "assistant") &&
+        message.content.trim(),
+    )
+    .slice(-30)
+    .map((message) => ({
+      role: message.role,
+      content: message.content,
+    }));
+}
+
+function parseArguments(item: AgentResponseOutputItem) {
+  if (item.parsed_arguments !== undefined) {
+    return item.parsed_arguments;
+  }
+
+  if (!item.arguments) {
+    return {};
+  }
+
+  return JSON.parse(item.arguments) as unknown;
+}
+
+function functionCalls(response: AgentModelResponse) {
+  return (response.output ?? []).filter(
+    (item) => item.type === "function_call" && item.name,
+  );
+}
+
+function extractTextFromContent(content: unknown): string[] {
+  if (!Array.isArray(content)) {
+    return [];
+  }
+
+  return content.flatMap((item) => {
+    if (
+      item &&
+      typeof item === "object" &&
+      "text" in item &&
+      typeof item.text === "string"
+    ) {
+      return [item.text];
+    }
+
+    return [];
+  });
+}
+
+function assistantText(response: AgentModelResponse) {
+  if (typeof response.output_text === "string" && response.output_text.trim()) {
+    return response.output_text.trim();
+  }
+
+  const parts = (response.output ?? []).flatMap((item) =>
+    extractTextFromContent(item.content),
+  );
+  const text = parts.join("\n").trim();
+
+  return text || "I could not produce a response for this turn.";
+}
+
+function safeToolOutput(value: unknown) {
+  const json = JSON.stringify(value);
+  if (json.length <= MAX_TOOL_OUTPUT_CHARS) {
+    return value;
+  }
+
+  return {
+    truncated: true,
+    original_length: json.length,
+    json_prefix: json.slice(0, MAX_TOOL_OUTPUT_CHARS),
+  };
+}
+
+async function defaultExecuteTool(input: AgentRunnerInput) {
+  if (!input.supabase) {
+    throw new Error(
+      "Agent runner requires Supabase when no tool executor is injected",
+    );
+  }
+
+  const context: AgentToolContext = {
+    supabase: input.supabase,
+    thread: input.thread,
+  };
+
+  return (toolName: string, toolInput: unknown) =>
+    executeAgentTool(toolName, toolInput, context);
+}
+
+export async function runAgentTurnWithResponsesApi(
+  input: AgentRunnerInput,
+): Promise<AgentRunnerResult> {
+  const model = resolveAgentModel(input.model);
+  const client = input.client ?? createOpenAIResponsesClient();
+  const executeTool = input.executeTool ?? (await defaultExecuteTool(input));
+  const maxToolTurns = input.maxToolTurns ?? MAX_TOOL_TURNS;
+  const tools = buildAgentResponseTools();
+  const toolCalls: AgentRunnerToolCall[] = [];
+  let responseId: string | null = null;
+  let tokenInput: number | null = null;
+  let tokenOutput: number | null = null;
+  let nextInput: unknown = messagesForResponsesApi(input.messages);
+
+  for (let turn = 0; turn <= maxToolTurns; turn += 1) {
+    const params: Record<string, unknown> = {
+      model,
+      instructions: buildAgentSystemPrompt(input.caseSnapshot),
+      input: nextInput,
+      tools,
+      parallel_tool_calls: false,
+    };
+
+    if (responseId) {
+      params.previous_response_id = responseId;
+    }
+
+    const response = await client.parse(params);
+    responseId = response.id ?? responseId;
+    tokenInput = response.usage?.input_tokens ?? tokenInput;
+    tokenOutput = response.usage?.output_tokens ?? tokenOutput;
+
+    const calls = functionCalls(response);
+    if (calls.length === 0) {
+      return {
+        content: assistantText(response),
+        response_id: responseId,
+        token_input: tokenInput,
+        token_output: tokenOutput,
+        tool_calls: toolCalls,
+      };
+    }
+
+    if (turn === maxToolTurns) {
+      throw new Error("AI agent exceeded the maximum tool-turn limit");
+    }
+
+    const toolOutputs = [];
+
+    for (const call of calls) {
+      const toolName = call.name as string;
+      if (!call.call_id) {
+        throw new Error(`AI agent tool call is missing call_id: ${toolName}`);
+      }
+
+      const callId = call.call_id;
+      const toolInput = parseArguments(call);
+      const startEvent = {
+        tool_name: toolName,
+        tool_call_id: callId,
+        input: toolInput,
+      };
+      const started = await input.hooks?.onToolCallStart?.(startEvent);
+
+      try {
+        const output = safeToolOutput(await executeTool(toolName, toolInput));
+        toolCalls.push({
+          name: toolName,
+          call_id: callId,
+          input: toolInput,
+          output,
+          status: "succeeded",
+          error_message: null,
+        });
+        await input.hooks?.onToolCallEnd?.(started, {
+          ...startEvent,
+          status: "succeeded",
+          output,
+          error_message: null,
+        });
+        toolOutputs.push({
+          type: "function_call_output",
+          call_id: callId,
+          output: JSON.stringify(output),
+        });
+      } catch (error) {
+        const message =
+          error instanceof Error ? error.message : "Agent tool call failed";
+        toolCalls.push({
+          name: toolName,
+          call_id: callId,
+          input: toolInput,
+          output: null,
+          status: "failed",
+          error_message: message,
+        });
+        await input.hooks?.onToolCallEnd?.(started, {
+          ...startEvent,
+          status: "failed",
+          output: null,
+          error_message: message,
+        });
+        toolOutputs.push({
+          type: "function_call_output",
+          call_id: callId,
+          output: JSON.stringify({ error: message }),
+        });
+      }
+    }
+
+    nextInput = toolOutputs;
+  }
+
+  throw new Error("AI agent failed to finish within the tool-turn limit");
+}
