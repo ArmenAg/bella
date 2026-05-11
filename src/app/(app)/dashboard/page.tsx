@@ -1,12 +1,16 @@
+import Link from "next/link";
+
 import { PageHeader } from "@/components/shell/page-header";
 import { Badge } from "@/components/ui/badge";
 import { ErrorState } from "@/components/feedback/error-state";
 
 import { ActiveFlareCard } from "@/components/dashboard/active-flare-card";
+import { InstrumentCluster } from "@/components/dashboard/instrument-cluster";
 import { RangeSelector } from "@/components/dashboard/range-selector";
 import { SectionCard } from "@/components/dashboard/section-card";
 import { SectionRow } from "@/components/dashboard/section-row";
 import { TrendsAccordion } from "@/components/dashboard/trends-accordion";
+import { UpcomingPacketCta } from "@/components/dashboard/upcoming-packet-cta";
 
 import { FlareFrequencyChart } from "@/components/charts/flare-frequency-chart";
 import { RecoveryTimeChart } from "@/components/charts/recovery-time-chart";
@@ -18,6 +22,7 @@ import { PainOverTimeChart } from "@/components/charts/pain-over-time-chart";
 
 import { listAppointments } from "@/server/actions/schedule";
 import { listDecisions } from "@/server/actions/decisions";
+import { listDiagnoses } from "@/server/actions/diagnoses";
 import { listEntries } from "@/server/actions/entries";
 import { listMedications } from "@/server/actions/medications";
 import { listTasks } from "@/server/actions/schedule";
@@ -27,6 +32,10 @@ import { getDashboardMetrics } from "@/server/actions/metrics";
 
 import { strings, format as formatString } from "@/lib/strings";
 import { formatDate, formatDateTime, formatRelative } from "@/lib/format";
+
+const emptyCtas = strings.dashboard.emptyCtas;
+
+const STALE_REVIEW_THRESHOLD_DAYS = 90;
 
 export const dynamic = "force-dynamic";
 
@@ -77,15 +86,24 @@ export default async function DashboardPage({
   const range = pickRange(params.range);
   const window = rangeToWindow(range);
 
+  // Pull a wider flare window (60d) so the instrument cluster can compute the
+  // last-30d vs prior-30d delta without a second round-trip. Capped at 200 to
+  // keep this cheap; flares are rare enough that this is plenty for the math.
+  const flareWindowFromIso = new Date(
+    Date.now() - 60 * 24 * 60 * 60 * 1000,
+  ).toISOString();
+
   const [
     metricsResult,
     appointmentsResult,
     decisionsResult,
     flaresResult,
+    flareWindowResult,
     vasomotorResult,
     medicationsResult,
     tasksResult,
     referenceResult,
+    diagnosesResult,
   ] = await Promise.all([
     getDashboardMetrics({
       date_from: window.date_from,
@@ -94,10 +112,16 @@ export default async function DashboardPage({
     listAppointments({ upcoming: true, page_size: 5 }),
     listDecisions({ open_only: true, page_size: 5 }),
     listEntries({ flare_only: true, page_size: 5 }),
+    listEntries({
+      flare_only: true,
+      date_from: flareWindowFromIso,
+      page_size: 200,
+    }),
     listVasomotorMeasurements({ page_size: 5 }),
     listMedications({ status: "active", page_size: 10 }),
     listTasks({ open_only: true, page_size: 10 }),
     listReferenceData(),
+    listDiagnoses({ page_size: 100 }),
   ]);
 
   const referenceData = referenceResult.ok
@@ -143,6 +167,62 @@ export default async function DashboardPage({
     pain_current: entry.pain_current,
   }));
 
+  // ── Instrument cluster derivations ────────────────────────────────────────
+  const allUpcomingAppointments = appointmentsResult.ok
+    ? appointmentsResult.data.items
+    : [];
+  const nextAppointment = allUpcomingAppointments[0] ?? null;
+
+  const flareWindowItems = flareWindowResult.ok
+    ? flareWindowResult.data.items
+    : [];
+  const latestFlare =
+    [...flareWindowItems].sort((a, b) =>
+      b.occurred_at.localeCompare(a.occurred_at),
+    )[0] ?? null;
+
+  const nowMs = Date.now();
+  const day30Ms = 30 * 24 * 60 * 60 * 1000;
+  const flaresInLast30d = flareWindowItems.filter((e) => {
+    const t = new Date(e.occurred_at).getTime();
+    return t >= nowMs - day30Ms && t <= nowMs;
+  }).length;
+  const flaresInPrior30d = flareWindowItems.filter((e) => {
+    const t = new Date(e.occurred_at).getTime();
+    return t >= nowMs - 2 * day30Ms && t < nowMs - day30Ms;
+  }).length;
+
+  const latestComparison = recentVasomotor[0] ?? null;
+
+  const overdueDecisionsCount = decisionsResult.ok
+    ? decisionsResult.data.items.filter(
+        (d) => d.target_date !== null && d.target_date < todayDate,
+      ).length
+    : 0;
+
+  // Stale review: nodes never reviewed, or reviewed more than N days ago.
+  // Sorted "staleest first" so the cluster sub-line names the worst offender.
+  const staleCutoffMs =
+    nowMs - STALE_REVIEW_THRESHOLD_DAYS * 24 * 60 * 60 * 1000;
+  const staleDiagnoses = diagnosesResult.ok
+    ? [...diagnosesResult.data.items]
+        .filter((d) => {
+          if (d.last_reviewed_at === null) return true;
+          return new Date(d.last_reviewed_at).getTime() < staleCutoffMs;
+        })
+        .sort((a, b) => {
+          // Nulls (never reviewed) sort first, then oldest review date next.
+          const aT = a.last_reviewed_at
+            ? new Date(a.last_reviewed_at).getTime()
+            : -Infinity;
+          const bT = b.last_reviewed_at
+            ? new Date(b.last_reviewed_at).getTime()
+            : -Infinity;
+          return aT - bT;
+        })
+    : [];
+  const staleFallbackToTasks = !diagnosesResult.ok;
+
   return (
     <div className="flex flex-col gap-6">
       <PageHeader
@@ -150,6 +230,28 @@ export default async function DashboardPage({
         description={strings.dashboard.subtitle}
         actions={<RangeSelector current={range} />}
       />
+
+      {/* Instrument cluster: six glanceable metrics, single horizontal row on
+          desktop, stacks gracefully on mobile. */}
+      <InstrumentCluster
+        latestFlare={latestFlare}
+        flaresInLast30d={flaresInLast30d}
+        flaresInPrior30d={flaresInPrior30d}
+        latestComparison={latestComparison}
+        nextAppointment={nextAppointment}
+        openDecisionsCount={
+          metricsResult.ok ? metricsResult.data.open_decisions_count : 0
+        }
+        overdueDecisionsCount={overdueDecisionsCount}
+        staleDiagnoses={staleDiagnoses}
+        openTasksCount={
+          metricsResult.ok ? metricsResult.data.open_tasks_count : 0
+        }
+        staleFallbackToTasks={staleFallbackToTasks}
+      />
+
+      {/* Visit-prep CTA: only renders when an appointment is within 48h. */}
+      <UpcomingPacketCta appointments={allUpcomingAppointments} />
 
       {/* Row 1: Active flare (renders null when no active flare) */}
       <ActiveFlareCard />
@@ -176,7 +278,13 @@ export default async function DashboardPage({
               <ErrorState message={appointmentsResult.error.message} />
             ) : upcomingAppointments.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                {strings.dashboard.empty.appointments}
+                {emptyCtas.appointments}{" "}
+                <Link
+                  href="/schedule/appointments/new"
+                  className="text-primary hover:underline"
+                >
+                  {emptyCtas.appointmentsCta}
+                </Link>
               </p>
             ) : (
               <ul className="flex flex-col gap-1.5">
@@ -209,7 +317,13 @@ export default async function DashboardPage({
               <ErrorState message={tasksResult.error.message} />
             ) : tasksDue.length === 0 ? (
               <p className="text-sm text-muted-foreground">
-                {strings.dashboard.empty.tasks}
+                {emptyCtas.tasks}{" "}
+                <Link
+                  href="/schedule/tasks/new"
+                  className="text-primary hover:underline"
+                >
+                  {emptyCtas.tasksCta}
+                </Link>
               </p>
             ) : (
               <ul className="flex flex-col gap-1.5">
@@ -299,7 +413,13 @@ export default async function DashboardPage({
             <ErrorState message={decisionsResult.error.message} />
           ) : openDecisions.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              {strings.dashboard.empty.decisions}
+              {emptyCtas.decisions}{" "}
+              <Link
+                href="/decisions/new"
+                className="text-primary hover:underline"
+              >
+                {emptyCtas.decisionsCta}
+              </Link>
             </p>
           ) : (
             <ul className="flex flex-col gap-1.5">
@@ -351,7 +471,10 @@ export default async function DashboardPage({
             <ErrorState message={flaresResult.error.message} />
           ) : recentFlares.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              {strings.dashboard.empty.flares}
+              {emptyCtas.flares}{" "}
+              <Link href="/flare" className="text-primary hover:underline">
+                {emptyCtas.flaresCta}
+              </Link>
             </p>
           ) : (
             <ul className="flex flex-col gap-1.5">
@@ -384,7 +507,13 @@ export default async function DashboardPage({
             <ErrorState message={vasomotorResult.error.message} />
           ) : recentVasomotor.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              {strings.dashboard.empty.comparisons}
+              {emptyCtas.comparisons}{" "}
+              <Link
+                href="/vasomotor/new"
+                className="text-primary hover:underline"
+              >
+                {emptyCtas.comparisonsCta}
+              </Link>
             </p>
           ) : (
             <ul className="flex flex-col gap-1.5">
@@ -425,7 +554,13 @@ export default async function DashboardPage({
             <ErrorState message={medicationsResult.error.message} />
           ) : activeMedications.length === 0 ? (
             <p className="text-sm text-muted-foreground">
-              {strings.dashboard.empty.medications}
+              {emptyCtas.medications}{" "}
+              <Link
+                href="/medications/new"
+                className="text-primary hover:underline"
+              >
+                {emptyCtas.medicationsCta}
+              </Link>
             </p>
           ) : (
             <ul className="flex flex-col gap-1.5">

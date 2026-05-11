@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Clock } from "lucide-react";
 
 import { Card } from "@/components/ui/card";
 import {
@@ -8,8 +9,16 @@ import {
 } from "./diagnosis-badges";
 import type { DiagnosisTreeNode } from "./diagnosis-tree";
 
+import { formatRelative } from "@/lib/format";
 import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
+
+const reviewStrings = strings.diagnoses.review;
+
+// Per UX.md §XIV, last-reviewed-at must be visible. A node whose review is
+// older than this window is rendered with a muted-alarm caption color so it
+// reads as "this is drifting" without screaming destructive.
+const STALE_AFTER_MS = 90 * 24 * 60 * 60 * 1000;
 
 export interface DiagnosisTreeListProps {
   tree: DiagnosisTreeNode[];
@@ -63,6 +72,13 @@ function flatten(
   return out;
 }
 
+function isReviewStale(lastReviewedAt: string | null): boolean {
+  if (!lastReviewedAt) return true;
+  const reviewedAt = new Date(lastReviewedAt).getTime();
+  if (Number.isNaN(reviewedAt)) return true;
+  return Date.now() - reviewedAt > STALE_AFTER_MS;
+}
+
 function NodeRow({
   entry,
   depth,
@@ -73,6 +89,10 @@ function NodeRow({
   const { node } = entry;
   const summary = node.summary?.trim();
   const isStruck = node.status === "ruled_out";
+  const stale = isReviewStale(node.last_reviewed_at);
+  const reviewCaption = node.last_reviewed_at
+    ? `${reviewStrings.reviewedPrefix} ${formatRelative(node.last_reviewed_at)}`
+    : reviewStrings.neverReviewed;
   return (
     <Link
       href={`/diagnostic-tree/${node.id}/edit`}
@@ -100,11 +120,23 @@ function NodeRow({
             {summary}
           </p>
         ) : null}
-        {node.open_questions.length > 0 ? (
-          <p className="text-xs text-muted-foreground">
-            {strings.diagnoses.node.openQuestions}: {node.open_questions.length}
+        <div className="flex flex-wrap items-center gap-x-3 gap-y-1">
+          <p
+            className={cn(
+              "inline-flex items-center gap-1 text-xs",
+              stale ? "text-rose-700" : "text-muted-foreground",
+            )}
+          >
+            <Clock className="h-3 w-3" aria-hidden />
+            {reviewCaption}
           </p>
-        ) : null}
+          {node.open_questions.length > 0 ? (
+            <p className="text-xs text-muted-foreground">
+              {strings.diagnoses.node.openQuestions}:{" "}
+              {node.open_questions.length}
+            </p>
+          ) : null}
+        </div>
       </div>
     </Link>
   );

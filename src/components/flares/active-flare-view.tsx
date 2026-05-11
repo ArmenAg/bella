@@ -8,13 +8,18 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 
+import { CollapsibleSection } from "@/components/entries/collapsible-section";
+
 import { FlareCheckpointForm } from "./flare-checkpoint-form";
+import { QuickCheckpointButton } from "./quick-checkpoint-button";
 import { EndFlareDialog } from "./end-flare-dialog";
 import { FlareEditSheet } from "./flare-edit-sheet";
 import { FlareVasomotorSheet } from "./flare-vasomotor-sheet";
 
 import { formatDateTime, formatRelative, formatTime } from "@/lib/format";
 import { strings } from "@/lib/strings";
+
+const customCheckpointStrings = strings.flare.active.customCheckpoint;
 import type {
   BodyRegionDTO,
   FlareCheckpointDTO,
@@ -180,7 +185,13 @@ export function ActiveFlareView({
         <CardContent className="flex flex-col gap-4">
           {canWrite ? (
             <>
-              <FlareCheckpointForm session={session} />
+              <QuickCheckpointButton session={session} />
+              <CollapsibleSection
+                title={customCheckpointStrings.title}
+                hint={customCheckpointStrings.hint}
+              >
+                <FlareCheckpointForm session={session} />
+              </CollapsibleSection>
               <Button
                 type="button"
                 variant="outline"
