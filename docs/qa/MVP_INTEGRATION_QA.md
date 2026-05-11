@@ -174,3 +174,48 @@ Neither is a code defect; both are documentation/setup omissions.
 
 No critical defects open. The integration surface is consistent, contracts are
 honored, and the seeded data path renders end-to-end.
+
+## Post-shipping review follow-ups
+
+Findings from a code-review pass on Agent Mode + Apple Health. The two P1s are
+fixed in commit fc48477's follow-up; the two P2s are recorded here.
+
+### Fixed in this pass
+
+- **Agent draft rail thread filtering (P1).** `ai_import_drafts.agent_thread_id`
+  was already persisted by the agent's `create_draft` / `update_draft` tools
+  and indexed in the migration, but the draft DTO/filter did not expose it. The
+  Agent rail therefore listed every family draft. Added `agent_thread_id` to
+  `aiImportDraftSchema` + `aiImportDraftFilterSchema` (and the sister session
+  shapes), threaded it through `listAiImportDrafts` and `listAiImportSessions`,
+  and used `listAiImportDrafts({ agent_thread_id })` on thread load in
+  `agent-workspace.tsx`. Drafts now strictly scope to the active thread.
+- **Apple Health raw-zip cleanup (P1).** The 500 MB raw export was sitting in
+  private storage as an ordinary attachment after a successful import, eligible
+  to surface in bulk-export manifests. After a successful import, the service
+  now removes the storage object and soft-deletes the attachment row
+  (best-effort; any failure is recorded on the import row's metadata, not
+  raised). Provenance stays on `apple_health_imports.attachment_id` (FK is
+  `on delete set null`).
+- **Evidence on agent draft cards (P3).** The agent rail's draft card now
+  renders the top three `evidence_spans` as a first-class section above the
+  payload toggle, with `+N more` overflow. Matches the "evidence stays linked"
+  principle.
+
+### Open follow-ups (P2)
+
+1. **Apple Health summary day grouping is UTC.** `refresh_apple_health_daily_summaries`
+   in `20260510060000_apple_health_import.sql:259` buckets samples by
+   `(s.start_at at time zone 'UTC')::date`. For samples recorded in non-UTC
+   timezones (e.g. Pacific overnight sleep), this can place a record on the
+   wrong local day. Plumb the original timezone offset through (Apple's export
+   uses an offset suffix on each `<Record>` timestamp), or store a derived
+   `local_date` per sample and group by that.
+2. **Idempotency test at persistence level.** Parser-level unit tests cover the
+   external-key derivation in `apple-health.test.ts`, and the DB has
+   `unique (family_id, external_key)` on `apple_health_samples`. Add an
+   integration test that runs the importer twice on the same fixture and
+   asserts: same imported count on run 1, near-zero imported (all-duplicate) on
+   run 2, identical daily summary totals on both. Requires the Supabase test
+   harness, which the QA-pass environment doesn't have provisioned (see
+   **Local setup gaps**).

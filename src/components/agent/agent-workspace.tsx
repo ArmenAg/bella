@@ -109,7 +109,7 @@ export function AgentWorkspace({
     const [messagesResult, toolsResult, draftsResult] = await Promise.all([
       listAgentMessages({ thread_id: threadId, page_size: 200 }),
       listAgentToolCalls({ thread_id: threadId, page_size: 200 }),
-      listAiImportDrafts({ page_size: 200 }),
+      listAiImportDrafts({ page_size: 200, agent_thread_id: threadId }),
     ]);
     if (!messagesResult.ok) {
       setThreadError(userFacingErrorMessage(messagesResult.error));
@@ -119,12 +119,7 @@ export function AgentWorkspace({
     } else {
       setMessages(messagesResult.data.items);
       setToolCalls(toolsResult.ok ? toolsResult.data.items : []);
-      const allDrafts = draftsResult.ok ? draftsResult.data.items : [];
-      // Best-effort filter: keep drafts created in this thread's window.
-      // The backend stores agent_thread_id on the import session, but the
-      // draft DTO doesn't carry the thread reference. We still get fresh
-      // drafts back from sendAgentMessage and can rely on that for now.
-      setDrafts(allDrafts);
+      setDrafts(draftsResult.ok ? draftsResult.data.items : []);
     }
     setThreadLoading(false);
   }, []);

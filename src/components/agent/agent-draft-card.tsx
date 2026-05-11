@@ -143,6 +143,29 @@ export function AgentDraftCard({ draft }: { draft: AiImportDraft }) {
         </ul>
       ) : null}
 
+      {draft.evidence_spans.length > 0 ? (
+        <div className="rounded-sm border border-border bg-muted/30 px-2 py-1.5">
+          <p className="mb-1 text-[10px] font-medium uppercase tracking-wider text-muted-foreground">
+            {strings.agent.drafts.evidenceLabel}
+          </p>
+          <ul className="flex flex-col gap-1 text-xs leading-5">
+            {draft.evidence_spans.slice(0, 3).map((span, idx) => (
+              <li key={idx} className="flex flex-col">
+                <span className="font-mono text-[10px] text-muted-foreground">
+                  {span.field}
+                </span>
+                <span className="italic text-foreground">“{span.quote}”</span>
+              </li>
+            ))}
+            {draft.evidence_spans.length > 3 ? (
+              <li className="text-[10px] text-muted-foreground">
+                + {draft.evidence_spans.length - 3} more
+              </li>
+            ) : null}
+          </ul>
+        </div>
+      ) : null}
+
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}

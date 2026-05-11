@@ -91,12 +91,14 @@ export const commitAiImportDraftInputSchema = z.object({
 
 export const aiImportSessionFilterSchema = paginationInputSchema.extend({
   status: aiImportSessionStatusSchema.optional(),
+  agent_thread_id: uuidSchema.optional(),
 });
 
 export const aiImportDraftFilterSchema = paginationInputSchema.extend({
   session_id: uuidSchema.optional(),
   status: aiImportDraftStatusSchema.optional(),
   target_type: aiImportTargetTypeSchema.optional(),
+  agent_thread_id: uuidSchema.optional(),
 });
 
 export const aiImportSessionSchema = z.object({
@@ -104,6 +106,7 @@ export const aiImportSessionSchema = z.object({
   family_id: uuidSchema,
   user_id: uuidSchema,
   source_id: uuidSchema.nullable(),
+  agent_thread_id: uuidSchema.nullable(),
   input_label: z.string().nullable(),
   raw_text: z.string(),
   requested_target_types: z.array(aiImportTargetTypeSchema),
@@ -121,6 +124,7 @@ export const aiImportDraftSchema = z.object({
   family_id: uuidSchema,
   user_id: uuidSchema,
   session_id: uuidSchema,
+  agent_thread_id: uuidSchema.nullable(),
   target_type: aiImportTargetTypeSchema,
   status: aiImportDraftStatusSchema,
   title: z.string().nullable(),

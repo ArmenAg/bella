@@ -672,6 +672,47 @@ export function normalizeAppleHealthDailySummaryRow(
   });
 }
 
+/**
+ * After a successful import, remove the raw export from storage and soft-delete
+ * the attachment row. The raw Apple Health zip is much broader than the
+ * normalized samples we keep, so we don't want it lingering in private storage
+ * or surfacing in bulk-export manifests. Provenance stays on the import row's
+ * `attachment_id` (FK is `on delete set null`).
+ *
+ * Best-effort: cleanup errors are recorded on the import row's metadata but
+ * never fail the import itself.
+ */
+async function cleanupImportAttachment(
+  attachment: AttachmentRow,
+  importId: string,
+  supabase: SupabaseClient,
+): Promise<void> {
+  try {
+    const { error: storageError } = await supabase.storage
+      .from(attachment.bucket_id)
+      .remove([attachment.file_path]);
+    if (storageError) throw storageError;
+
+    const { error: updateError } = await supabase
+      .from("attachments")
+      .update({ deleted_at: new Date().toISOString() })
+      .eq("id", attachment.id);
+    if (updateError) throw updateError;
+  } catch (error) {
+    const message = error instanceof Error ? error.message : "cleanup failed";
+    await supabase
+      .from("apple_health_imports")
+      .update({
+        metadata: { raw_attachment_cleanup_error: message },
+      })
+      .eq("id", importId)
+      .then(
+        () => undefined,
+        () => undefined,
+      );
+  }
+}
+
 async function getAttachmentForImport(
   attachmentId: string,
   supabase: SupabaseClient,
@@ -862,6 +903,8 @@ export async function importAppleHealthExport(
       },
       supabase,
     );
+
+    await cleanupImportAttachment(attachment, importRow.id, supabase);
 
     return appleHealthImportResultSchema.parse({
       import: completed,

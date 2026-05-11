@@ -158,6 +158,7 @@ export function normalizeAiImportSessionRow(row: Row): AiImportSession {
   return aiImportSessionSchema.parse({
     ...row,
     source_id: row.source_id ?? null,
+    agent_thread_id: row.agent_thread_id ?? null,
     input_label: row.input_label ?? null,
     requested_target_types: Array.isArray(row.requested_target_types)
       ? row.requested_target_types
@@ -171,6 +172,7 @@ export function normalizeAiImportSessionRow(row: Row): AiImportSession {
 export function normalizeAiImportDraftRow(row: Row): AiImportDraft {
   return aiImportDraftSchema.parse({
     ...row,
+    agent_thread_id: row.agent_thread_id ?? null,
     title: row.title ?? null,
     proposed_payload:
       row.proposed_payload && typeof row.proposed_payload === "object"
@@ -494,6 +496,8 @@ export async function listAiImportSessions(
 
   if (parsed.cursor) query = query.lt("created_at", parsed.cursor);
   if (parsed.status) query = query.eq("status", parsed.status);
+  if (parsed.agent_thread_id)
+    query = query.eq("agent_thread_id", parsed.agent_thread_id);
 
   const { data, error } = await query;
   if (error) throw error;
@@ -529,6 +533,8 @@ export async function listAiImportDrafts(
   if (parsed.session_id) query = query.eq("session_id", parsed.session_id);
   if (parsed.status) query = query.eq("status", parsed.status);
   if (parsed.target_type) query = query.eq("target_type", parsed.target_type);
+  if (parsed.agent_thread_id)
+    query = query.eq("agent_thread_id", parsed.agent_thread_id);
 
   const { data, error } = await query;
   if (error) throw error;
