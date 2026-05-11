@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { canWrite } from "@/lib/auth";
-import { useForm, Controller, type FieldErrors } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
@@ -37,7 +37,10 @@ import { userFacingErrorMessage } from "@/lib/result";
 import {
   toLocalDateTimeInputValue,
   fromLocalDateTimeInputValue,
+  nowIso,
+  nowIsoForInput,
 } from "@/lib/format";
+import { firstZodError } from "@/lib/forms";
 import { useShellProfile } from "@/components/shell/shell-context";
 
 type AppointmentFormValues = z.input<typeof appointmentMutationSchema>;
@@ -48,16 +51,12 @@ const STATUS_ORDER: Appointment["status"][] = [
   "cancelled",
 ];
 
-function nowIsoForInput(): string {
-  return toLocalDateTimeInputValue(new Date().toISOString());
-}
-
 function buildDefaults(
   appointment: Appointment | undefined,
 ): AppointmentFormValues {
   if (!appointment) {
     return {
-      date_time: new Date().toISOString(),
+      date_time: nowIso(),
       provider: undefined,
       specialty: undefined,
       location: undefined,
@@ -87,19 +86,6 @@ function buildDefaults(
     follow_up_tasks: appointment.follow_up_tasks ?? [],
     status: appointment.status,
   };
-}
-
-function firstZodError(
-  errors: FieldErrors<AppointmentFormValues>,
-): string | null {
-  for (const key in errors) {
-    const value = errors[key as keyof AppointmentFormValues];
-    if (value && typeof value === "object" && "message" in value) {
-      const message = (value as { message?: string }).message;
-      if (message) return message;
-    }
-  }
-  return null;
 }
 
 export interface AppointmentFormProps {

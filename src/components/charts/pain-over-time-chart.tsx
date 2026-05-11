@@ -12,6 +12,7 @@ import {
   YAxis,
 } from "recharts";
 import { strings } from "@/lib/strings";
+import { formatMonthDay } from "@/lib/format";
 import { ChartCard } from "./chart-card";
 import { ChartEmpty } from "./empty";
 
@@ -25,19 +26,13 @@ export interface PainOverTimeChartProps {
   data: PainOverTimePoint[];
 }
 
-function formatDayLabel(occurredAt: string): string {
-  const d = new Date(occurredAt);
-  if (Number.isNaN(d.getTime())) return occurredAt;
-  return `${d.getMonth() + 1}/${d.getDate()}`;
-}
-
 export function PainOverTimeChart({ data }: PainOverTimeChartProps) {
   const series = React.useMemo(
     () =>
       [...data]
         .sort((a, b) => a.occurred_at.localeCompare(b.occurred_at))
         .map((item) => ({
-          label: formatDayLabel(item.occurred_at),
+          label: formatMonthDay(item.occurred_at),
           occurred_at: item.occurred_at,
           peak: item.pain_peak,
           current: item.pain_current,

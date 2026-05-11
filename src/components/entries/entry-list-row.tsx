@@ -1,9 +1,9 @@
 import Link from "next/link";
-import { format as formatDate } from "date-fns";
 import { Paperclip } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { strings, format as formatString } from "@/lib/strings";
 import type { EntryDTO } from "@/server/contracts";
+import { formatDateTime } from "@/lib/format";
 import { cn } from "@/lib/utils";
 
 export interface EntryListRowProps {
@@ -11,14 +11,6 @@ export interface EntryListRowProps {
   href: string;
   hasAttachments?: boolean;
   variant: "pain" | "log";
-}
-
-function formatOccurredAt(iso: string): string {
-  try {
-    return formatDate(new Date(iso), "MMM d, yyyy · h:mm a");
-  } catch {
-    return iso;
-  }
 }
 
 export function EntryListRow({
@@ -48,7 +40,7 @@ export function EntryListRow({
       <div className="flex flex-col gap-1 sm:flex-row sm:items-center sm:justify-between">
         <div className="min-w-0">
           <p className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-            {formatOccurredAt(entry.occurred_at)}
+            {formatDateTime(entry.occurred_at)}
           </p>
           <p className="truncate text-sm font-semibold text-foreground">
             {entry.title}

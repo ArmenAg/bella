@@ -12,21 +12,12 @@ import {
 } from "recharts";
 import type { VasomotorDeltaMetric } from "@/server/contracts";
 import { strings } from "@/lib/strings";
+import { formatMonthDay } from "@/lib/format";
 import { ChartCard } from "./chart-card";
 import { ChartEmpty } from "./empty";
 
 export interface VasomotorDeltaChartProps {
   data: VasomotorDeltaMetric[];
-}
-
-function formatDate(iso: string): string {
-  try {
-    const d = new Date(iso);
-    if (Number.isNaN(d.getTime())) return iso;
-    return `${d.getMonth() + 1}/${d.getDate()}`;
-  } catch {
-    return iso;
-  }
 }
 
 export function VasomotorDeltaChart({ data }: VasomotorDeltaChartProps) {
@@ -37,7 +28,7 @@ export function VasomotorDeltaChart({ data }: VasomotorDeltaChartProps) {
         .sort((a, b) => a.measured_at.localeCompare(b.measured_at))
         .map((point) => ({
           measured_at: point.measured_at,
-          label: formatDate(point.measured_at),
+          label: formatMonthDay(point.measured_at),
           delta: Math.round((point.delta_c ?? 0) * 10) / 10,
           site: point.site,
         })),

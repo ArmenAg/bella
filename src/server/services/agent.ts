@@ -457,7 +457,10 @@ export async function sendAgentMessage(
 
   if (threadPrepareError) throw threadPrepareError;
 
-  const caseSnapshot = await buildCaseSnapshot(supabase);
+  const [caseSnapshot, messages] = await Promise.all([
+    buildCaseSnapshot(supabase),
+    listThreadMessagesForRunner(thread.id, supabase),
+  ]);
   await insertContextSnapshot(supabase, {
     family_id: thread.family_id,
     user_id: profile.id,
@@ -465,8 +468,6 @@ export async function sendAgentMessage(
     message_id: userMessage.id,
     context: caseSnapshot,
   });
-
-  const messages = await listThreadMessagesForRunner(thread.id, supabase);
 
   try {
     const result = await runner({
@@ -563,12 +564,17 @@ export async function sendAgentMessage(
 
     if (threadUpdateError) throw threadUpdateError;
 
+    const [toolCalls, drafts] = await Promise.all([
+      listToolCallsByIds(toolCallIds, supabase),
+      listDraftsForThread(thread.id, supabase),
+    ]);
+
     return agentTurnResultSchema.parse({
       thread: normalizeAgentThreadRow(updatedThreadRow as Row),
       user_message: userMessage,
       assistant_message: assistantMessage,
-      tool_calls: await listToolCallsByIds(toolCallIds, supabase),
-      drafts: await listDraftsForThread(thread.id, supabase),
+      tool_calls: toolCalls,
+      drafts,
     });
   } catch (error) {
     const message =

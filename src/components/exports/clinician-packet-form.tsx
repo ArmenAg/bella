@@ -29,6 +29,7 @@ import type {
 
 import { strings } from "@/lib/strings";
 import { userFacingErrorMessage } from "@/lib/result";
+import { downloadBlob } from "@/lib/utils";
 import { formatDate } from "@/lib/format";
 
 const ANY_VALUE = "__any__";
@@ -102,14 +103,7 @@ export function ClinicianPacketForm({
     if (!packet) return;
     const date = new Date().toISOString().slice(0, 10);
     const blob = new Blob([packet.markdown], { type: "text/markdown" });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `bella-clinician-packet-${date}.md`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-    URL.revokeObjectURL(url);
+    downloadBlob(`bella-clinician-packet-${date}.md`, blob);
   };
 
   const filters = packet?.filters;

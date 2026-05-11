@@ -12,18 +12,12 @@ import {
 } from "recharts";
 import type { WeeklyFlareMetric } from "@/server/contracts";
 import { strings } from "@/lib/strings";
+import { formatMonthDay } from "@/lib/format";
 import { ChartCard } from "./chart-card";
 import { ChartEmpty } from "./empty";
 
 export interface FlareFrequencyChartProps {
   data: WeeklyFlareMetric[];
-}
-
-function formatWeekLabel(weekStart: string): string {
-  // weekStart is YYYY-MM-DD (local-date string from contract).
-  const d = new Date(weekStart);
-  if (Number.isNaN(d.getTime())) return weekStart;
-  return `${d.getMonth() + 1}/${d.getDate()}`;
 }
 
 export function FlareFrequencyChart({ data }: FlareFrequencyChartProps) {
@@ -32,7 +26,7 @@ export function FlareFrequencyChart({ data }: FlareFrequencyChartProps) {
       [...data]
         .sort((a, b) => a.week_start.localeCompare(b.week_start))
         .map((item) => ({
-          weekLabel: formatWeekLabel(item.week_start),
+          weekLabel: formatMonthDay(item.week_start),
           weekStart: item.week_start,
           count: item.flare_count,
         })),
