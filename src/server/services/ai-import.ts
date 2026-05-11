@@ -45,6 +45,7 @@ import { createProcedureEvent } from "./procedures";
 import { createAppointment, createTask } from "./schedule";
 import { createSource, getSource } from "./sources";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { NotFoundError } from "./errors";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 type Row = Record<string, unknown>;
@@ -511,7 +512,7 @@ export async function getAiImportSession(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("AI import session not found");
+  if (!data) throw new NotFoundError("AI import session not found");
   return normalizeAiImportSessionRow(data as Row);
 }
 
@@ -529,7 +530,7 @@ export async function getAiImportDraft(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("AI import draft not found");
+  if (!data) throw new NotFoundError("AI import draft not found");
   return normalizeAiImportDraftRow(data as Row);
 }
 

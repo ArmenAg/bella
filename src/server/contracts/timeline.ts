@@ -91,6 +91,7 @@ export const timelinePageSchema = z.object({
   next_cursor: z.string().nullable(),
   page_size: z.number().int().min(1),
   metadata: timelineMetadataSchema,
+  source_truncated: z.boolean().optional(),
 });
 
 export type TimelineItem = z.infer<typeof timelineItemSchema>;

@@ -20,6 +20,7 @@ import {
 } from "@/server/contracts";
 import { recordSoftDeleteReason } from "./audit";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { NotFoundError } from "./errors";
 
 type AppointmentRow = Record<string, unknown>;
 type TaskRow = Record<string, unknown>;
@@ -158,7 +159,7 @@ export async function getAppointment(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("Appointment not found");
+  if (!data) throw new NotFoundError("Appointment not found");
   return normalizeAppointmentRow(data as AppointmentRow);
 }
 
@@ -300,7 +301,7 @@ export async function getTask(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("Task not found");
+  if (!data) throw new NotFoundError("Task not found");
   return normalizeTaskRow(data as TaskRow);
 }
 

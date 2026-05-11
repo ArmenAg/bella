@@ -12,6 +12,7 @@ import {
 } from "@/server/contracts";
 import { recordSoftDeleteReason } from "./audit";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { NotFoundError } from "./errors";
 
 type EntryLinkInput = {
   body_region_ids?: string[];
@@ -296,7 +297,7 @@ export async function getEntry(
   }
 
   if (!data) {
-    throw new Error("Entry not found");
+    throw new NotFoundError("Entry not found");
   }
 
   return hydrateEntry(supabase, data as EntryRow);

@@ -12,6 +12,7 @@ import {
 } from "@/server/contracts";
 import { recordSoftDeleteReason } from "./audit";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { NotFoundError } from "./errors";
 
 type VasomotorRow = Record<string, unknown>;
 
@@ -205,7 +206,7 @@ export async function getVasomotorMeasurement(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("Vasomotor measurement not found");
+  if (!data) throw new NotFoundError("Vasomotor measurement not found");
   return normalizeVasomotorRow(data as VasomotorRow);
 }
 

@@ -150,5 +150,12 @@ describe("timeline service merge helpers", () => {
         },
       ],
     });
+    expect(page.source_truncated).toBe(true);
+  });
+
+  it("omits source_truncated on the happy path", () => {
+    const page = buildTimelinePage(rows, { page_size: 2 });
+
+    expect(page.source_truncated).toBeUndefined();
   });
 });

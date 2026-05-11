@@ -28,6 +28,7 @@ import {
 } from "@/server/contracts";
 import { recordSoftDeleteReason } from "./audit";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { NotFoundError } from "./errors";
 
 type DiagnosisRow = Record<string, unknown>;
 type EvidenceLinkRow = Record<string, unknown>;
@@ -80,7 +81,7 @@ export async function getDiagnosis(
   }
 
   if (!data) {
-    throw new Error("Diagnosis not found");
+    throw new NotFoundError("Diagnosis not found");
   }
 
   return normalizeDiagnosisRow(data as DiagnosisRow);
@@ -429,7 +430,7 @@ export async function mergeDiagnosisNodes(
   );
 
   if (sources.length !== sourceIds.length) {
-    throw new Error("One or more source diagnoses were not found");
+    throw new NotFoundError("One or more source diagnoses were not found");
   }
 
   const evidenceLinksMoved = await moveEvidenceLinksToTarget(

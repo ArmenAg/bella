@@ -34,6 +34,7 @@ import {
 import { buildCaseSnapshot } from "./agent-tools";
 import { normalizeAiImportDraftRow } from "./ai-import";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { NotFoundError } from "./errors";
 
 type Row = Record<string, unknown>;
 
@@ -176,7 +177,7 @@ export async function getAgentThread(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("AI agent thread not found");
+  if (!data) throw new NotFoundError("AI agent thread not found");
   return normalizeAgentThreadRow(data as Row);
 }
 
