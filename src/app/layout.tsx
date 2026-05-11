@@ -1,7 +1,16 @@
 import type { Metadata, Viewport } from "next";
+import { Newsreader } from "next/font/google";
 import { ServiceWorkerRegistration } from "@/components/mobile/service-worker-registration";
 import { strings } from "@/lib/strings";
 import "./globals.css";
+
+const newsreader = Newsreader({
+  subsets: ["latin"],
+  weight: ["400", "500", "600"],
+  style: ["normal", "italic"],
+  variable: "--font-newsreader",
+  display: "swap",
+});
 
 export const viewport: Viewport = {
   width: "device-width",
@@ -52,7 +61,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en">
+    <html lang="en" className={newsreader.variable}>
       <body className="min-h-screen bg-background text-foreground antialiased">
         <ServiceWorkerRegistration />
         {children}

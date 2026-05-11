@@ -20,6 +20,7 @@ import {
 } from "@/server/contracts";
 import { recordSoftDeleteReason } from "./audit";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { NotFoundError } from "./errors";
 
 type Row = Record<string, unknown>;
 
@@ -147,7 +148,7 @@ export async function getMedication(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("Medication not found");
+  if (!data) throw new NotFoundError("Medication not found");
   return normalizeMedicationRow(data as Row);
 }
 
@@ -255,7 +256,7 @@ export async function getMedicationResponse(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("Medication response not found");
+  if (!data) throw new NotFoundError("Medication response not found");
   return normalizeMedicationResponseRow(data as Row);
 }
 

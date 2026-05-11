@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Controller, useForm, type FieldErrors } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
@@ -43,8 +43,11 @@ import type {
 
 import {
   fromLocalDateTimeInputValue,
+  nowIso,
+  nowIsoForInput,
   toLocalDateTimeInputValue,
 } from "@/lib/format";
+import { firstZodError } from "@/lib/forms";
 import { strings } from "@/lib/strings";
 import { userFacingErrorMessage } from "@/lib/result";
 import { cn } from "@/lib/utils";
@@ -93,10 +96,6 @@ export interface VasomotorFormProps {
   className?: string;
 }
 
-function nowIsoForInput(): string {
-  return toLocalDateTimeInputValue(new Date().toISOString());
-}
-
 function buildDefaults(
   props: VasomotorFormProps,
   captureOpenedAt: string,
@@ -136,19 +135,6 @@ function buildDefaults(
     left_attachment_id: undefined,
     right_attachment_id: undefined,
   };
-}
-
-function firstZodError(
-  errors: FieldErrors<VasomotorFormValues>,
-): string | null {
-  for (const key in errors) {
-    const value = errors[key as keyof VasomotorFormValues];
-    if (value && typeof value === "object" && "message" in value) {
-      const message = (value as { message?: string }).message;
-      if (message) return message;
-    }
-  }
-  return null;
 }
 
 function formatDelta(left: number | undefined, right: number | undefined) {

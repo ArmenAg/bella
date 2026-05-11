@@ -54,7 +54,7 @@ export interface AttachmentUploaderProps {
 }
 
 function makeLocalId() {
-  return `att-${Math.random().toString(36).slice(2)}-${Date.now().toString(36)}`;
+  return `att-${crypto.randomUUID()}`;
 }
 
 function detectMimeType(file: File): string {

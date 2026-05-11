@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Controller, useForm, type FieldErrors } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Loader2 } from "lucide-react";
@@ -35,8 +35,11 @@ import type {
 
 import {
   fromLocalDateTimeInputValue,
+  nowIso,
+  nowIsoForInput,
   toLocalDateTimeInputValue,
 } from "@/lib/format";
+import { firstZodError } from "@/lib/forms";
 import { strings } from "@/lib/strings";
 import { userFacingErrorMessage } from "@/lib/result";
 
@@ -46,10 +49,6 @@ export interface FlareStartFormProps {
   bodyRegions: BodyRegionDTO[];
   symptoms: SymptomDTO[];
   triggers: TriggerDTO[];
-}
-
-function nowIsoForInput(): string {
-  return toLocalDateTimeInputValue(new Date().toISOString());
 }
 
 function buildDefaults(captureOpenedAt: string): StartFlareFormValues {
@@ -65,19 +64,6 @@ function buildDefaults(captureOpenedAt: string): StartFlareFormValues {
     notes: undefined,
     client_recorded_at: captureOpenedAt,
   };
-}
-
-function firstZodError(
-  errors: FieldErrors<StartFlareFormValues>,
-): string | null {
-  for (const key in errors) {
-    const value = errors[key as keyof StartFlareFormValues];
-    if (value && typeof value === "object" && "message" in value) {
-      const message = (value as { message?: string }).message;
-      if (message) return message;
-    }
-  }
-  return null;
 }
 
 export function FlareStartForm({

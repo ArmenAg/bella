@@ -37,7 +37,7 @@ export function LoginForm({ showDemoCredentials }: LoginFormProps) {
       ) : null}
 
       <div className="grid gap-2">
-        <Label htmlFor="email">Email</Label>
+        <Label htmlFor="email">{strings.login.emailLabel}</Label>
         <Input
           id="email"
           name="email"
@@ -49,7 +49,7 @@ export function LoginForm({ showDemoCredentials }: LoginFormProps) {
       </div>
 
       <div className="grid gap-2">
-        <Label htmlFor="password">Password</Label>
+        <Label htmlFor="password">{strings.login.passwordLabel}</Label>
         <Input
           id="password"
           name="password"
@@ -62,14 +62,13 @@ export function LoginForm({ showDemoCredentials }: LoginFormProps) {
 
       {showDemoCredentials ? (
         <p className="rounded-md border border-border bg-muted px-3 py-2 text-xs leading-5 text-muted-foreground">
-          Local demo login is prefilled. Use this only with the local Supabase
-          fixture database.
+          {strings.login.demoNotice}
         </p>
       ) : null}
 
       <Button type="submit" disabled={pending} className="gap-2">
         <KeyRound aria-hidden="true" className="h-4 w-4" />
-        {pending ? "Signing in" : "Sign in"}
+        {pending ? strings.login.submitPending : strings.login.submit}
       </Button>
     </form>
   );

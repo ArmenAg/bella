@@ -20,6 +20,7 @@ import {
 } from "@/server/contracts";
 import { createEntry, getEntry, updateEntry } from "./entries";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { ConflictError } from "./errors";
 
 type FlareCheckpointRow = Record<string, unknown>;
 type FlareEntryRow = Record<string, unknown>;
@@ -125,7 +126,7 @@ async function assertNoActiveFlareForSubject(
   }
 
   if ((data ?? []).length > 0) {
-    throw new Error("Active flare already exists for this subject");
+    throw new ConflictError("Active flare already exists for this subject");
   }
 }
 

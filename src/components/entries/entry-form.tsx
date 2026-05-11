@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm, Controller, type FieldErrors } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Trash2, Loader2 } from "lucide-react";
@@ -45,7 +45,14 @@ import type {
 } from "@/server/contracts";
 
 import { strings } from "@/lib/strings";
-import { formatDateTime } from "@/lib/format";
+import {
+  formatDateTime,
+  fromLocalDateTimeInputValue,
+  nowIso,
+  nowIsoForInput,
+  toLocalDateTimeInputValue,
+} from "@/lib/format";
+import { firstZodError } from "@/lib/forms";
 import { cn } from "@/lib/utils";
 
 import { ToggleChip } from "./toggle-chip";
@@ -75,25 +82,6 @@ const PAIN_TYPE_ORDER: EntryType[] = [
   "procedure_related",
   "medication_related",
 ];
-
-function toLocalDateTimeInputValue(iso: string): string {
-  const date = new Date(iso);
-  if (Number.isNaN(date.getTime())) return "";
-  const offsetMs = date.getTimezoneOffset() * 60_000;
-  const local = new Date(date.getTime() - offsetMs);
-  return local.toISOString().slice(0, 16);
-}
-
-function fromLocalDateTimeInputValue(value: string): string | undefined {
-  if (!value) return undefined;
-  const date = new Date(value);
-  if (Number.isNaN(date.getTime())) return undefined;
-  return date.toISOString();
-}
-
-function nowIsoForInput(): string {
-  return toLocalDateTimeInputValue(new Date().toISOString());
-}
 
 function buildDefaults(
   variant: EntryFormVariant,
@@ -150,17 +138,6 @@ function buildDefaults(
     symptoms: [],
     triggers: [],
   };
-}
-
-function firstZodError(errors: FieldErrors<EntryFormValues>): string | null {
-  for (const key in errors) {
-    const value = errors[key as keyof EntryFormValues];
-    if (value && typeof value === "object" && "message" in value) {
-      const message = (value as { message?: string }).message;
-      if (message) return message;
-    }
-  }
-  return null;
 }
 
 export function EntryForm(props: EntryFormProps) {
@@ -245,37 +222,36 @@ export function EntryForm(props: EntryFormProps) {
 
   // Disclosure defaults: collapsed in create mode; in edit mode, expand a
   // section if it carries any existing data so saved values are never hidden.
+  // Attachments isn't surfaced on EntryDTO yet, so it opens unconditionally
+  // in edit mode — see the attachmentsEditNote rendered below.
   const isEdit = mode === "edit";
-  const hasPainExtras = Boolean(
-    entry &&
-    ((entry.pain_peak !== null && entry.pain_peak !== undefined) ||
-      (entry.pain_average !== null && entry.pain_average !== undefined) ||
-      (entry.recovery_minutes !== null &&
-        entry.recovery_minutes !== undefined)),
-  );
-  const hasContext = Boolean(
-    entry &&
-    ((entry.body_region_ids && entry.body_region_ids.length > 0) ||
-      (entry.symptom_ids && entry.symptom_ids.length > 0) ||
-      (entry.trigger_ids && entry.trigger_ids.length > 0)),
-  );
-  const hasResponse = Boolean(
-    entry &&
-    ((entry.function_impact && entry.function_impact.length > 0) ||
-      (entry.interventions_tried && entry.interventions_tried.length > 0) ||
-      (entry.response && entry.response.trim() !== "")),
-  );
-  const hasNotes = Boolean(entry && entry.notes && entry.notes.trim() !== "");
-  // Attachments aren't surfaced on EntryDTO yet, so default this section open
-  // in edit mode unconditionally — the existing attachments-edit note already
-  // explains the gap.
-  const hasAttachments = isEdit;
-
-  const painExtrasOpen = isEdit && hasPainExtras;
-  const contextOpen = isEdit && hasContext;
-  const responseOpen = isEdit && hasResponse;
-  const notesOpen = isEdit && hasNotes;
-  const attachmentsOpen = isEdit && hasAttachments;
+  const painExtrasOpen =
+    isEdit &&
+    Boolean(
+      entry &&
+      (entry.pain_peak != null ||
+        entry.pain_average != null ||
+        entry.recovery_minutes != null),
+    );
+  const contextOpen =
+    isEdit &&
+    Boolean(
+      entry &&
+      ((entry.body_region_ids?.length ?? 0) > 0 ||
+        (entry.symptom_ids?.length ?? 0) > 0 ||
+        (entry.trigger_ids?.length ?? 0) > 0),
+    );
+  const responseOpen =
+    isEdit &&
+    Boolean(
+      entry &&
+      ((entry.function_impact?.length ?? 0) > 0 ||
+        (entry.interventions_tried?.length ?? 0) > 0 ||
+        (entry.response && entry.response.trim() !== "")),
+    );
+  const notesOpen =
+    isEdit && Boolean(entry?.notes && entry.notes.trim() !== "");
+  const attachmentsOpen = isEdit;
 
   const onSubmit = handleSubmit(async (values) => {
     setServerError(null);
@@ -343,8 +319,7 @@ export function EntryForm(props: EntryFormProps) {
         const effectiveType: EntryType = isPain ? currentType : "freeform";
         const typeLabel =
           strings.painBook.types[effectiveType] ?? effectiveType;
-        const occurredIso =
-          form.getValues("occurred_at") ?? new Date().toISOString();
+        const occurredIso = form.getValues("occurred_at") ?? nowIso();
         form.setValue(
           "title",
           `${typeLabel} · ${formatDateTime(occurredIso)}`,
@@ -590,7 +565,7 @@ export function EntryForm(props: EntryFormProps) {
                           value={field.value ?? undefined}
                           onValueChange={(next) =>
                             field.onChange(
-                              next as "active" | "ended" | "cancelled",
+                              next as EntryFormValues["flare_status"],
                             )
                           }
                         >

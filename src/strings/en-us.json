@@ -23,7 +23,8 @@
     "primary": "Primary",
     "secondary": "Tools",
     "review": "Review",
-    "config": "Config"
+    "config": "Config",
+    "more": "More"
   },
   "actions": {
     "startFlare": "Start flare",
@@ -47,7 +48,8 @@
     "viewAll": "View all",
     "add": "Add",
     "remove": "Remove",
-    "clear": "Clear"
+    "clear": "Clear",
+    "newComparison": "New comparison"
   },
   "common": {
     "loading": "Loading…",
@@ -245,6 +247,25 @@
       "medication_related": "Medication-related",
       "freeform": "Freeform",
       "vasomotor": "Vasomotor"
+    },
+    "quick": {
+      "heading": "Quick entry",
+      "hint": "Tap a pain digit, then Save. Under fifteen seconds.",
+      "painLabel": "Pain now",
+      "notesPlaceholder": "Optional note",
+      "notesAriaLabel": "Optional note",
+      "bodyRegionsLabel": "Body regions",
+      "more": "More",
+      "moreSheetTitle": "All body regions",
+      "moreSheetDescription": "Pick any region. The most recent ones stay pinned in the quick row.",
+      "moreSheetDone": "Done",
+      "save": "Save",
+      "saving": "Saving",
+      "fullEntry": "Full entry",
+      "savedBadge": "Saved · just now",
+      "errorTitle": "Could not save",
+      "validationMissingPain": "Add a pain digit, a note, or pick at least one body region first.",
+      "noRegionsAvailable": "No body regions available yet."
     }
   },
   "logBook": {
@@ -328,6 +349,13 @@
     "signedOutTitle": "Sign in to continue",
     "signedOutBody": "Bella Care Tracker is private. Use a magic link from your invited email to sign in. Single-user mode is available for local development."
   },
+  "login": {
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "demoNotice": "Local demo login is prefilled. Use this only with the local Supabase fixture database.",
+    "submit": "Sign in",
+    "submitPending": "Signing in"
+  },
   "commandPalette": {
     "title": "Command palette",
     "description": "Jump to any page or quickly create an entry.",
@@ -354,7 +382,15 @@
       "startedAt": "Started",
       "checkpointSingular": "checkpoint",
       "checkpointPlural": "checkpoints",
-      "peakLabel": "Peak"
+      "peakLabel": "Peak",
+      "actions": {
+        "add30m": "+30m",
+        "add60m": "+60m",
+        "add2h": "+2h",
+        "end": "End",
+        "alreadyLogged": "Already logged",
+        "endFlareLabel": "Open end-flare flow"
+      }
     },
     "noActive": {
       "title": "No active flare",
@@ -407,7 +443,11 @@
       "savingChanges": "Saving…",
       "vasomotorSheetTitle": "New photo comparison",
       "vasomotorSheetDescription": "Linked to this flare. Captures left/right photos, temperatures, and color.",
-      "vasomotorAdd": "Add photo comparison + temperature"
+      "vasomotorAdd": "Add photo comparison + temperature",
+      "customCheckpoint": {
+        "title": "Custom checkpoint",
+        "hint": "Pick type, time, symptoms, notes"
+      }
     },
     "checkpoint": {
       "title": "New checkpoint",
@@ -469,6 +509,26 @@
       "responseTitle": "Response",
       "notesTitle": "Notes",
       "ongoing": "Ongoing"
+    },
+    "quickCheckpoint": {
+      "buttonPrefix": "Log",
+      "buttonSuffix": "checkpoint",
+      "buttonGenericLabel": "Log checkpoint",
+      "cancel": "Cancel",
+      "save": "Save",
+      "saving": "Saving…",
+      "painLabel": "Pain right now",
+      "typeLabels": {
+        "start": "start",
+        "30m": "30m",
+        "60m": "60m",
+        "120m": "2h",
+        "6h": "6h",
+        "12h": "12h",
+        "24h": "24h",
+        "48h": "48h",
+        "custom": "checkpoint"
+      }
     }
   },
   "vasomotor": {
@@ -523,7 +583,14 @@
       "deleteTitle": "Remove this comparison?",
       "submit": "Save",
       "submitting": "Saving…",
-      "siteSuggestions": ["knees", "thighs", "feet", "wrists", "hands", "arms"],
+      "siteSuggestions": [
+        "knees",
+        "thighs",
+        "feet",
+        "wrists",
+        "hands",
+        "arms"
+      ],
       "pendingUploads": "An upload is still in progress. Wait for it to finish before saving.",
       "missingSite": "Add a site name (knees, thighs, feet, etc.).",
       "tempStep": "0.1",
@@ -713,6 +780,10 @@
         "medication_response": "Medication response",
         "diagnosis": "Diagnosis"
       }
+    },
+    "review": {
+      "neverReviewed": "Never reviewed",
+      "reviewedPrefix": "Reviewed"
     }
   },
   "decisions": {
@@ -1284,6 +1355,64 @@
       "today": "Nothing scheduled or due right now.",
       "painOverTime": "Trends are populated as entries are logged.",
       "trends": "Not enough data yet for trends."
+    },
+    "cluster": {
+      "lastFlare": {
+        "label": "Last flare",
+        "none": "None on record"
+      },
+      "flares30d": {
+        "label": "Flares 30d",
+        "none": "0",
+        "same": "vs prior 30d",
+        "down": "from",
+        "up": "from"
+      },
+      "lastComparison": {
+        "label": "Last comparison",
+        "none": "None yet"
+      },
+      "nextAppt": {
+        "label": "Next appt",
+        "none": "None scheduled",
+        "nonePeriod": "—",
+        "today": "today",
+        "tomorrow": "tomorrow",
+        "inPrefix": "in "
+      },
+      "openDecisions": {
+        "label": "Open decisions",
+        "overdueSuffix": "overdue",
+        "noneOverdue": "none overdue",
+        "noOpen": "—"
+      },
+      "staleReview": {
+        "label": "Stale review",
+        "none": "All reviewed within 90d",
+        "suffix": "stale",
+        "over90": "over 90d old",
+        "neverReviewed": "never reviewed"
+      }
+    },
+    "packetCta": {
+      "eyebrow": "Visit prep",
+      "packPrefix": "Pack for ",
+      "packMissingProvider": "Pack for upcoming visit",
+      "cta": "Open packet preview"
+    },
+    "emptyCtas": {
+      "appointments": "No appointments scheduled.",
+      "appointmentsCta": "Schedule one →",
+      "tasks": "No open tasks.",
+      "tasksCta": "Add one →",
+      "decisions": "No open decisions.",
+      "decisionsCta": "Open one →",
+      "flares": "No flares logged in this range.",
+      "flaresCta": "Start a flare →",
+      "comparisons": "No comparisons yet.",
+      "comparisonsCta": "New comparison →",
+      "medications": "No active medications.",
+      "medicationsCta": "Add one →"
     }
   },
   "charts": {
@@ -1738,6 +1867,13 @@
       "m": "m",
       "ft": "ft",
       "percent": "%"
+    }
+  },
+  "entries": {
+    "nowField": {
+      "nowPrefix": "Now",
+      "editTime": "Edit time",
+      "useNow": "Use now"
     }
   }
 }

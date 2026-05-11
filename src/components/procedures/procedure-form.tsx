@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm, Controller, type FieldErrors } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
@@ -38,8 +38,11 @@ import { strings } from "@/lib/strings";
 import { userFacingErrorMessage } from "@/lib/result";
 import {
   fromLocalDateTimeInputValue,
+  nowIso,
+  nowIsoForInput,
   toLocalDateTimeInputValue,
 } from "@/lib/format";
+import { firstZodError } from "@/lib/forms";
 
 type ProcedureFormValues = z.input<typeof procedureEventMutationSchema>;
 
@@ -65,10 +68,6 @@ export interface ProcedureFormProps {
   mode: "create" | "edit";
   procedureEvent?: ProcedureEvent;
   sources: SourceOption[];
-}
-
-function nowIso(): string {
-  return new Date().toISOString();
 }
 
 function buildDefaults(
@@ -101,19 +100,6 @@ function buildDefaults(
     occurred_at: nowIso(),
     title: "",
   };
-}
-
-function firstZodError(
-  errors: FieldErrors<ProcedureFormValues>,
-): string | null {
-  for (const key in errors) {
-    const value = errors[key as keyof ProcedureFormValues];
-    if (value && typeof value === "object" && "message" in value) {
-      const message = (value as { message?: string }).message;
-      if (message) return message;
-    }
-  }
-  return null;
 }
 
 function emptyToUndefined(value: string | undefined): string | undefined {
@@ -345,7 +331,7 @@ export function ProcedureForm({
                     value={
                       field.value
                         ? toLocalDateTimeInputValue(field.value)
-                        : toLocalDateTimeInputValue(nowIso())
+                        : nowIsoForInput()
                     }
                     onChange={(event) => {
                       const next = fromLocalDateTimeInputValue(

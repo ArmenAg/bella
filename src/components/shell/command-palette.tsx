@@ -9,6 +9,7 @@ import {
   Pill,
   Plus,
   Search,
+  Thermometer,
   type LucideIcon,
 } from "lucide-react";
 import {
@@ -40,12 +41,32 @@ export function useCommandPalette(): CommandPaletteContextValue {
   return ctx;
 }
 
+// Global single-key shortcuts active only when the palette is closed
+// and the user isn't typing into a form field.
+const GLOBAL_KEY_SHORTCUTS: Record<string, string> = {
+  c: "/vasomotor/new",
+  f: "/flare",
+};
+
+function isEditableTarget(target: EventTarget | null): boolean {
+  if (!(target instanceof HTMLElement)) return false;
+  if (target.isContentEditable) return true;
+  const tag = target.tagName;
+  return tag === "INPUT" || tag === "TEXTAREA" || tag === "SELECT";
+}
+
 export function CommandPaletteProvider({
   children,
 }: {
   children: React.ReactNode;
 }) {
+  const router = useRouter();
   const [open, setOpen] = React.useState(false);
+  const openRef = React.useRef(open);
+  React.useEffect(() => {
+    openRef.current = open;
+  }, [open]);
+
   const value = React.useMemo<CommandPaletteContextValue>(
     () => ({
       open,
@@ -65,11 +86,29 @@ export function CommandPaletteProvider({
       if (isModK) {
         event.preventDefault();
         setOpen((current) => !current);
+        return;
+      }
+
+      // Single-key global shortcuts (no modifiers, palette closed, not in a field).
+      if (
+        openRef.current ||
+        event.metaKey ||
+        event.ctrlKey ||
+        event.altKey ||
+        event.shiftKey ||
+        isEditableTarget(event.target)
+      ) {
+        return;
+      }
+      const target = GLOBAL_KEY_SHORTCUTS[event.key.toLowerCase()];
+      if (target) {
+        event.preventDefault();
+        router.push(target);
       }
     }
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
-  }, []);
+  }, [router]);
 
   return (
     <CommandPaletteContext.Provider value={value}>
@@ -104,6 +143,12 @@ const CREATE_ACTIONS: ReadonlyArray<Omit<CommandItem, "group">> = [
     label: strings.actions.startFlare,
     href: "/flare",
     icon: Activity,
+  },
+  {
+    id: "new-comparison",
+    label: strings.actions.newComparison,
+    href: "/vasomotor/new",
+    icon: Thermometer,
   },
   {
     id: "create-medication",

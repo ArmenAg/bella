@@ -1,5 +1,4 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { cookies } from "next/headers";
 import { PRIVATE_UPLOAD_BUCKET } from "./config";
 
@@ -42,19 +41,6 @@ export async function createSupabaseServerClient() {
             // Handlers can; auth refresh still works there.
           }
         },
-      },
-    },
-  );
-}
-
-export function createSupabaseAdminClient(): SupabaseClient {
-  return createClient(
-    requireEnv("NEXT_PUBLIC_SUPABASE_URL"),
-    requireEnv("SUPABASE_SERVICE_ROLE_KEY"),
-    {
-      auth: {
-        autoRefreshToken: false,
-        persistSession: false,
       },
     },
   );

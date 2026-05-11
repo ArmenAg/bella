@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { Controller, useForm, type FieldErrors } from "react-hook-form";
+import { Controller, useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
@@ -42,6 +42,7 @@ import {
 import { strings } from "@/lib/strings";
 import { userFacingErrorMessage } from "@/lib/result";
 import { toDateInputValue } from "@/lib/format";
+import { firstZodError } from "@/lib/forms";
 
 import { SourceLinksCard } from "./source-links-card";
 import type { DiagnosisNode, Decision } from "@/server/contracts";
@@ -90,17 +91,6 @@ function buildDefaults(source: Source | undefined): SourceFormValues {
     tags: [],
     url: undefined,
   };
-}
-
-function firstZodError(errors: FieldErrors<SourceFormValues>): string | null {
-  for (const key in errors) {
-    const value = errors[key as keyof SourceFormValues];
-    if (value && typeof value === "object" && "message" in value) {
-      const message = (value as { message?: string }).message;
-      if (message) return message;
-    }
-  }
-  return null;
 }
 
 export function SourceForm({

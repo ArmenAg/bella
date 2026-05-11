@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import * as React from "react";
-import { Activity, MoreHorizontal, Search } from "lucide-react";
+import { MoreHorizontal, Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import {
   Sheet,
@@ -15,7 +15,12 @@ import {
 import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 import { useCommandPalette } from "./command-palette";
-import { allNavItems, navGroups, type NavItem } from "./nav-config";
+import {
+  allNavItems,
+  globalActions,
+  navGroups,
+  type NavItem,
+} from "./nav-config";
 
 function isActive(currentPath: string, href: string) {
   if (href === "/dashboard") {
@@ -74,12 +79,29 @@ export function MobileNav() {
       <header className="sticky top-0 z-30 flex min-h-[calc(3rem+var(--safe-top))] items-center justify-between gap-2 border-b border-border bg-background/95 pb-0 pl-[max(var(--safe-left),0.75rem)] pr-[max(var(--safe-right),0.75rem)] pt-[var(--safe-top)] backdrop-blur lg:hidden">
         <span className="text-sm font-semibold">{strings.app.name}</span>
         <div className="flex items-center gap-1.5">
-          <Button asChild size="sm" className="gap-1.5">
-            <Link href="/flare">
-              <Activity aria-hidden="true" className="h-3.5 w-3.5" />
-              {strings.actions.startFlare}
-            </Link>
-          </Button>
+          {globalActions.map((action) => {
+            const Icon = action.icon;
+            return (
+              <Button
+                key={action.href}
+                asChild
+                size="sm"
+                variant={action.kind === "primary" ? "default" : "outline"}
+                className="gap-1.5"
+              >
+                <Link href={action.href} aria-label={action.label}>
+                  <Icon aria-hidden="true" className="h-3.5 w-3.5" />
+                  <span
+                    className={cn(
+                      action.kind === "primary" ? "" : "hidden sm:inline",
+                    )}
+                  >
+                    {action.label}
+                  </span>
+                </Link>
+              </Button>
+            );
+          })}
           <Button
             type="button"
             variant="ghost"
@@ -93,7 +115,7 @@ export function MobileNav() {
       </header>
 
       <nav
-        aria-label="Primary"
+        aria-label={strings.nav.primary}
         className="fixed bottom-0 left-0 right-0 z-30 grid min-h-[calc(var(--mobile-bottom-nav-height)+var(--safe-bottom))] grid-cols-5 border-t border-border bg-background/95 pb-[var(--safe-bottom)] pl-[var(--safe-left)] pr-[var(--safe-right)] backdrop-blur lg:hidden"
       >
         {bottomItems.map((item) => {
@@ -140,7 +162,7 @@ export function MobileNav() {
               className="flex flex-col items-center justify-center gap-0.5 px-1 py-2 text-[11px] leading-tight text-muted-foreground transition-colors hover:text-foreground"
             >
               <MoreHorizontal aria-hidden="true" className="h-4 w-4" />
-              <span className="truncate">More</span>
+              <span className="truncate">{strings.nav.more}</span>
             </button>
           </SheetTrigger>
           <SheetContent

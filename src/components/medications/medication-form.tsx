@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm, Controller, type FieldErrors } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
@@ -38,10 +38,11 @@ import type {
 import { strings } from "@/lib/strings";
 import { userFacingErrorMessage } from "@/lib/result";
 import { toDateInputValue } from "@/lib/format";
+import { firstZodError } from "@/lib/forms";
 
 type MedicationFormValues = z.input<typeof medicationMutationSchema>;
 
-const STATUS_ORDER: Array<"active" | "paused" | "stopped" | "planned"> = [
+const STATUS_ORDER: Medication["status"][] = [
   "active",
   "paused",
   "stopped",
@@ -79,19 +80,6 @@ function buildDefaults(
     name: "",
     status: "active",
   };
-}
-
-function firstZodError(
-  errors: FieldErrors<MedicationFormValues>,
-): string | null {
-  for (const key in errors) {
-    const value = errors[key as keyof MedicationFormValues];
-    if (value && typeof value === "object" && "message" in value) {
-      const message = (value as { message?: string }).message;
-      if (message) return message;
-    }
-  }
-  return null;
 }
 
 function emptyToUndefined(value: string | undefined): string | undefined {
@@ -334,9 +322,7 @@ export function MedicationForm({ mode, medication }: MedicationFormProps) {
                   <Select
                     value={field.value}
                     onValueChange={(next) =>
-                      field.onChange(
-                        next as "active" | "paused" | "stopped" | "planned",
-                      )
+                      field.onChange(next as Medication["status"])
                     }
                   >
                     <SelectTrigger id="med-status">

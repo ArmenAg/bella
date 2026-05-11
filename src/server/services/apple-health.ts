@@ -29,6 +29,7 @@ import {
 } from "@/server/contracts";
 import { DEFAULT_PAGE_SIZE } from "@/server/contracts/common";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { NotFoundError, UnsupportedMediaTypeError } from "./errors";
 
 type Row = Record<string, unknown>;
 type XmlAttributes = Record<string, string>;
@@ -760,14 +761,16 @@ async function getAttachmentForImport(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("Attachment not found");
+  if (!data) throw new NotFoundError("Attachment not found");
 
   const attachment = data as AttachmentRow;
   if (
     !SUPPORTED_ZIP_MIME_TYPES.has(attachment.mime_type) &&
     !attachment.file_name.toLowerCase().endsWith(".zip")
   ) {
-    throw new Error("Apple Health import requires an export.zip attachment");
+    throw new UnsupportedMediaTypeError(
+      "Apple Health import requires an export.zip attachment",
+    );
   }
 
   return attachment;
@@ -978,7 +981,7 @@ export async function getAppleHealthImport(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("Apple Health import not found");
+  if (!data) throw new NotFoundError("Apple Health import not found");
   return normalizeAppleHealthImportRow(data as Row);
 }
 

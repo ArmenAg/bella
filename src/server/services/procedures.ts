@@ -12,6 +12,7 @@ import {
 } from "@/server/contracts";
 import { recordSoftDeleteReason } from "./audit";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { NotFoundError } from "./errors";
 
 type Row = Record<string, unknown>;
 
@@ -115,7 +116,7 @@ export async function getProcedureEvent(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("Procedure event not found");
+  if (!data) throw new NotFoundError("Procedure event not found");
   return normalizeProcedureEventRow(data as Row);
 }
 
