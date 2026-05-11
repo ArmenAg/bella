@@ -9,10 +9,13 @@ import { z } from "zod";
 
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 
 import { Field } from "@/components/entries/field";
+import {
+  NowDateTimeField,
+  type NowDateTimeFieldHandle,
+} from "@/components/entries/now-datetime-field";
 import { PainSegmented } from "@/components/entries/pain-segmented";
 import { ToggleChip } from "@/components/entries/toggle-chip";
 
@@ -20,10 +23,6 @@ import { addFlareCheckpoint } from "@/server/actions/flares";
 import { flareCheckpointInputSchema } from "@/server/contracts/flares";
 import type { FlareSessionDTO } from "@/server/contracts";
 
-import {
-  fromLocalDateTimeInputValue,
-  toLocalDateTimeInputValue,
-} from "@/lib/format";
 import { strings } from "@/lib/strings";
 import { userFacingErrorMessage } from "@/lib/result";
 
@@ -139,15 +138,21 @@ export function FlareCheckpointForm({
   const watchedType = watch("checkpoint_type");
   const checkpointStrings = strings.flare.checkpoint;
   const typeLabels = checkpointStrings.checkpointTypes;
+  const nowFieldRef = React.useRef<NowDateTimeFieldHandle>(null);
 
   const onSubmit = handleSubmit(async (values) => {
+    // If the time field is in "Now" mode, ensure the value reflects the
+    // moment of save, not the moment the form was opened. Use the returned
+    // iso since the parent's state update is async.
+    const snapped = nowFieldRef.current?.snapToNow();
+    const checkpointAt = snapped ?? values.checkpoint_at;
     setServerError(null);
     setSubmitting(true);
     try {
       const result = await addFlareCheckpoint({
         entry_id: values.entry_id,
         checkpoint_type: values.checkpoint_type,
-        checkpoint_at: values.checkpoint_at,
+        checkpoint_at: checkpointAt,
         pain_score: values.pain_score,
         symptoms: values.symptoms ?? [],
         notes: values.notes,
@@ -221,19 +226,12 @@ export function FlareCheckpointForm({
             control={control}
             name="checkpoint_at"
             render={({ field }) => (
-              <Input
+              <NowDateTimeField
+                ref={nowFieldRef}
                 id="checkpoint-at"
-                type="datetime-local"
-                value={
-                  field.value
-                    ? toLocalDateTimeInputValue(field.value)
-                    : toLocalDateTimeInputValue(new Date().toISOString())
-                }
-                onChange={(event) => {
-                  const next = fromLocalDateTimeInputValue(event.target.value);
-                  if (next) field.onChange(next);
-                }}
-                aria-invalid={errors.checkpoint_at ? true : undefined}
+                ariaLabel={checkpointStrings.checkpointAt}
+                value={field.value ?? undefined}
+                onChange={(iso) => field.onChange(iso)}
               />
             )}
           />

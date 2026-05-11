@@ -24,6 +24,7 @@
     --input: 214 20% 84%;
     --ring: 188 64% 28%;
     --radius: 0.5rem;
+    --font-serif: var(--font-newsreader), Georgia, "Times New Roman", serif;
   }
 
   * {

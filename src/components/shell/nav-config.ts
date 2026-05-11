@@ -16,6 +16,7 @@ import {
   Pill,
   Settings,
   Stethoscope,
+  Thermometer,
   type LucideIcon,
 } from "lucide-react";
 import { strings } from "@/lib/strings";
@@ -32,6 +33,13 @@ export interface NavGroup {
   id: "primary" | "review" | "secondary" | "config";
   label: string;
   items: NavItem[];
+}
+
+export interface GlobalAction {
+  href: string;
+  label: string;
+  icon: LucideIcon;
+  kind: "primary" | "secondary";
 }
 
 export const navGroups: NavGroup[] = [
@@ -126,3 +134,18 @@ export const navGroups: NavGroup[] = [
 export const allNavItems: NavItem[] = navGroups.flatMap((group) => group.items);
 
 export const DOCS_LINK_ICON = FileText;
+
+export const globalActions: GlobalAction[] = [
+  {
+    href: "/flare",
+    label: strings.actions.startFlare,
+    icon: Activity,
+    kind: "primary",
+  },
+  {
+    href: "/vasomotor/new",
+    label: strings.actions.newComparison,
+    icon: Thermometer,
+    kind: "secondary",
+  },
+];

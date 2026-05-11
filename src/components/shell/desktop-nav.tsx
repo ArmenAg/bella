@@ -2,12 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Activity, Search } from "lucide-react";
+import { Search } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 import { useCommandPalette } from "./command-palette";
-import { navGroups, type NavItem } from "./nav-config";
+import { globalActions, navGroups, type NavItem } from "./nav-config";
 
 function isActive(currentPath: string, href: string) {
   if (href === "/dashboard") {
@@ -46,7 +46,7 @@ export function DesktopNav() {
   const { setOpen } = useCommandPalette();
   return (
     <nav
-      aria-label="Primary"
+      aria-label={strings.nav.primary}
       className="sticky top-0 hidden h-screen max-h-screen w-60 shrink-0 self-start flex-col border-r border-border bg-card lg:flex"
     >
       <div className="flex items-center gap-2 px-4 py-3">
@@ -59,12 +59,23 @@ export function DesktopNav() {
       </div>
 
       <div className="flex flex-col gap-2 px-3 pt-1">
-        <Button asChild className="w-full justify-start gap-2" size="sm">
-          <Link href="/flare">
-            <Activity aria-hidden="true" className="h-4 w-4" />
-            {strings.actions.startFlare}
-          </Link>
-        </Button>
+        {globalActions.map((action) => {
+          const Icon = action.icon;
+          return (
+            <Button
+              key={action.href}
+              asChild
+              size="sm"
+              variant={action.kind === "primary" ? "default" : "outline"}
+              className="w-full justify-start gap-2"
+            >
+              <Link href={action.href}>
+                <Icon aria-hidden="true" className="h-4 w-4" />
+                {action.label}
+              </Link>
+            </Button>
+          );
+        })}
         <Button
           type="button"
           variant="outline"
