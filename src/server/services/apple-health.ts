@@ -816,7 +816,11 @@ async function updateImportRow(
   return normalizeAppleHealthImportRow(data as Row);
 }
 
-async function insertSampleBatch(
+// Exported for tests: this is the literal idempotency contract for repeat
+// imports. The unique constraint on (family_id, external_key) combined with
+// `ignoreDuplicates: true` means a re-import returns 0 newly-inserted rows
+// while leaving the existing rows in place.
+export async function insertSampleBatch(
   samples: NormalizedAppleHealthSample[],
   context: {
     familyId: string;

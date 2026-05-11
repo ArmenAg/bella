@@ -10,9 +10,11 @@ import { primaryAuthStatePath, supabaseE2EEnabled } from "./auth";
  * Tier-1 smokes do not require this; we still skip the heavy lifting when
  * BELLA_E2E_SUPABASE is unset so the suite passes without Docker.
  *
- * Credentials default to the demo seed:
- *   email    primary@example.com
- *   password (set via BELLA_E2E_PRIMARY_PASSWORD)
+ * Credentials default to the demo seed (see supabase/seed/002_demo.sql):
+ *   email     bella.demo@example.test
+ *   password  local-demo-password
+ *
+ * Override either with BELLA_E2E_PRIMARY_EMAIL / BELLA_E2E_PRIMARY_PASSWORD.
  */
 export default async function globalSetup() {
   if (!supabaseE2EEnabled()) {
@@ -21,8 +23,10 @@ export default async function globalSetup() {
 
   const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
   const anon = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-  const email = process.env.BELLA_E2E_PRIMARY_EMAIL ?? "primary@example.com";
-  const password = process.env.BELLA_E2E_PRIMARY_PASSWORD;
+  const email =
+    process.env.BELLA_E2E_PRIMARY_EMAIL ?? "bella.demo@example.test";
+  const password =
+    process.env.BELLA_E2E_PRIMARY_PASSWORD ?? "local-demo-password";
 
   if (!url || !anon) {
     throw new Error(
@@ -31,7 +35,8 @@ export default async function globalSetup() {
   }
   if (!password) {
     throw new Error(
-      "BELLA_E2E_SUPABASE=1 requires BELLA_E2E_PRIMARY_PASSWORD to sign in the seeded primary user.",
+      "BELLA_E2E_SUPABASE=1 needs a seeded primary password. The demo seed " +
+        "uses `local-demo-password`; override with BELLA_E2E_PRIMARY_PASSWORD.",
     );
   }
 

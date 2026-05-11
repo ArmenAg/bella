@@ -45,6 +45,10 @@ export default defineConfig({
         process.env.NEXT_PUBLIC_SUPABASE_URL ?? "http://127.0.0.1:54321",
       NEXT_PUBLIC_SUPABASE_ANON_KEY:
         process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY ?? "e2e-placeholder",
+      // Propagate the test-mode AI fake flag into the dev server. When set,
+      // the agent + AI import services swap out the OpenAI client for a
+      // deterministic fake so smokes don't need OPENAI_API_KEY.
+      BELLA_E2E_AGENT_FAKE: process.env.BELLA_E2E_AGENT_FAKE ?? "",
     },
   },
 });

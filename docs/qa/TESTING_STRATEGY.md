@@ -114,25 +114,44 @@ others should be checked locally with seeded Supabase.
 These are deliberately deferred. They are out of scope for fast PR review;
 land them as their own PRs when justified.
 
-- **Tier-2 smokes for every feature surface.** The harness and Pain
-  Book/Flare/Agent/Apple Health smokes are scaffolded but several are still
-  documented-only. They need a stable seed user + password mechanism that
-  doesn't weaken production auth.
-- **Real OpenAI mock for Agent / AI Import.** Today the agent service is
-  testable via its `injectableResponsesClient`, but a Playwright smoke that
-  drives `/agent` end-to-end needs a mock injected through the dev server.
-  Scope this with the test-only route discussion (see `agent-runner.ts`).
-- **Apple Health daily-summary SQL function still groups by UTC day.** The
-  parser already tags `metadata.local_date` per sample (see
-  `apple-health-local-date.test.ts`). The next backend pass needs to update
-  the SQL function to group by `metadata->>'local_date'` (or to add a
-  dedicated `local_date` column). Until then, sleep records that cross local
-  midnight will show under the UTC day.
-- **Apple Health full persistence integration test.** The parser idempotency
-  test in `apple-health-idempotency.test.ts` proves `external_key`
-  stability, which the DB unique constraint then enforces. A true round-trip
-  through Supabase requires the Supabase test harness (`@supabase/ssr`
-  cookie wiring) and is gated on Tier-2 work.
+- **Apple Health daily-summary SQL function** — fixed in migration
+  `20260510070000_apple_health_local_date_summary.sql`. Summaries now group
+  by `metadata->>'local_date'` when set and fall back to UTC otherwise. The
+  RLS verifier (`supabase/tests/rls_verification.sql`) inserts a 23:00 PT
+  sleep sample plus UTC-fallback step samples and asserts the resulting
+  `summary_date` values.
+- **Apple Health DB round-trip / idempotency** — covered in
+  `apple-health-roundtrip.test.ts`. A focused fake Supabase emulates the
+  unique-constraint behavior on `(family_id, external_key)`. The test runs
+  the parser → `insertSampleBatch` → re-import path and asserts: full
+  insert on run 1, zero new inserts on run 2, no cross-family collisions,
+  `metadata.local_date` carried through. A full Supabase ssr-cookie
+  integration is still gated on the running-Supabase Tier-2 harness.
+- **AI agent / import mock for e2e** — `BELLA_E2E_AGENT_FAKE=1` swaps the
+  OpenAI client for a deterministic fake (`createFakeResponsesClient` in
+  `agent-runner.ts`, `extractAiImportDraftsFake` in `ai-import.ts`). Tier-2
+  smokes for `/agent` and `/import` exercise the flag — they self-skip
+  without it. Production behavior is unchanged.
+- **Tier-2 smokes for every feature surface** — Pain Book, Flare,
+  Vasomotor, Apple Health upload+import, Export packet, Agent, and Import
+  Review smokes are wired against the seeded primary user. Run them with:
+  ```sh
+  npx supabase start && npx supabase db reset && npm run supabase:seed
+  BELLA_E2E_SUPABASE=1 BELLA_E2E_AGENT_FAKE=1 \
+    BELLA_E2E_PRIMARY_PASSWORD=local-demo-password \
+    npm run test:e2e
+  ```
+  Default credentials come from `supabase/seed/002_demo.sql`:
+  `bella.demo@example.test` / `local-demo-password`.
+
+### Still open
+
+- **Full Supabase + ssr-cookie integration test in CI.** Tier-2 smokes
+  require Docker + the `npx supabase` containers, which we don't run in
+  every PR. They run locally and pre-staging only.
+- **Photo-upload smokes for Vasomotor.** The vasomotor smoke covers temp +
+  delta but not the L/R image upload UI. Add when a small image fixture is
+  worth the bytes.
 
 ## Rules
 

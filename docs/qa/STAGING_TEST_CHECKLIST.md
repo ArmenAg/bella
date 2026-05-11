@@ -117,13 +117,28 @@ uploads, third-party services, or real data:
 - [ ] No `.env` or credential files staged. Run
       `git status` and inspect.
 
+## How to run the automated half
+
+```sh
+# Fast gates (CI parity, no Supabase)
+npm run verify
+
+# Slow gates with helpful skip notices when prereqs are missing
+npm run verify:full
+
+# Tier-2 against seeded local Supabase + faked AI
+npx supabase start && npx supabase db reset && npm run supabase:seed
+BELLA_E2E_SUPABASE=1 BELLA_E2E_AGENT_FAKE=1 \
+  BELLA_E2E_PRIMARY_PASSWORD=local-demo-password \
+  npm run test:e2e
+```
+
 ## Deferred (documented, not blocking)
 
-These are tracked in `docs/qa/TESTING_STRATEGY.md` under "Known gaps and
-follow-ups":
+Tracked in `docs/qa/TESTING_STRATEGY.md`:
 
-- Tier-2 smokes for every feature surface.
-- Real OpenAI mock harness for Agent + AI Import smokes.
-- Apple Health daily-summary SQL function still groups by UTC day (parser
-  already tags `metadata.local_date`).
-- Apple Health full Supabase round-trip integration test.
+- **Full Supabase + ssr-cookie integration test in CI.** Tier-2 smokes
+  require Docker + `npx supabase` containers, which we don't run in every
+  PR. They run locally and pre-staging only.
+- **Photo-upload smokes for Vasomotor + Pain Book attachments.** Skipped
+  to keep fixture sizes small.

@@ -603,4 +603,144 @@ begin
 end;
 $$;
 
+-- Apple Health summary day-grouping (local-date with UTC fallback).
+do $$
+declare
+  family_a uuid := uuid_generate_v5(uuid_ns_url(), 'bella-rls-test:family-a');
+  primary_a uuid := uuid_generate_v5(uuid_ns_url(), 'bella-rls-test:primary-a');
+  import_id uuid := uuid_generate_v5(uuid_ns_url(), 'bella-rls-test:ah-import');
+  inserted_summaries integer;
+  local_day_count integer;
+  utc_day_count integer;
+  bad_day_count integer;
+begin
+  execute 'set local role authenticated';
+  perform set_config('request.jwt.claim.sub', primary_a::text, true);
+
+  insert into public.apple_health_imports (
+    id, family_id, user_id, attachment_id, status, file_name
+  )
+  values (
+    import_id, family_a, primary_a, null, 'completed', 'rls-test.zip'
+  )
+  on conflict (id) do nothing;
+
+  -- Sample 1: sleep starting 23:00 Pacific on May 9.
+  -- start_at in UTC is May 10 06:00, but the parser tags metadata.local_date
+  -- as 2026-05-09. The summary must land on May 9.
+  insert into public.apple_health_samples (
+    family_id, user_id, import_id,
+    external_key, apple_type, normalized_type, sample_kind,
+    source_name, unit,
+    value_numeric, value_text,
+    start_at, end_at, creation_at, duration_seconds,
+    metadata
+  )
+  values (
+    family_a, primary_a, import_id,
+    'rls-test:local-date-sleep',
+    'HKCategoryTypeIdentifierSleepAnalysis',
+    'sleep_asleep_minutes', 'category',
+    'Test Watch', null,
+    null, 'HKCategoryValueSleepAnalysisAsleepUnspecified',
+    timestamptz '2026-05-10 06:00:00 +00:00',
+    timestamptz '2026-05-10 13:30:00 +00:00',
+    timestamptz '2026-05-10 13:30:30 +00:00',
+    27000,
+    jsonb_build_object('local_date', '2026-05-09')
+  )
+  on conflict (family_id, external_key) do nothing;
+
+  -- Sample 2: walk step count on May 9 Pacific, but the parser left
+  -- metadata.local_date empty (legacy import). Falls back to UTC date.
+  insert into public.apple_health_samples (
+    family_id, user_id, import_id,
+    external_key, apple_type, normalized_type, sample_kind,
+    source_name, unit,
+    value_numeric, value_text,
+    start_at, end_at, creation_at, duration_seconds,
+    metadata
+  )
+  values (
+    family_a, primary_a, import_id,
+    'rls-test:utc-fallback-steps',
+    'HKQuantityTypeIdentifierStepCount',
+    'step_count', 'quantity',
+    'Test iPhone', 'count',
+    500, null,
+    timestamptz '2026-05-09 18:00:00 +00:00',
+    timestamptz '2026-05-09 18:10:00 +00:00',
+    timestamptz '2026-05-09 18:10:01 +00:00',
+    600,
+    '{}'::jsonb
+  )
+  on conflict (family_id, external_key) do nothing;
+
+  -- Sample 3: a malformed local_date string. Should fall through to UTC.
+  insert into public.apple_health_samples (
+    family_id, user_id, import_id,
+    external_key, apple_type, normalized_type, sample_kind,
+    source_name, unit,
+    value_numeric, value_text,
+    start_at, end_at, creation_at, duration_seconds,
+    metadata
+  )
+  values (
+    family_a, primary_a, import_id,
+    'rls-test:bad-local-date',
+    'HKQuantityTypeIdentifierStepCount',
+    'step_count', 'quantity',
+    'Test iPhone', 'count',
+    100, null,
+    timestamptz '2026-05-09 19:00:00 +00:00',
+    timestamptz '2026-05-09 19:05:00 +00:00',
+    timestamptz '2026-05-09 19:05:01 +00:00',
+    300,
+    jsonb_build_object('local_date', 'not-a-date')
+  )
+  on conflict (family_id, external_key) do nothing;
+
+  inserted_summaries := public.refresh_apple_health_daily_summaries(
+    date '2026-05-08',
+    date '2026-05-10'
+  );
+
+  select count(*) into local_day_count
+  from public.apple_health_daily_summaries
+  where family_id = family_a
+    and summary_date = date '2026-05-09'
+    and metric_type = 'sleep_asleep_minutes';
+
+  perform public.assert_condition(
+    local_day_count = 1,
+    'Apple Health sleep sample at 23:00 PT must summarize under local date 2026-05-09'
+  );
+
+  -- The legacy + malformed step samples should fall back to UTC (2026-05-09).
+  select count(*) into utc_day_count
+  from public.apple_health_daily_summaries
+  where family_id = family_a
+    and summary_date = date '2026-05-09'
+    and metric_type = 'step_count';
+
+  perform public.assert_condition(
+    utc_day_count = 1,
+    'Step samples without a valid local_date must summarize under their UTC date 2026-05-09'
+  );
+
+  -- And nothing for May 10 — the UTC midnight bleed must not have leaked.
+  select count(*) into bad_day_count
+  from public.apple_health_daily_summaries
+  where family_id = family_a
+    and summary_date = date '2026-05-10';
+
+  perform public.assert_condition(
+    bad_day_count = 0,
+    'No Apple Health samples should summarize under 2026-05-10 (UTC bleed)'
+  );
+
+  reset role;
+end;
+$$;
+
 rollback;

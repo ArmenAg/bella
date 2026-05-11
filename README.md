@@ -87,12 +87,17 @@ unregisters itself, and reloads open clients.
 - `npm run format`: check formatting with Prettier.
 - `npm run test`: run Vitest tests.
 - `npm run test:e2e`: run Playwright browser smokes. Tier-1 only by default;
-  set `BELLA_E2E_SUPABASE=1` to run Tier-2 smokes against local Supabase.
-  See `tests/e2e/README.md`.
+  set `BELLA_E2E_SUPABASE=1` to run Tier-2 smokes against local Supabase
+  (seeded `bella.demo@example.test` / `local-demo-password`). For Agent +
+  Import smokes without OpenAI, also set `BELLA_E2E_AGENT_FAKE=1` so the
+  dev server uses a deterministic fake responses client. See
+  `tests/e2e/README.md` and `docs/qa/TESTING_STRATEGY.md`.
 - `npm run verify`: fast all-in-one — `typecheck && lint && format && test &&
 build`. Use before opening a PR.
 - `npm run verify:full`: `verify` plus `db:verify:local-postgres` and
-  `test:e2e`. Use before tagging a staging release.
+  `test:e2e`. Skips the DB verifier when Postgres 15 isn't installed and
+  prints a clear notice rather than failing. Use before tagging a staging
+  release.
 - `npm run supabase:seed`: load reference, demo, diagnostic-tree, historical,
   and current-records seed data into the running local Supabase database.
 - `npm run supabase:verify`: run SQL checks for RLS, role, soft-delete, and

@@ -202,20 +202,29 @@ fixed in commit fc48477's follow-up; the two P2s are recorded here.
   payload toggle, with `+N more` overflow. Matches the "evidence stays linked"
   principle.
 
-### Open follow-ups (P2)
+### Resolved later
 
-1. **Apple Health summary day grouping is UTC.** `refresh_apple_health_daily_summaries`
-   in `20260510060000_apple_health_import.sql:259` buckets samples by
-   `(s.start_at at time zone 'UTC')::date`. For samples recorded in non-UTC
-   timezones (e.g. Pacific overnight sleep), this can place a record on the
-   wrong local day. Plumb the original timezone offset through (Apple's export
-   uses an offset suffix on each `<Record>` timestamp), or store a derived
-   `local_date` per sample and group by that.
-2. **Idempotency test at persistence level.** Parser-level unit tests cover the
-   external-key derivation in `apple-health.test.ts`, and the DB has
-   `unique (family_id, external_key)` on `apple_health_samples`. Add an
-   integration test that runs the importer twice on the same fixture and
-   asserts: same imported count on run 1, near-zero imported (all-duplicate) on
-   run 2, identical daily summary totals on both. Requires the Supabase test
-   harness, which the QA-pass environment doesn't have provisioned (see
-   **Local setup gaps**).
+- **Apple Health summary day grouping** — fixed in
+  `20260510070000_apple_health_local_date_summary.sql`. The function now
+  groups by `metadata->>'local_date'` when present (parser tags it) and
+  falls back to UTC. RLS verifier covers a 23:00 PT sleep sample crossing
+  midnight and a malformed `local_date` falling through to UTC.
+- **Idempotency at persistence level** — covered by
+  `apple-health-roundtrip.test.ts`. Drives parser → `insertSampleBatch` →
+  re-import against an in-memory Supabase fake that enforces the real
+  unique-constraint contract on `(family_id, external_key)`. Asserts zero
+  newly-inserted rows on re-import, no cross-family collisions, and
+  `metadata.local_date` plumb-through.
+- **Tier-2 Playwright smokes** — Pain Book / Flare / Vasomotor / Apple
+  Health / Export / Agent / Import smokes are wired against the seeded
+  `bella.demo@example.test` user. They self-skip without
+  `BELLA_E2E_SUPABASE=1`. Agent + Import smokes additionally require
+  `BELLA_E2E_AGENT_FAKE=1` so they never need a real OpenAI key.
+
+### Open follow-ups
+
+- **Full Supabase + ssr-cookie integration test in CI.** Tier-2 smokes
+  require Docker + `npx supabase` containers, which we don't run in every
+  PR. They run locally and pre-staging only.
+- **Photo-upload smokes for Vasomotor / Pain Book attachments.** Skipped to
+  keep fixture sizes small.
