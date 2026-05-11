@@ -100,7 +100,7 @@ The pain book is the breviary: the regular practice from which the timeline grow
 
 ### XII. The Log Book — When Pain Scores Don't Fit
 
-Some events do not reduce to a number. *Arm froze after BP cuff. Knee turned red and cold. New top-of-foot numbness this morning. Bad reaction to scar injection. Speech episode at dinner.* These are log-book entries.
+Some events do not reduce to a number. _Arm froze after BP cuff. Knee turned red and cold. New top-of-foot numbness this morning. Bad reaction to scar injection. Speech episode at dinner._ These are log-book entries.
 
 The log book is freeform with structure: title, description, body regions, tags, attachments. It is the place where the patient's experience that does not collapse to a pain score still gets a record. Cognitive and visual episodes belong here, not in the pain book.
 
@@ -124,11 +124,11 @@ The visual model should not be a directed graph. A node list with status chips, 
 
 ### XV. The Decision Journal — The Discipline of Revisiting Choices
 
-A decision-journal entry is a question, not an answer. *Should we pursue scar exploration? Should we attempt sigma-1 PET/MRI? Should we retry EMG with a tolerance plan? Should we consider buprenorphine rotation?* Each entry has options, evidence for and against, risks, what-would-change-the-decision, an owner, a target date, and a final decision with rationale.
+A decision-journal entry is a question, not an answer. _Should we pursue scar exploration? Should we attempt sigma-1 PET/MRI? Should we retry EMG with a tolerance plan? Should we consider buprenorphine rotation?_ Each entry has options, evidence for and against, risks, what-would-change-the-decision, an owner, a target date, and a final decision with rationale.
 
 Decisions are reopened. Status moves from open → waiting → decided → revisiting as new data arrives. The journal preserves the reasoning even when the decision changes.
 
-The decision journal resists the gravitational pull of *we already decided that*. It assumes that decisions in chronic care are revisited and that the rationale for past decisions matters as much as the decisions themselves.
+The decision journal resists the gravitational pull of _we already decided that_. It assumes that decisions in chronic care are revisited and that the rationale for past decisions matters as much as the decisions themselves.
 
 ### XVI. The Procedure Impact View — Keeping Faith with the Question
 
@@ -136,7 +136,7 @@ Every procedure asks a question. The 2025-12-23 hydrodissection asked whether a 
 
 The procedure impact view holds that question alongside the impact: baseline before, immediate effect, 24h, 72h, 1 week, 1 month. New symptoms triggered. Whether it answered the diagnostic question. Whether to repeat.
 
-The view exists because the case has a clear pattern of nondiagnostic procedures, several of which flared symptoms. Without an explicit place to record what each procedure was supposed to answer, that pattern hides. With it, the next procedural conversation begins with the right question — *what is this supposed to tell us, and what is the falsifying outcome?*
+The view exists because the case has a clear pattern of nondiagnostic procedures, several of which flared symptoms. Without an explicit place to record what each procedure was supposed to answer, that pattern hides. With it, the next procedural conversation begins with the right question — _what is this supposed to tell us, and what is the falsifying outcome?_
 
 ### XVII. The Visit Packet — Crossing the Gap
 
@@ -172,15 +172,15 @@ Bottom navigation on mobile, left navigation on desktop. The flare-mode start bu
 
 ### XXI. Empty States, Loading, And Error
 
-Every major view has an empty state that says what to do next. Loading states use skeletons that match the final layout, not spinners; the user should never wonder whether a list is empty or still arriving. Errors say what failed and what action to take, in plain language; they never expose stack traces or technical identifiers. A failed upload says *the photo did not save — try again* and offers retry; it does not say *400 Bad Request*.
+Every major view has an empty state that says what to do next. Loading states use skeletons that match the final layout, not spinners; the user should never wonder whether a list is empty or still arriving. Errors say what failed and what action to take, in plain language; they never expose stack traces or technical identifiers. A failed upload says _the photo did not save — try again_ and offers retry; it does not say _400 Bad Request_.
 
 ### XXII. Destructive Actions
 
-Deletion is soft by default; the audit log records the deletion. The UI confirms with the noun and a reason field. *Delete this flare entry? (optional reason)*. The reason is preserved in the audit log. Hard delete exists only as a privileged action initiated from Settings → Account → Erase Data, after a typed confirmation. Medical records do not vanish silently.
+Deletion is soft by default; the audit log records the deletion. The UI confirms with the noun and a reason field. _Delete this flare entry? (optional reason)_. The reason is preserved in the audit log. Hard delete exists only as a privileged action initiated from Settings → Account → Erase Data, after a typed confirmation. Medical records do not vanish silently.
 
 ### XXIII. Time and Timezone
 
-All times are stored UTC and displayed in the user's local timezone. Times are shown in absolute form near the entry (*May 8, 2026, 2:14 AM*) and relative form when scanning a list (*4 hours ago*). Both are present in dense list views. Daylight-savings transitions do not silently shift entries.
+All times are stored UTC and displayed in the user's local timezone. Times are shown in absolute form near the entry (_May 8, 2026, 2:14 AM_) and relative form when scanning a list (_4 hours ago_). Both are present in dense list views. Daylight-savings transitions do not silently shift entries.
 
 ---
 
