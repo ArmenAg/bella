@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm, Controller, type FieldErrors } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
@@ -40,6 +40,7 @@ import {
   fromLocalDateTimeInputValue,
   toLocalDateTimeInputValue,
 } from "@/lib/format";
+import { firstZodError } from "@/lib/forms";
 import { cn } from "@/lib/utils";
 
 import { collectDescendantIds } from "./diagnosis-tree";
@@ -103,19 +104,6 @@ function buildDefaults(node: DiagnosisNode | undefined): DiagnosisFormValues {
     open_questions: [],
     last_reviewed_at: undefined,
   };
-}
-
-function firstZodError(
-  errors: FieldErrors<DiagnosisFormValues>,
-): string | null {
-  for (const key in errors) {
-    const value = errors[key as keyof DiagnosisFormValues];
-    if (value && typeof value === "object" && "message" in value) {
-      const message = (value as { message?: string }).message;
-      if (message) return message;
-    }
-  }
-  return null;
 }
 
 export function DiagnosisForm({

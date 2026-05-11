@@ -125,44 +125,44 @@ async function replaceEntryLinks(
     if (error) throw error;
   }
 
-  await replaceLinkSet(
-    "entry_regions",
-    "entry_id,body_region_id",
-    links.body_region_ids,
-    (bodyRegionId) => ({
-      family_id: familyId,
-      entry_id: entryId,
-      body_region_id: bodyRegionId,
-      deleted_at: null,
-    }),
-  );
-
-  await replaceLinkSet(
-    "entry_symptoms",
-    "entry_id,symptom_id",
-    links.symptoms,
-    (symptom) => ({
-      family_id: familyId,
-      entry_id: entryId,
-      symptom_id: symptom.symptom_id,
-      severity: symptom.severity,
-      notes: symptom.notes,
-      deleted_at: null,
-    }),
-  );
-
-  await replaceLinkSet(
-    "entry_triggers",
-    "entry_id,trigger_id",
-    links.triggers,
-    (trigger) => ({
-      family_id: familyId,
-      entry_id: entryId,
-      trigger_id: trigger.trigger_id,
-      notes: trigger.notes,
-      deleted_at: null,
-    }),
-  );
+  await Promise.all([
+    replaceLinkSet(
+      "entry_regions",
+      "entry_id,body_region_id",
+      links.body_region_ids,
+      (bodyRegionId) => ({
+        family_id: familyId,
+        entry_id: entryId,
+        body_region_id: bodyRegionId,
+        deleted_at: null,
+      }),
+    ),
+    replaceLinkSet(
+      "entry_symptoms",
+      "entry_id,symptom_id",
+      links.symptoms,
+      (symptom) => ({
+        family_id: familyId,
+        entry_id: entryId,
+        symptom_id: symptom.symptom_id,
+        severity: symptom.severity,
+        notes: symptom.notes,
+        deleted_at: null,
+      }),
+    ),
+    replaceLinkSet(
+      "entry_triggers",
+      "entry_id,trigger_id",
+      links.triggers,
+      (trigger) => ({
+        family_id: familyId,
+        entry_id: entryId,
+        trigger_id: trigger.trigger_id,
+        notes: trigger.notes,
+        deleted_at: null,
+      }),
+    ),
+  ]);
 }
 
 async function findEntryIdsForFilter(

@@ -1,7 +1,7 @@
 "use client";
 
 import * as React from "react";
-import { useForm, Controller, type FieldErrors } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
@@ -40,8 +40,11 @@ import { strings } from "@/lib/strings";
 import { userFacingErrorMessage } from "@/lib/result";
 import {
   fromLocalDateTimeInputValue,
+  nowIso,
+  nowIsoForInput,
   toLocalDateTimeInputValue,
 } from "@/lib/format";
+import { firstZodError } from "@/lib/forms";
 
 type MedicationResponseFormValues = z.input<
   typeof medicationResponseMutationSchema
@@ -74,10 +77,6 @@ export interface ResponseFormProps {
   defaultMedicationId?: string;
 }
 
-function nowIso(): string {
-  return new Date().toISOString();
-}
-
 function buildDefaults(
   response: MedicationResponse | undefined,
   defaultMedicationId: string | undefined,
@@ -104,19 +103,6 @@ function buildDefaults(
     medication_id: defaultMedicationId,
     taken_at: nowIso(),
   };
-}
-
-function firstZodError(
-  errors: FieldErrors<MedicationResponseFormValues>,
-): string | null {
-  for (const key in errors) {
-    const value = errors[key as keyof MedicationResponseFormValues];
-    if (value && typeof value === "object" && "message" in value) {
-      const message = (value as { message?: string }).message;
-      if (message) return message;
-    }
-  }
-  return null;
 }
 
 function emptyToUndefined(value: string | undefined): string | undefined {
@@ -322,7 +308,7 @@ export function MedicationResponseForm(props: ResponseFormProps) {
                     value={
                       field.value
                         ? toLocalDateTimeInputValue(field.value)
-                        : toLocalDateTimeInputValue(nowIso())
+                        : nowIsoForInput()
                     }
                     onChange={(event) => {
                       const next = fromLocalDateTimeInputValue(

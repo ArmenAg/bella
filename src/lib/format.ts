@@ -80,6 +80,25 @@ export function toDateInputValue(value: string | null | undefined): string {
   return value.slice(0, 10);
 }
 
+export function nowIso(): string {
+  return new Date().toISOString();
+}
+
+export function nowIsoForInput(): string {
+  return toLocalDateTimeInputValue(nowIso());
+}
+
+/**
+ * `M/D` label used by chart axes (e.g. `3/5`). Falls back to the input string
+ * if it can't be parsed.
+ */
+export function formatMonthDay(value: string | null | undefined): string {
+  if (!value) return "";
+  const date = new Date(value);
+  if (Number.isNaN(date.getTime())) return value;
+  return `${date.getMonth() + 1}/${date.getDate()}`;
+}
+
 /**
  * `JSON.stringify(value, null, 2)` with a String() fallback for values that
  * can't be serialized (BigInt, cycles, etc.). Used by the agent/import draft

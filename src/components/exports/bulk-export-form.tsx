@@ -15,6 +15,7 @@ import { createBulkDataExport } from "@/server/actions/exports";
 import type { BulkExport, BulkExportRequest } from "@/server/contracts";
 import { strings } from "@/lib/strings";
 import { userFacingErrorMessage } from "@/lib/result";
+import { downloadBlob } from "@/lib/utils";
 
 export interface BulkExportFormProps {
   canGenerate: boolean;
@@ -62,14 +63,7 @@ export function BulkExportForm({
     const blob = new Blob([JSON.stringify(archive, null, 2)], {
       type: "application/json",
     });
-    const url = URL.createObjectURL(blob);
-    const anchor = document.createElement("a");
-    anchor.href = url;
-    anchor.download = `bella-bulk-export-${date}.json`;
-    document.body.appendChild(anchor);
-    anchor.click();
-    document.body.removeChild(anchor);
-    URL.revokeObjectURL(url);
+    downloadBlob(`bella-bulk-export-${date}.json`, blob);
   };
 
   return (

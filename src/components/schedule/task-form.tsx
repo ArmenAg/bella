@@ -2,7 +2,7 @@
 
 import * as React from "react";
 import { canWrite } from "@/lib/auth";
-import { useForm, Controller, type FieldErrors } from "react-hook-form";
+import { useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Loader2, Trash2 } from "lucide-react";
@@ -37,6 +37,7 @@ import {
   toLocalDateTimeInputValue,
   fromLocalDateTimeInputValue,
 } from "@/lib/format";
+import { firstZodError } from "@/lib/forms";
 import { useShellProfile } from "@/components/shell/shell-context";
 
 type TaskFormValues = z.input<typeof taskMutationSchema>;
@@ -77,17 +78,6 @@ function buildDefaults(task: Task | undefined): TaskFormValues {
     diagnosis_id: task.diagnosis_id ?? undefined,
     source_id: task.source_id ?? undefined,
   };
-}
-
-function firstZodError(errors: FieldErrors<TaskFormValues>): string | null {
-  for (const key in errors) {
-    const value = errors[key as keyof TaskFormValues];
-    if (value && typeof value === "object" && "message" in value) {
-      const message = (value as { message?: string }).message;
-      if (message) return message;
-    }
-  }
-  return null;
 }
 
 export interface LinkedOption {

@@ -2,12 +2,7 @@
 
 import * as React from "react";
 import { canWrite } from "@/lib/auth";
-import {
-  useFieldArray,
-  useForm,
-  Controller,
-  type FieldErrors,
-} from "react-hook-form";
+import { useFieldArray, useForm, Controller } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
 import { Loader2, Plus, Trash2, X } from "lucide-react";
@@ -39,6 +34,7 @@ import type { Decision } from "@/server/contracts";
 import { strings } from "@/lib/strings";
 import { userFacingErrorMessage } from "@/lib/result";
 import { toDateInputValue } from "@/lib/format";
+import { firstZodError } from "@/lib/forms";
 import { useShellProfile } from "@/components/shell/shell-context";
 
 type DecisionFormValues = z.input<typeof decisionMutationSchema>;
@@ -83,17 +79,6 @@ function buildDefaults(decision: Decision | undefined): DecisionFormValues {
     final_decision: decision.final_decision ?? undefined,
     rationale: decision.rationale ?? undefined,
   };
-}
-
-function firstZodError(errors: FieldErrors<DecisionFormValues>): string | null {
-  for (const key in errors) {
-    const value = errors[key as keyof DecisionFormValues];
-    if (value && typeof value === "object" && "message" in value) {
-      const message = (value as { message?: string }).message;
-      if (message) return message;
-    }
-  }
-  return null;
 }
 
 export interface DecisionFormProps {

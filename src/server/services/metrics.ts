@@ -98,11 +98,11 @@ export function buildDashboardMetrics(
     string,
     { count: number; peak: number[]; current: number[] }
   >();
+  const entryById = new Map(entries.map((row) => [String(row.id), row]));
 
   for (const link of rows.entry_regions ?? []) {
     const entryId = String(link.entry_id);
-    if (!entryIds.has(entryId)) continue;
-    const entry = entries.find((row) => String(row.id) === entryId);
+    const entry = entryById.get(entryId);
     if (!entry) continue;
     const regionId = String(link.body_region_id);
     const bucket = regions.get(regionId) ?? { count: 0, peak: [], current: [] };
