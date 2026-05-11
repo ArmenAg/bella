@@ -21,6 +21,9 @@ const eslintConfig = [
       "coverage/**",
       "supabase/.branches/**",
       "supabase/.temp/**",
+      "playwright-report/**",
+      "test-results/**",
+      "tests/e2e/**",
     ],
   },
 ];

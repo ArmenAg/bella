@@ -54,6 +54,30 @@ backend contracts, services, Supabase migrations, and demo seed data.
    npm run dev
    ```
 
+## Mobile Home Screen Install
+
+Use a stable HTTPS deployment URL for iPhone install QA. In Safari, open Bella,
+sign in, tap Share, choose Add to Home Screen, name it `Bella`, then launch it
+from the Home Screen icon. Confirm the app opens full screen, avoids the status
+bar and home indicator, and keeps the mobile bottom navigation tappable.
+
+The service worker is production-only and intentionally caches static assets and
+the generic offline page only. Authenticated pages, server actions, uploads, API
+responses, and signed URLs must keep using the network.
+
+Mobile rollout flags:
+
+```bash
+NEXT_PUBLIC_MOBILE_INSTALL_PROMPT_ENABLED=true
+NEXT_PUBLIC_OFFLINE_CAPTURE_ENABLED=false
+NEXT_PUBLIC_WEB_PUSH_ENABLED=false
+```
+
+Flags only hide unfinished UI; server validation and storage policies remain the
+security boundary. If a bad service worker ships, deploy a new `public/sw.js`
+with `ROLLBACK_UNREGISTER = true`; that worker clears `bella-*` caches,
+unregisters itself, and reloads open clients.
+
 ## Scripts
 
 - `npm run dev`: start the Next.js dev server.
@@ -62,6 +86,13 @@ backend contracts, services, Supabase migrations, and demo seed data.
 - `npm run lint`: run ESLint.
 - `npm run format`: check formatting with Prettier.
 - `npm run test`: run Vitest tests.
+- `npm run test:e2e`: run Playwright browser smokes. Tier-1 only by default;
+  set `BELLA_E2E_SUPABASE=1` to run Tier-2 smokes against local Supabase.
+  See `tests/e2e/README.md`.
+- `npm run verify`: fast all-in-one — `typecheck && lint && format && test &&
+build`. Use before opening a PR.
+- `npm run verify:full`: `verify` plus `db:verify:local-postgres` and
+  `test:e2e`. Use before tagging a staging release.
 - `npm run supabase:seed`: load reference, demo, diagnostic-tree, historical,
   and current-records seed data into the running local Supabase database.
 - `npm run supabase:verify`: run SQL checks for RLS, role, soft-delete, and
@@ -103,6 +134,13 @@ Apple Health manual exports are supported through the private attachment flow:
 upload the iPhone Health `export.zip`, then call the Apple Health import action.
 The importer stream-parses `export.xml`, dedupes repeat imports, and stores
 daily summaries for charting. See `docs/backend/APPLE_HEALTH_IMPORT.md`.
+
+## Testing
+
+See `docs/qa/TESTING_STRATEGY.md` for the layered model, what each gate
+covers, local/CI commands, and how to add new tests without committing
+PHI. Use `docs/qa/STAGING_TEST_CHECKLIST.md` before tagging a staging
+release.
 
 ## Migration Workflow
 

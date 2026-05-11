@@ -162,6 +162,29 @@ function normalizeAppleDate(value: string | undefined) {
   return date.toISOString();
 }
 
+/**
+ * Returns the *Apple local day* (`YYYY-MM-DD`) for a timestamp in the format
+ * Apple Health exports use: `YYYY-MM-DD HH:mm:ss ±HHmm`. Daily summaries
+ * should group by this rather than by UTC day so that sleep / activity in
+ * non-UTC zones doesn't shift to the wrong day. Returns `null` for input the
+ * parser can't recognize. See `apple-health-local-date.test.ts`.
+ */
+export function appleLocalDate(
+  value: string | undefined | null,
+): string | null {
+  if (!value) return null;
+  const match = value
+    .trim()
+    .match(
+      /^(\d{4})-(\d{2})-(\d{2}) (\d{2}):(\d{2}):(\d{2}) ([+-]\d{2})(\d{2})$/,
+    );
+  if (!match) return null;
+  // The match's first three groups are already the local Y / M / D — Apple's
+  // export records the timestamp *in the local zone* and the offset is just
+  // provenance. Trust the source string.
+  return `${match[1]}-${match[2]}-${match[3]}`;
+}
+
 function durationSeconds(startAt: string | null, endAt: string | null) {
   if (!startAt || !endAt) return null;
   const start = new Date(startAt).getTime();
@@ -270,7 +293,15 @@ function sampleFromAttributes(
     end_at: endAt,
     creation_at: creationAt,
     duration_seconds: duration,
-    metadata: options.metadata ?? {},
+    metadata: {
+      ...(options.metadata ?? {}),
+      // Apple local day, derived from the source XML's timezone offset.
+      // The SQL daily-summary function still groups by UTC date today;
+      // tracking issue documented in docs/qa/MVP_INTEGRATION_QA.md. Once
+      // the function is migrated, it can group on this field for honest
+      // local-day reporting (e.g. sleep records crossing midnight).
+      local_date: appleLocalDate(attrs.startDate),
+    },
   };
 }
 

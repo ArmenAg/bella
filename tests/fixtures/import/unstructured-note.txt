@@ -1,0 +1,17 @@
+Synthetic visit note — for AI import tests only. Not real medical data.
+
+Date: 2026-05-09
+Patient: Test Family Member
+Provider: Dr. Synth (Test Clinic)
+
+Reviewed daily logs for the past week. Flares appear correlated with prolonged
+sitting. Pressure-trigger pain at the left lateral thigh continues to be the
+dominant complaint. Walking speed has improved modestly since starting the
+current home program. No new neurologic symptoms reported. Sleep continues to
+be fragmented; HRV trend is stable.
+
+Plan:
+- Continue current home exercises.
+- Recheck in 4 weeks.
+- Consider photo-comparison protocol if vasomotor signs reappear during a
+  flare.

@@ -23,4 +23,44 @@ describe("agent tool allowlist", () => {
       false,
     );
   });
+
+  it("does not expose any direct domain-record write tools to the model", () => {
+    const forbidden = [
+      // Direct entity creates — only draft-only writes allowed.
+      "createEntry",
+      "create_entry",
+      "createProcedureEvent",
+      "create_procedure_event",
+      "createMedication",
+      "create_medication",
+      "createDecision",
+      "create_decision",
+      "createSource",
+      "create_source",
+      "createDiagnosis",
+      "create_diagnosis",
+      "createVasomotorMeasurement",
+      "create_vasomotor_measurement",
+      "createAppointment",
+      "create_appointment",
+      "createTask",
+      "create_task",
+      // Updates and destructive actions.
+      "updateEntry",
+      "softDeleteEntry",
+      "soft_delete_record",
+      // Storage / signed URL surface.
+      "createUploadUrl",
+      "createAttachment",
+      "getSignedAttachmentUrl",
+      // Bulk export and packet generation are human-triggered only.
+      "generateClinicianExportPacket",
+      "createBulkDataExport",
+    ];
+    const exposed = new Set<string>(agentToolNames());
+    for (const name of forbidden) {
+      expect(exposed.has(name)).toBe(false);
+      expect(agentToolNameSchema.safeParse(name).success).toBe(false);
+    }
+  });
 });

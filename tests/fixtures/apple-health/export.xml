@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<HealthData locale="en_US">
+  <ExportDate value="2026-05-10 08:00:00 -0700"/>
+  <Me HKCharacteristicTypeIdentifierDateOfBirth="" HKCharacteristicTypeIdentifierBiologicalSex="HKBiologicalSexNotSet" HKCharacteristicTypeIdentifierBloodType="HKBloodTypeNotSet" HKCharacteristicTypeIdentifierFitzpatrickSkinType="HKFitzpatrickSkinTypeNotSet"/>
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Test iPhone" unit="count" value="500" startDate="2026-05-09 08:00:00 -0700" endDate="2026-05-09 08:10:00 -0700" creationDate="2026-05-09 08:10:01 -0700"/>
+  <Record type="HKQuantityTypeIdentifierStepCount" sourceName="Test iPhone" unit="count" value="750" startDate="2026-05-09 14:00:00 -0700" endDate="2026-05-09 14:15:00 -0700" creationDate="2026-05-09 14:15:01 -0700"/>
+  <Record type="HKQuantityTypeIdentifierHeartRate" sourceName="Test Watch" unit="count/min" value="68" startDate="2026-05-09 09:00:00 -0700" endDate="2026-05-09 09:00:00 -0700" creationDate="2026-05-09 09:00:01 -0700"/>
+  <Record type="HKCategoryTypeIdentifierSleepAnalysis" sourceName="Test Watch" value="HKCategoryValueSleepAnalysisAsleepUnspecified" startDate="2026-05-09 23:00:00 -0700" endDate="2026-05-10 06:30:00 -0700" creationDate="2026-05-10 06:30:30 -0700"/>
+  <Workout workoutActivityType="HKWorkoutActivityTypeWalking" duration="30" durationUnit="min" totalDistance="2.4" totalDistanceUnit="km" totalEnergyBurned="120" totalEnergyBurnedUnit="kcal" sourceName="Test Watch" startDate="2026-05-09 17:00:00 -0700" endDate="2026-05-09 17:30:00 -0700" creationDate="2026-05-09 17:30:01 -0700"/>
+</HealthData>

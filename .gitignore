@@ -10,6 +10,7 @@ dist/
 tsconfig.tsbuildinfo
 playwright-report/
 test-results/
+tests/e2e/.auth/
 supabase/.branches/
 supabase/.temp/
 data/bootstrap/*.jsonl
