@@ -95,8 +95,8 @@ export default async function DashboardPage({
     listDecisions({ open_only: true, page_size: 5 }),
     listEntries({ flare_only: true, page_size: 5 }),
     listVasomotorMeasurements({ page_size: 5 }),
-    listMedications({ status: "active", page_size: 50 }),
-    listTasks({ open_only: true, page_size: 20 }),
+    listMedications({ status: "active", page_size: 10 }),
+    listTasks({ open_only: true, page_size: 10 }),
     listReferenceData(),
   ]);
 

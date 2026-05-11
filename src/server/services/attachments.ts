@@ -69,6 +69,10 @@ export function sniffMimeFromBytes(bytes: Uint8Array): string | null {
     return "application/pdf";
   }
 
+  if (bytesStartWith(bytes, [0x50, 0x4b, 0x03, 0x04])) {
+    return "application/zip";
+  }
+
   if (bytes.length >= 12 && asciiDecoder.decode(bytes.slice(4, 8)) === "ftyp") {
     const brand = asciiDecoder.decode(bytes.slice(8, 12));
     return brand.includes("qt") ? "video/quicktime" : "video/mp4";

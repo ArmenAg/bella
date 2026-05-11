@@ -1549,5 +1549,151 @@
       "medium": "Medium",
       "low": "Low"
     }
+  },
+  "appleHealth": {
+    "navLabel": "Apple Health",
+    "title": "Apple Health import",
+    "subtitle": "Import objective Health samples from a manual Apple Health export. Samples and daily summaries are stored alongside the rest of the family record.",
+    "boundary": "Apple Health data stays separate. It does not create pain entries, log events, diagnoses, or decisions. It is not sent to AI.",
+    "tabs": {
+      "import": "Import",
+      "summaries": "Daily summaries",
+      "samples": "Raw samples"
+    },
+    "upload": {
+      "title": "Upload export.zip",
+      "instructions": "On iPhone, open Health, tap your profile picture, then “Export All Health Data”. Drop the resulting export.zip here.",
+      "safe": "Repeat uploads are safe; samples are deduped by their export key.",
+      "fileTypes": "Only .zip files up to 500 MB.",
+      "browse": "Choose file",
+      "uploading": "Uploading {name}",
+      "importing": "Importing… large exports can take a minute.",
+      "completedTitle": "Import complete",
+      "failedTitle": "Import failed",
+      "filePickedSize": "{size}",
+      "tooLarge": "File is larger than 500 MB.",
+      "notZip": "Only .zip exports are accepted.",
+      "submit": "Start import",
+      "submitting": "Working…",
+      "newImport": "Start another import",
+      "warningTitle": "Heads up",
+      "warningBody": "Apple Health exports can contain very broad data (steps, heart rate, sleep, workouts, location traces, and more). Unsupported types are skipped, but you should know what you are sharing with this family record."
+    },
+    "result": {
+      "status": "Status",
+      "fileName": "File",
+      "dateRange": "Export date range",
+      "noRange": "No date range reported",
+      "scanned": "Scanned records",
+      "imported": "Imported samples",
+      "duplicates": "Duplicates",
+      "skipped": "Skipped (unsupported)",
+      "summaries": "Daily summaries",
+      "errorLabel": "Backend error"
+    },
+    "history": {
+      "title": "Import history",
+      "loadError": "Couldn't load import history.",
+      "empty": {
+        "title": "No imports yet",
+        "body": "Upload your first Apple Health export to populate samples and daily summaries."
+      },
+      "fileName": "File",
+      "createdAt": "Started",
+      "imported": "Imported",
+      "duplicates": "Duplicates",
+      "skipped": "Skipped",
+      "dateRange": "Range",
+      "dailySummaries": "Summaries",
+      "statuses": {
+        "processing": "Processing",
+        "completed": "Completed",
+        "failed": "Failed"
+      }
+    },
+    "summaries": {
+      "title": "Daily summaries",
+      "hint": "Chart-ready aggregates rebuilt from imported samples.",
+      "loadError": "Couldn't load summaries.",
+      "empty": {
+        "title": "No summaries yet",
+        "body": "Run an import to populate daily aggregates."
+      },
+      "filters": {
+        "metric": "Metric",
+        "dateFrom": "From",
+        "dateTo": "To",
+        "apply": "Apply",
+        "clear": "Clear"
+      },
+      "table": {
+        "date": "Date",
+        "value": "Value",
+        "min": "Min",
+        "max": "Max",
+        "avg": "Avg",
+        "samples": "Samples"
+      },
+      "chartTitle": "{label}",
+      "chartUnit": "{unit}",
+      "noDataInRange": "No samples in this range."
+    },
+    "samples": {
+      "title": "Raw samples",
+      "hint": "Individual samples as imported. Useful when validating an unfamiliar source.",
+      "loadError": "Couldn't load samples.",
+      "empty": "No samples match these filters.",
+      "filters": {
+        "metric": "Metric",
+        "dateFrom": "From",
+        "dateTo": "To"
+      },
+      "table": {
+        "source": "Source",
+        "start": "Start",
+        "end": "End",
+        "value": "Value",
+        "unit": "Unit",
+        "type": "Type"
+      },
+      "loadMore": "Load more",
+      "loadingMore": "Loading…"
+    },
+    "metrics": {
+      "step_count": "Steps",
+      "distance_walking_running": "Walking + running distance",
+      "flights_climbed": "Flights climbed",
+      "active_energy_burned": "Active energy",
+      "apple_exercise_time": "Exercise minutes",
+      "heart_rate": "Heart rate",
+      "resting_heart_rate": "Resting heart rate",
+      "heart_rate_variability_sdnn": "HRV (SDNN)",
+      "walking_heart_rate_average": "Walking heart rate",
+      "walking_step_length": "Walking step length",
+      "walking_speed": "Walking speed",
+      "walking_asymmetry_percentage": "Walking asymmetry",
+      "walking_double_support_percentage": "Walking double-support %",
+      "stair_ascent_speed": "Stair ascent speed",
+      "stair_descent_speed": "Stair descent speed",
+      "six_minute_walk_test_distance": "6-minute walk distance",
+      "apple_walking_steadiness": "Walking steadiness",
+      "sleep_asleep_minutes": "Sleep (asleep)",
+      "sleep_in_bed_minutes": "Sleep (in bed)",
+      "workout_minutes": "Workout minutes",
+      "workout_distance": "Workout distance",
+      "workout_energy": "Workout energy"
+    },
+    "units": {
+      "count": "count",
+      "minutes": "min",
+      "hours": "h",
+      "bpm": "bpm",
+      "ms": "ms",
+      "kcal": "kcal",
+      "km": "km",
+      "m": "m",
+      "ft": "ft",
+      "percent": "%"
+    }
   }
 }

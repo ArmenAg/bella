@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { canWrite } from "@/lib/auth";
 import { GraduationCap, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -46,10 +47,6 @@ function pickSourceType(
   const value = pickString(params, "source_type");
   if (value && SOURCE_TYPE_KEYS.has(value)) return value as SourceType;
   return null;
-}
-
-function canWrite(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
 }
 
 export default async function SourcesPage({ searchParams }: SourcesPageProps) {

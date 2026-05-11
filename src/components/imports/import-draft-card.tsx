@@ -29,7 +29,7 @@ import {
 } from "@/server/actions/ai-import";
 import type { AiImportDraft } from "@/server/contracts";
 import { format, strings } from "@/lib/strings";
-import { formatDate } from "@/lib/format";
+import { formatDate, safeStringify } from "@/lib/format";
 import { userFacingErrorMessage } from "@/lib/result";
 import { cn } from "@/lib/utils";
 import { ImportDraftStatusBadge } from "./import-status-badge";
@@ -57,14 +57,6 @@ function confidenceLabel(value: AiImportDraft["confidence"]): string {
       value as keyof typeof strings.importNs.confidences
     ] ?? value
   );
-}
-
-function safeStringify(value: unknown): string {
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return String(value);
-  }
 }
 
 export function ImportDraftCard({

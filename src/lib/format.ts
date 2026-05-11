@@ -79,3 +79,16 @@ export function toDateInputValue(value: string | null | undefined): string {
   if (!value) return "";
   return value.slice(0, 10);
 }
+
+/**
+ * `JSON.stringify(value, null, 2)` with a String() fallback for values that
+ * can't be serialized (BigInt, cycles, etc.). Used by the agent/import draft
+ * cards and tool-call audit panels.
+ */
+export function safeStringify(value: unknown): string {
+  try {
+    return JSON.stringify(value, null, 2);
+  } catch {
+    return String(value);
+  }
+}

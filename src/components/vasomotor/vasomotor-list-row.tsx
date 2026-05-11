@@ -1,11 +1,7 @@
-"use client";
-
-import * as React from "react";
 import Link from "next/link";
 import { ImageOff, Link2, Paperclip } from "lucide-react";
 
 import { Badge } from "@/components/ui/badge";
-import { getSignedAttachmentUrl } from "@/server/actions/attachments";
 import type { VasomotorMeasurementDTO } from "@/server/contracts";
 import { formatDateTime } from "@/lib/format";
 import { strings } from "@/lib/strings";
@@ -14,42 +10,24 @@ import { cn } from "@/lib/utils";
 export interface VasomotorListRowProps {
   measurement: VasomotorMeasurementDTO;
   href: string;
+  /** Signed URL pre-resolved by the server. `null` renders the fallback. */
+  leftThumbUrl: string | null;
+  /** Signed URL pre-resolved by the server. `null` renders the fallback. */
+  rightThumbUrl: string | null;
 }
 
 function Thumb({
+  url,
   attachmentId,
   alt,
   fallbackLabel,
 }: {
+  url: string | null;
   attachmentId: string | null;
   alt: string;
   fallbackLabel: string;
 }) {
-  const [url, setUrl] = React.useState<string | null>(null);
-  const [failed, setFailed] = React.useState(false);
-
-  React.useEffect(() => {
-    let cancelled = false;
-    if (!attachmentId) return;
-    void getSignedAttachmentUrl({ attachment_id: attachmentId }).then(
-      (result) => {
-        if (cancelled) return;
-        if (!result.ok) {
-          setFailed(true);
-          return;
-        }
-        setUrl(result.data.signed_url);
-      },
-      () => {
-        if (!cancelled) setFailed(true);
-      },
-    );
-    return () => {
-      cancelled = true;
-    };
-  }, [attachmentId]);
-
-  if (!attachmentId || failed) {
+  if (!attachmentId || !url) {
     return (
       <div
         aria-label={fallbackLabel}
@@ -57,15 +35,6 @@ function Thumb({
       >
         <ImageOff aria-hidden="true" className="h-4 w-4" />
       </div>
-    );
-  }
-
-  if (!url) {
-    return (
-      <div
-        aria-label={fallbackLabel}
-        className="h-14 w-14 shrink-0 animate-pulse rounded-md border border-border bg-muted"
-      />
     );
   }
 
@@ -79,7 +48,12 @@ function Thumb({
   );
 }
 
-export function VasomotorListRow({ measurement, href }: VasomotorListRowProps) {
+export function VasomotorListRow({
+  measurement,
+  href,
+  leftThumbUrl,
+  rightThumbUrl,
+}: VasomotorListRowProps) {
   const listStrings = strings.vasomotor.list;
   const contextLabel =
     strings.vasomotor.contexts[measurement.context] ?? measurement.context;
@@ -101,6 +75,7 @@ export function VasomotorListRow({ measurement, href }: VasomotorListRowProps) {
         <div className="flex items-center gap-2">
           <div className="relative flex flex-col items-center gap-1">
             <Thumb
+              url={leftThumbUrl}
               attachmentId={measurement.left_attachment_id}
               alt={listStrings.leftAlt}
               fallbackLabel={listStrings.noPhotoLeft}
@@ -111,6 +86,7 @@ export function VasomotorListRow({ measurement, href }: VasomotorListRowProps) {
           </div>
           <div className="relative flex flex-col items-center gap-1">
             <Thumb
+              url={rightThumbUrl}
               attachmentId={measurement.right_attachment_id}
               alt={listStrings.rightAlt}
               fallbackLabel={listStrings.noPhotoRight}

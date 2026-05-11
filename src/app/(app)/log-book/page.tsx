@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { canWrite } from "@/lib/auth";
 import { ClipboardList, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/feedback/empty-state";
@@ -10,10 +11,6 @@ import { loadShellProfile } from "@/components/shell/profile-loader";
 import { strings } from "@/lib/strings";
 
 export const dynamic = "force-dynamic";
-
-function canWrite(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
-}
 
 export default async function LogBookPage() {
   const profile = await loadShellProfile();

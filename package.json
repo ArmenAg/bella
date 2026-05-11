@@ -54,6 +54,7 @@
     "react-hook-form": "^7.75.0",
     "recharts": "^3.8.1",
     "tailwind-merge": "^2.6.0",
+    "yauzl": "^3.3.0",
     "zod": "^3.24.1"
   },
   "devDependencies": {
@@ -63,6 +64,7 @@
     "@types/node": "^22.10.2",
     "@types/react": "^19.0.2",
     "@types/react-dom": "^19.0.2",
+    "@types/yauzl": "^2.10.3",
     "@vitejs/plugin-react": "^4.3.4",
     "autoprefixer": "^10.4.20",
     "eslint": "^9.17.0",

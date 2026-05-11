@@ -1,4 +1,5 @@
 import { ErrorState } from "@/components/feedback/error-state";
+import { canWrite } from "@/lib/auth";
 import { PageHeader } from "@/components/shell/page-header";
 import { loadActiveFlare } from "@/components/shell/active-flare-loader";
 import { loadShellProfile } from "@/components/shell/profile-loader";
@@ -8,10 +9,6 @@ import { strings } from "@/lib/strings";
 
 export const dynamic = "force-dynamic";
 
-function canWriteRole(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
-}
-
 export default async function FlareModePage() {
   const [profile, activeFlare, reference] = await Promise.all([
     loadShellProfile(),
@@ -19,7 +16,7 @@ export default async function FlareModePage() {
     listReferenceData(),
   ]);
 
-  const canWrite = canWriteRole(profile?.role);
+  const writable = canWrite(profile?.role);
 
   return (
     <div className="flex flex-col gap-6">
@@ -36,7 +33,7 @@ export default async function FlareModePage() {
           bodyRegions={reference.data.body_regions}
           symptoms={reference.data.symptoms}
           triggers={reference.data.triggers}
-          canWrite={canWrite}
+          canWrite={writable}
         />
       )}
     </div>

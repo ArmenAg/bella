@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { canWrite } from "@/lib/auth";
 
 import { PageHeader } from "@/components/shell/page-header";
 import { SourceForm } from "@/components/sources/source-form";
@@ -9,10 +10,6 @@ import { loadShellProfile } from "@/components/shell/profile-loader";
 import { strings } from "@/lib/strings";
 
 export const dynamic = "force-dynamic";
-
-function canWrite(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
-}
 
 export default async function NewSourcePage() {
   const profile = await loadShellProfile();

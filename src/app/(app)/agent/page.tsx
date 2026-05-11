@@ -1,4 +1,5 @@
 import { ErrorState } from "@/components/feedback/error-state";
+import { canWrite } from "@/lib/auth";
 import { PageHeader } from "@/components/shell/page-header";
 import { loadShellProfile } from "@/components/shell/profile-loader";
 import { AgentWorkspace } from "@/components/agent/agent-workspace";
@@ -23,7 +24,7 @@ export default async function AgentPage({ searchParams }: AgentPageProps) {
   const params = await searchParams;
   const filter = pickFilter(params.status);
   const profile = await loadShellProfile();
-  const canWrite = profile?.role === "primary" || profile?.role === "caregiver";
+  const writable = canWrite(profile?.role);
 
   const listInput: { page_size: number; status?: AgentThreadStatus } = {
     page_size: 50,
@@ -62,7 +63,7 @@ export default async function AgentPage({ searchParams }: AgentPageProps) {
         initialThreads={threads}
         initialFilter={filter}
         initialThreadId={initialThreadId}
-        canWrite={canWrite}
+        canWrite={writable}
       />
     </div>
   );

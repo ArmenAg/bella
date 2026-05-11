@@ -17,6 +17,9 @@ describe("attachment service helpers", () => {
     expect(sniffMimeFromBytes(new TextEncoder().encode("%PDF-1.7"))).toBe(
       "application/pdf",
     );
+    expect(sniffMimeFromBytes(Uint8Array.from([0x50, 0x4b, 0x03, 0x04]))).toBe(
+      "application/zip",
+    );
   });
 
   it("rejects unsupported mime types", () => {
@@ -24,5 +27,6 @@ describe("attachment service helpers", () => {
       /Unsupported attachment mime type/,
     );
     expect(() => assertAllowedMimeType("image/jpeg")).not.toThrow();
+    expect(() => assertAllowedMimeType("application/zip")).not.toThrow();
   });
 });

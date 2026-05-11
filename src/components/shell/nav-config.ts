@@ -10,6 +10,7 @@ import {
   FileText,
   GitBranch,
   GraduationCap,
+  HeartPulse,
   Home,
   ListChecks,
   Pill,
@@ -102,6 +103,11 @@ export const navGroups: NavGroup[] = [
         href: "/sources",
         label: strings.nav.sourceLibrary,
         icon: GraduationCap,
+      },
+      {
+        href: "/apple-health",
+        label: strings.appleHealth.navLabel,
+        icon: HeartPulse,
       },
       {
         href: "/export",

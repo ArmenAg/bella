@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { canWrite } from "@/lib/auth";
 import { ErrorState } from "@/components/feedback/error-state";
 import { PageHeader } from "@/components/shell/page-header";
 import {
@@ -26,7 +27,7 @@ export default async function EditMedicationResponsePage({
   const { id } = await params;
 
   const profile = await loadShellProfile();
-  if (profile && profile.role !== "primary" && profile.role !== "caregiver") {
+  if (profile && !canWrite(profile.role)) {
     redirect("/medications?tab=responses");
   }
 

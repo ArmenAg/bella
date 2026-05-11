@@ -2,7 +2,7 @@ import { z } from "zod";
 
 export const DEFAULT_PAGE_SIZE = 50;
 export const MAX_PAGE_SIZE = 200;
-export const MAX_UPLOAD_SIZE_BYTES = 50 * 1024 * 1024;
+export const MAX_UPLOAD_SIZE_BYTES = 500 * 1024 * 1024;
 export const SIGNED_URL_TTL_SECONDS = 300;
 
 export const uuidSchema = z.string().uuid();

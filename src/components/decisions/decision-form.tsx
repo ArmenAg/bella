@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { canWrite } from "@/lib/auth";
 import {
   useFieldArray,
   useForm,
@@ -95,10 +96,6 @@ function firstZodError(errors: FieldErrors<DecisionFormValues>): string | null {
   return null;
 }
 
-function canWriteRole(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
-}
-
 export interface DecisionFormProps {
   mode: "create" | "edit";
   decision?: Decision;
@@ -107,7 +104,7 @@ export interface DecisionFormProps {
 export function DecisionForm({ mode, decision }: DecisionFormProps) {
   const router = useRouter();
   const profile = useShellProfile();
-  const canWrite = canWriteRole(profile?.role);
+  const writable = canWrite(profile?.role);
 
   const [submitting, setSubmitting] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
@@ -493,7 +490,7 @@ export function DecisionForm({ mode, decision }: DecisionFormProps) {
 
       <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          {mode === "edit" && canWrite ? (
+          {mode === "edit" && writable ? (
             <Button
               type="button"
               variant="outline"
@@ -518,7 +515,7 @@ export function DecisionForm({ mode, decision }: DecisionFormProps) {
           >
             {strings.actions.cancel}
           </Button>
-          <Button type="submit" disabled={submitting || !canWrite}>
+          <Button type="submit" disabled={submitting || !writable}>
             {submitting ? (
               <>
                 <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />

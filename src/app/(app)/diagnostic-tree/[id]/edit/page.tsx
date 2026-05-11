@@ -1,4 +1,5 @@
 import { ErrorState } from "@/components/feedback/error-state";
+import { canWrite } from "@/lib/auth";
 import { PageHeader } from "@/components/shell/page-header";
 import { DiagnosisForm } from "@/components/diagnoses/diagnosis-form";
 import { DiagnosisEvidenceSection } from "@/components/diagnoses/diagnosis-evidence-section";
@@ -15,10 +16,6 @@ export const dynamic = "force-dynamic";
 
 interface EditDiagnosisPageProps {
   params: Promise<{ id: string }>;
-}
-
-function canWrite(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
 }
 
 export default async function EditDiagnosisPage({

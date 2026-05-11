@@ -60,6 +60,9 @@ select public.assert_condition(
         'ai_agent_messages',
         'ai_agent_tool_calls',
         'ai_agent_context_snapshots',
+        'apple_health_imports',
+        'apple_health_samples',
+        'apple_health_daily_summaries',
         'audit_log'
       )
       and not exists (
@@ -98,9 +101,9 @@ select public.assert_condition(
     from storage.buckets
     where id = 'bella-private-uploads'
       and public = false
-      and file_size_limit = 52428800
+      and file_size_limit = 524288000
   ),
-  'private upload bucket must be private with 50 MB size limit'
+  'private upload bucket must be private with 500 MB size limit'
 );
 
 do $$
@@ -282,6 +285,7 @@ declare
   blocked boolean;
   affected_rows integer;
   visible_count integer;
+  health_import_id uuid;
 begin
   execute 'set local role authenticated';
   perform set_config('request.jwt.claim.sub', primary_a::text, true);
@@ -367,6 +371,64 @@ begin
     '{"rls":"visible"}'::jsonb
   );
 
+  insert into public.apple_health_imports (
+    family_id,
+    user_id,
+    status,
+    file_name
+  )
+  values (
+    family_a,
+    primary_a,
+    'completed',
+    'rls-export.zip'
+  )
+  returning id into health_import_id;
+
+  insert into public.apple_health_samples (
+    family_id,
+    user_id,
+    import_id,
+    external_key,
+    apple_type,
+    normalized_type,
+    sample_kind,
+    unit,
+    value_numeric,
+    start_at,
+    end_at
+  )
+  values (
+    family_a,
+    primary_a,
+    health_import_id,
+    'rls-health-sample-a',
+    'HKQuantityTypeIdentifierStepCount',
+    'step_count',
+    'quantity',
+    'count',
+    42,
+    now(),
+    now()
+  );
+
+  insert into public.apple_health_daily_summaries (
+    family_id,
+    summary_date,
+    metric_type,
+    unit,
+    sample_count,
+    value_sum
+  )
+  values (
+    family_a,
+    current_date,
+    'step_count',
+    'count',
+    1,
+    42
+  );
+
   select count(*) into visible_count
   from public.entries
   where family_id = family_b;
@@ -383,6 +445,15 @@ begin
   perform public.assert_condition(
     visible_count = 0,
     'primary must not read another family agent threads'
+  );
+
+  select count(*) into visible_count
+  from public.apple_health_imports
+  where family_id = family_b;
+
+  perform public.assert_condition(
+    visible_count = 0,
+    'primary must not read another family Apple Health imports'
   );
 
   select count(*) into visible_count
@@ -470,6 +541,30 @@ begin
     'viewer role must not create agent threads'
   );
 
+  blocked := false;
+
+  begin
+    insert into public.apple_health_imports (
+      family_id,
+      user_id,
+      status,
+      file_name
+    )
+    values (
+      family_a,
+      viewer_a,
+      'processing',
+      'RLS viewer Apple Health import must fail'
+    );
+  exception when insufficient_privilege or check_violation or with_check_option_violation then
+    blocked := true;
+  end;
+
+  perform public.assert_condition(
+    blocked,
+    'viewer role must not create Apple Health imports'
+  );
+
   perform set_config('request.jwt.claim.sub', clinician_a::text, true);
   update public.entries
   set notes = 'clinician update must not change rows'
@@ -491,6 +586,17 @@ begin
   perform public.assert_condition(
     affected_rows = 0,
     'clinician_readonly role must not update agent threads'
+  );
+
+  update public.apple_health_imports
+  set file_name = 'clinician update must not change rows'
+  where family_id = family_a;
+
+  get diagnostics affected_rows = row_count;
+
+  perform public.assert_condition(
+    affected_rows = 0,
+    'clinician_readonly role must not update Apple Health imports'
   );
 
   reset role;

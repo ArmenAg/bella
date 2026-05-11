@@ -1,5 +1,6 @@
 export * from "./ai-import";
 export * from "./agent";
+export * from "./apple-health";
 export * from "./attachments";
 export * from "./common";
 export * from "./decisions";

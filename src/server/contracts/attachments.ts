@@ -18,6 +18,8 @@ export const allowedMimeTypes = [
   "application/pdf",
   "text/plain",
   "text/markdown",
+  "application/zip",
+  "application/x-zip-compressed",
 ] as const;
 
 export const attachmentLinkedTypeSchema = z.enum([

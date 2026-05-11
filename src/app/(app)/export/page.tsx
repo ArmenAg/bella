@@ -1,4 +1,5 @@
 import { PageHeader } from "@/components/shell/page-header";
+import { canWrite } from "@/lib/auth";
 import { ExportTabs } from "@/components/exports/export-tabs";
 import { ClinicianPacketForm } from "@/components/exports/clinician-packet-form";
 import { BulkExportForm } from "@/components/exports/bulk-export-form";
@@ -16,10 +17,6 @@ interface ExportPageProps {
 
 function pickTab(value: string | undefined): "clinician" | "bulk" {
   return value === "bulk" ? "bulk" : "clinician";
-}
-
-function canWrite(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
 }
 
 export default async function ExportPage({ searchParams }: ExportPageProps) {

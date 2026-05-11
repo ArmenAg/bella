@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { canWrite } from "@/lib/auth";
 import { Plus, Stethoscope } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/feedback/empty-state";
@@ -32,10 +33,6 @@ function resolveType(raw: string | undefined): ProcedureTypeFilterValue {
     return raw as ProcedureTypeFilterValue;
   }
   return "all";
-}
-
-function canWrite(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
 }
 
 export default async function ProceduresPage({

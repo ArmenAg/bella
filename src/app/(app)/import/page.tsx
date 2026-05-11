@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { canWrite } from "@/lib/auth";
 import { ArrowLeft } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { ErrorState } from "@/components/feedback/error-state";
@@ -53,7 +54,7 @@ export default async function ImportPage({ searchParams }: ImportPageProps) {
   const params = await searchParams;
   const filter = pickFilter(params.filter);
   const profile = await loadShellProfile();
-  const canWrite = profile?.role === "primary" || profile?.role === "caregiver";
+  const writable = canWrite(profile?.role);
 
   const sessionInput =
     filter === "all"
@@ -98,7 +99,7 @@ export default async function ImportPage({ searchParams }: ImportPageProps) {
         initialDrafts={draftsResult.ok ? draftsResult.data.items : []}
         initialFilter={filter}
         highlightDraftId={params.draft ?? null}
-        canWrite={canWrite}
+        canWrite={writable}
       />
     </div>
   );

@@ -4,7 +4,7 @@ import * as React from "react";
 import { ChevronDown, ChevronRight, Wrench } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import type { AgentToolCall } from "@/server/contracts";
-import { formatDateTime } from "@/lib/format";
+import { formatDateTime, safeStringify } from "@/lib/format";
 import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 
@@ -23,14 +23,6 @@ function statusVariant(
       return "muted";
     default:
       return "outline";
-  }
-}
-
-function safeStringify(value: unknown): string {
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return String(value);
   }
 }
 

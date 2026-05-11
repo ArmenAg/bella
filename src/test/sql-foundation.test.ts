@@ -56,6 +56,9 @@ const requiredTables = [
   "ai_agent_messages",
   "ai_agent_tool_calls",
   "ai_agent_context_snapshots",
+  "apple_health_imports",
+  "apple_health_samples",
+  "apple_health_daily_summaries",
   "audit_log",
 ];
 
@@ -96,10 +99,10 @@ describe("Supabase foundation SQL", () => {
     }
   });
 
-  it("keeps the storage bucket private with a 50 MB upload limit", () => {
+  it("keeps the storage bucket private with a 500 MB upload limit", () => {
     expect(migration).toContain("'bella-private-uploads'");
     expect(migration).toContain("false");
-    expect(migration).toContain("52428800");
+    expect(migration).toContain("524288000");
     expect(migration).toContain("storage.objects");
   });
 
@@ -185,14 +188,17 @@ describe("Supabase RLS verifier SQL", () => {
       "every foundation table must have RLS enabled",
       "public tables must not grant anon policies",
       "anon role must not have table privileges",
-      "private upload bucket must be private with 50 MB size limit",
+      "private upload bucket must be private with 500 MB size limit",
       "primary must not read another family entries",
       "soft-deleted rows must be hidden by normal RLS reads",
       "viewer role must be read-only",
       "clinician_readonly role must be read-only",
       "primary must not read another family agent threads",
+      "primary must not read another family Apple Health imports",
       "viewer role must not create agent threads",
+      "viewer role must not create Apple Health imports",
       "clinician_readonly role must not update agent threads",
+      "clinician_readonly role must not update Apple Health imports",
       "set local role authenticated",
       "request.jwt.claim.sub",
     ]) {

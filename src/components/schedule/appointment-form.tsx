@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { canWrite } from "@/lib/auth";
 import { useForm, Controller, type FieldErrors } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { useRouter } from "next/navigation";
@@ -101,10 +102,6 @@ function firstZodError(
   return null;
 }
 
-function canWriteRole(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
-}
-
 export interface AppointmentFormProps {
   mode: "create" | "edit";
   appointment?: Appointment;
@@ -113,7 +110,7 @@ export interface AppointmentFormProps {
 export function AppointmentForm({ mode, appointment }: AppointmentFormProps) {
   const router = useRouter();
   const profile = useShellProfile();
-  const canWrite = canWriteRole(profile?.role);
+  const writable = canWrite(profile?.role);
 
   const [submitting, setSubmitting] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
@@ -497,7 +494,7 @@ export function AppointmentForm({ mode, appointment }: AppointmentFormProps) {
 
       <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
         <div className="flex items-center gap-2">
-          {mode === "edit" && canWrite ? (
+          {mode === "edit" && writable ? (
             <Button
               type="button"
               variant="outline"
@@ -522,7 +519,7 @@ export function AppointmentForm({ mode, appointment }: AppointmentFormProps) {
           >
             {strings.actions.cancel}
           </Button>
-          <Button type="submit" disabled={submitting || !canWrite}>
+          <Button type="submit" disabled={submitting || !writable}>
             {submitting ? (
               <>
                 <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />

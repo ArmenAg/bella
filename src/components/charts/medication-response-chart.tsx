@@ -13,6 +13,7 @@ import {
 } from "recharts";
 import type { Medication, MedicationResponseSummary } from "@/server/contracts";
 import { strings } from "@/lib/strings";
+import { buildIdNameMap } from "@/lib/utils";
 import { ChartCard } from "./chart-card";
 import { ChartEmpty } from "./empty";
 
@@ -25,13 +26,10 @@ export function MedicationResponseSummaryChart({
   data,
   medications,
 }: MedicationResponseSummaryChartProps) {
-  const medicationNames = React.useMemo(() => {
-    const map = new Map<string, string>();
-    for (const med of medications) {
-      map.set(med.id, med.name);
-    }
-    return map;
-  }, [medications]);
+  const medicationNames = React.useMemo(
+    () => buildIdNameMap(medications),
+    [medications],
+  );
 
   const rows = React.useMemo(
     () =>

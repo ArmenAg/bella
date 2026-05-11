@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { canWrite } from "@/lib/auth";
 import { PageHeader } from "@/components/shell/page-header";
 import { MedicationForm } from "@/components/medications/medication-form";
 import { loadShellProfile } from "@/components/shell/profile-loader";
@@ -8,7 +9,7 @@ export const dynamic = "force-dynamic";
 
 export default async function NewMedicationPage() {
   const profile = await loadShellProfile();
-  if (profile && profile.role !== "primary" && profile.role !== "caregiver") {
+  if (profile && !canWrite(profile.role)) {
     redirect("/medications");
   }
 

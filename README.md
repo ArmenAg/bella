@@ -99,6 +99,11 @@ The multi-turn AI agent uses the same OpenAI key and falls back from
 tools and create/update/reject import drafts, but it is not given a commit
 tool. Human approval remains the only path to real record creation.
 
+Apple Health manual exports are supported through the private attachment flow:
+upload the iPhone Health `export.zip`, then call the Apple Health import action.
+The importer stream-parses `export.xml`, dedupes repeat imports, and stores
+daily summaries for charting. See `docs/backend/APPLE_HEALTH_IMPORT.md`.
+
 ## Migration Workflow
 
 Raw Supabase SQL migrations are the source of truth under

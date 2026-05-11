@@ -1,6 +1,7 @@
 "use client";
 
 import * as React from "react";
+import { safeStringify } from "@/lib/format";
 import Link from "next/link";
 import {
   AlertTriangle,
@@ -59,14 +60,6 @@ function statusBadge(status: AiImportDraft["status"]) {
         variant: "accent" as const,
         icon: Hourglass,
       };
-  }
-}
-
-function safeStringify(value: unknown): string {
-  try {
-    return JSON.stringify(value, null, 2);
-  } catch {
-    return String(value);
   }
 }
 

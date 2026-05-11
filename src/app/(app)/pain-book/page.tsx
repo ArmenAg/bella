@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { canWrite } from "@/lib/auth";
 import { BookOpen, Plus } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { EmptyState } from "@/components/feedback/empty-state";
@@ -14,10 +15,6 @@ export const dynamic = "force-dynamic";
 
 interface PainBookPageProps {
   searchParams: Promise<{ filter?: string }>;
-}
-
-function canWrite(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
 }
 
 export default async function PainBookPage({

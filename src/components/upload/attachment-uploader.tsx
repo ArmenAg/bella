@@ -238,22 +238,37 @@ export const AttachmentUploader = React.forwardRef<
     [items],
   );
 
-  // Resolve preview URLs lazily for ready items.
+  // Resolve preview URLs lazily for ready items. Fetched in parallel and
+  // committed in a single state update so each batch only re-renders once.
   React.useEffect(() => {
+    const missing = items
+      .filter(
+        (item): item is Extract<AttachmentItem, { kind: "ready" }> =>
+          item.kind === "ready" && !previewUrls[item.attachment.id],
+      )
+      .map((item) => item.attachment.id);
+    if (missing.length === 0) return;
+
     let cancelled = false;
-    items.forEach((item) => {
-      if (item.kind !== "ready") return;
-      if (previewUrls[item.attachment.id]) return;
-      void getSignedAttachmentUrl({ attachment_id: item.attachment.id }).then(
-        (result) => {
-          if (cancelled || !result.ok) return;
-          setPreviewUrls((prev) => ({
-            ...prev,
-            [item.attachment.id]: result.data.signed_url,
-          }));
-        },
+    void Promise.all(
+      missing.map((id) =>
+        getSignedAttachmentUrl({ attachment_id: id }).then((result) =>
+          result.ok ? ([id, result.data.signed_url] as const) : null,
+        ),
+      ),
+    ).then((entries) => {
+      if (cancelled) return;
+      const resolved = entries.filter(
+        (entry): entry is readonly [string, string] => entry !== null,
       );
+      if (resolved.length === 0) return;
+      setPreviewUrls((prev) => {
+        const next = { ...prev };
+        for (const [id, url] of resolved) next[id] = url;
+        return next;
+      });
     });
+
     return () => {
       cancelled = true;
     };

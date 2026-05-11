@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import type { TriggerFrequencyMetric, TriggerDTO } from "@/server/contracts";
 import { strings } from "@/lib/strings";
+import { buildIdNameMap } from "@/lib/utils";
 import { ChartCard } from "./chart-card";
 import { ChartEmpty } from "./empty";
 
@@ -24,13 +25,10 @@ export function TriggerFrequencyChart({
   data,
   triggers,
 }: TriggerFrequencyChartProps) {
-  const triggerNames = React.useMemo(() => {
-    const map = new Map<string, string>();
-    for (const trigger of triggers) {
-      map.set(trigger.id, trigger.name);
-    }
-    return map;
-  }, [triggers]);
+  const triggerNames = React.useMemo(
+    () => buildIdNameMap(triggers),
+    [triggers],
+  );
 
   const rows = React.useMemo(
     () =>

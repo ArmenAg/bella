@@ -12,6 +12,7 @@ import {
 } from "recharts";
 import type { BodyRegionDTO, PainByBodyRegionMetric } from "@/server/contracts";
 import { strings } from "@/lib/strings";
+import { buildIdNameMap } from "@/lib/utils";
 import { ChartCard } from "./chart-card";
 import { ChartEmpty } from "./empty";
 
@@ -24,13 +25,10 @@ export function PainByRegionChart({
   data,
   bodyRegions,
 }: PainByRegionChartProps) {
-  const regionNames = React.useMemo(() => {
-    const map = new Map<string, string>();
-    for (const region of bodyRegions) {
-      map.set(region.id, region.name);
-    }
-    return map;
-  }, [bodyRegions]);
+  const regionNames = React.useMemo(
+    () => buildIdNameMap(bodyRegions),
+    [bodyRegions],
+  );
 
   const rows = React.useMemo(
     () =>

@@ -18,9 +18,9 @@ export function ShellProfileProvider({
   profile: ShellProfile;
   children: React.ReactNode;
 }) {
-  return React.createElement(
-    ShellProfileContext.Provider,
-    { value: profile },
-    children,
+  return (
+    <ShellProfileContext.Provider value={profile}>
+      {children}
+    </ShellProfileContext.Provider>
   );
 }

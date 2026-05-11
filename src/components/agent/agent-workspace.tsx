@@ -344,7 +344,11 @@ export function AgentWorkspace({
             </section>
           </TabsContent>
           <TabsContent value="drafts">
-            <DraftsPanel drafts={drafts} hasThread={Boolean(activeThreadId)} />
+            <DraftsPanel
+              drafts={drafts}
+              proposedDrafts={proposedDrafts}
+              hasThread={Boolean(activeThreadId)}
+            />
           </TabsContent>
           <TabsContent value="audit">
             <AuditPanel
@@ -550,7 +554,11 @@ function RailTabs({
         </TabsTrigger>
       </TabsList>
       <TabsContent value="drafts" className="flex-1 overflow-y-auto">
-        <DraftsPanel drafts={drafts} hasThread={hasThread} />
+        <DraftsPanel
+          drafts={drafts}
+          proposedDrafts={proposedDrafts}
+          hasThread={hasThread}
+        />
       </TabsContent>
       <TabsContent value="audit" className="flex-1 overflow-y-auto">
         <AuditPanel toolCalls={toolCalls} hasThread={hasThread} />
@@ -561,9 +569,11 @@ function RailTabs({
 
 function DraftsPanel({
   drafts,
+  proposedDrafts,
   hasThread,
 }: {
   drafts: AiImportDraft[];
+  proposedDrafts: AiImportDraft[];
   hasThread: boolean;
 }) {
   if (!hasThread) {
@@ -580,13 +590,12 @@ function DraftsPanel({
       </div>
     );
   }
-  const proposed = drafts.filter((d) => d.status === "proposed");
   return (
     <div className="flex flex-col gap-3">
       <p className="text-[11px] text-muted-foreground">
         {strings.agent.drafts.panelHint}
       </p>
-      {proposed.length > 0 ? (
+      {proposedDrafts.length > 0 ? (
         <Button asChild size="sm" variant="outline" className="self-start">
           <Link href="/import">{strings.agent.rail.openAllInReview}</Link>
         </Button>

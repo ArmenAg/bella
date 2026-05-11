@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { canWrite } from "@/lib/auth";
 
 import { ErrorState } from "@/components/feedback/error-state";
 import { PageHeader } from "@/components/shell/page-header";
@@ -9,10 +10,6 @@ import { listDiagnoses } from "@/server/actions/diagnoses";
 import { strings } from "@/lib/strings";
 
 export const dynamic = "force-dynamic";
-
-function canWrite(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
-}
 
 export default async function NewDiagnosisPage() {
   const profile = await loadShellProfile();

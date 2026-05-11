@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { canWrite } from "@/lib/auth";
 import { GitBranch, Plus } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -48,10 +49,6 @@ function pickString(
   const raw = params[key];
   if (Array.isArray(raw)) return raw[0] ?? null;
   return typeof raw === "string" && raw.length > 0 ? raw : null;
-}
-
-function canWrite(role: string | undefined): boolean {
-  return role === "primary" || role === "caregiver";
 }
 
 export default async function DiagnosticTreePage({
