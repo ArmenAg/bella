@@ -3,10 +3,20 @@ import type { SupabaseClient } from "@supabase/supabase-js";
 import {
   bulkExportSchema,
   bulkExportRequestSchema,
+  avoidContraindicationSchema,
+  careTeamMemberSchema,
+  caseSummaryVersionSchema,
+  emergencyPacketRequestSchema,
+  emergencyPacketSchema,
   exportPacketRequestSchema,
   exportPacketSchema,
+  type AvoidContraindication,
   type BulkExport,
   type BulkExportRequest,
+  type CareTeamMember,
+  type CaseSummaryVersion,
+  type EmergencyPacket,
+  type EmergencyPacketRequest,
   type ExportFileManifestItem,
   type ExportPacket,
   type ExportPacketRequest,
@@ -63,6 +73,29 @@ type PacketContext = {
     repeat_recommendation: string | null;
   }[];
   clinicianQuestions: string[];
+  caseSummary: CaseSummaryVersion | null;
+};
+
+type EmergencyPacketMedication = {
+  id: string;
+  name: string;
+  dose: string | null;
+  route: string | null;
+  frequency: string | null;
+  prescriber: string | null;
+  status: string;
+  reason: string | null;
+};
+
+type EmergencyPacketContext = {
+  generatedAt: string;
+  subjectUserId: string;
+  lastReviewedAt: string | null;
+  caseSummary: CaseSummaryVersion | null;
+  medications: EmergencyPacketMedication[];
+  allergiesIntolerances: AvoidContraindication[];
+  avoidContraindications: AvoidContraindication[];
+  careTeam: CareTeamMember[];
 };
 
 function dateFromToDateTime(date: string | undefined, end = false) {
@@ -77,6 +110,76 @@ function bulletList(items: string[]) {
 
 function formatDateTime(value: string) {
   return value.replace("T", " ").replace(".000Z", "Z");
+}
+
+function latestTimestamp(values: (string | null | undefined)[]) {
+  const timestamps = values
+    .filter((value): value is string => Boolean(value))
+    .map((value) => new Date(value).getTime())
+    .filter(Number.isFinite);
+
+  if (timestamps.length === 0) {
+    return null;
+  }
+
+  return new Date(Math.max(...timestamps)).toISOString();
+}
+
+function normalizeCaseSummaryRow(row: Record<string, unknown>) {
+  return caseSummaryVersionSchema.parse({
+    ...row,
+    calibration_note: row.calibration_note ?? null,
+    authored_by_text: row.authored_by_text ?? null,
+    reviewed_by_text: row.reviewed_by_text ?? null,
+    reviewed_at: row.reviewed_at ?? null,
+    source_note: row.source_note ?? null,
+    deleted_at: row.deleted_at ?? null,
+  });
+}
+
+function normalizeAvoidContraindicationRow(row: Record<string, unknown>) {
+  return avoidContraindicationSchema.parse({
+    ...row,
+    reaction_description: row.reaction_description ?? null,
+    evidence_source: row.evidence_source ?? null,
+    source_id: row.source_id ?? null,
+    last_reviewed_at: row.last_reviewed_at ?? null,
+    notes: row.notes ?? null,
+    deleted_at: row.deleted_at ?? null,
+  });
+}
+
+function normalizeCareTeamMemberRow(row: Record<string, unknown>) {
+  return careTeamMemberSchema.parse({
+    ...row,
+    organization: row.organization ?? null,
+    specialty: row.specialty ?? null,
+    role: row.role ?? null,
+    portal_url: row.portal_url ?? null,
+    contact_notes: row.contact_notes ?? null,
+    manages: row.manages ?? null,
+    manages_tags: Array.isArray(row.manages_tags) ? row.manages_tags : [],
+    last_visit_at: row.last_visit_at ?? null,
+    next_visit_at: row.next_visit_at ?? null,
+    last_reviewed_at: row.last_reviewed_at ?? null,
+    notes: row.notes ?? null,
+    deleted_at: row.deleted_at ?? null,
+  });
+}
+
+function normalizeEmergencyMedicationRow(
+  row: Record<string, unknown>,
+): EmergencyPacketMedication {
+  return {
+    id: String(row.id),
+    name: String(row.name),
+    dose: row.dose ? String(row.dose) : null,
+    route: row.route ? String(row.route) : null,
+    frequency: row.frequency ? String(row.frequency) : null,
+    prescriber: row.prescriber ? String(row.prescriber) : null,
+    status: String(row.status),
+    reason: row.reason ? String(row.reason) : null,
+  };
 }
 
 export function buildClinicianPacketMarkdown(context: PacketContext): string {
@@ -123,21 +226,33 @@ export function buildClinicianPacketMarkdown(context: PacketContext): string {
         context.filters.body_region_id
           ? `Body region: ${context.filters.body_region_id}`
           : "",
+        context.filters.care_team_member_id
+          ? `Care team member: ${context.filters.care_team_member_id}`
+          : "",
       ].filter(Boolean),
     ),
     "",
-    "## Working Diagnosis",
-    activeDiagnoses.length === 0
-      ? "No active diagnostic branch is selected or supported in the current data."
-      : activeDiagnoses
-          .slice(0, 4)
-          .map(
-            (diagnosis) =>
-              `- ${diagnosis.title} (${diagnosis.status}, ${diagnosis.confidence} confidence): ${
-                diagnosis.summary ?? "No summary recorded."
-              }`,
-          )
-          .join("\n"),
+    "## Working Diagnosis / Case Summary",
+    context.caseSummary
+      ? [
+          context.caseSummary.summary_text,
+          context.caseSummary.calibration_note
+            ? `Calibration note: ${context.caseSummary.calibration_note}`
+            : "",
+        ]
+          .filter(Boolean)
+          .join("\n")
+      : activeDiagnoses.length === 0
+        ? "No active diagnostic branch is selected or supported in the current data."
+        : activeDiagnoses
+            .slice(0, 4)
+            .map(
+              (diagnosis) =>
+                `- ${diagnosis.title} (${diagnosis.status}, ${diagnosis.confidence} confidence): ${
+                  diagnosis.summary ?? "No summary recorded."
+                }`,
+            )
+            .join("\n"),
     "",
     "## Confirmed-By / What Would Change This",
     bulletList(
@@ -242,11 +357,13 @@ export async function generateClinicianExportPacket(
   supabase: SupabaseClient,
 ): Promise<ExportPacket> {
   const parsed = exportPacketRequestSchema.parse(input);
-  await requireCurrentProfile(supabase);
+  const profile = await requireCurrentProfile(supabase);
+  const subjectUserId = parsed.subject_user_id ?? profile.id;
   const dateFrom = dateFromToDateTime(parsed.date_from);
   const dateTo = dateFromToDateTime(parsed.date_to, true);
 
   const [
+    caseSummaryResult,
     timeline,
     diagnoses,
     medications,
@@ -256,6 +373,17 @@ export async function generateClinicianExportPacket(
     vasomotor,
     procedures,
   ] = await Promise.all([
+    supabase
+      .from("case_summary_versions")
+      .select("*")
+      .eq("family_id", profile.family_id)
+      .eq("subject_user_id", subjectUserId)
+      .eq("status", "active")
+      .is("deleted_at", null)
+      .order("reviewed_at", { ascending: false, nullsFirst: false })
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
     listTimelineItems(
       {
         date_from: dateFrom,
@@ -290,9 +418,16 @@ export async function generateClinicianExportPacket(
       : Promise.resolve({ items: [], next_cursor: null, page_size: 20 }),
   ]);
 
+  if (caseSummaryResult.error) throw caseSummaryResult.error;
+
   const markdown = buildClinicianPacketMarkdown({
     generatedAt: new Date().toISOString(),
     filters: parsed,
+    caseSummary: caseSummaryResult.data
+      ? normalizeCaseSummaryRow(
+          caseSummaryResult.data as Record<string, unknown>,
+        )
+      : null,
     timelineItems: timeline.items,
     diagnoses: diagnoses.items,
     medications: medications.items,
@@ -318,10 +453,258 @@ export async function generateClinicianExportPacket(
 
   return exportPacketSchema.parse({
     id: randomUUID(),
+    packet_kind: "clinician_visit",
     generated_at: new Date().toISOString(),
     markdown,
     included_attachment_ids: includedAttachmentIds,
     filters: parsed,
+  });
+}
+
+export function buildEmergencyPacketMarkdown(
+  context: EmergencyPacketContext,
+): string {
+  return [
+    "# Bella Care Tracker Emergency Packet",
+    "",
+    `Generated: ${context.generatedAt}`,
+    `Subject user: ${context.subjectUserId}`,
+    `Last reviewed: ${context.lastReviewedAt ?? "Not reviewed yet"}`,
+    "",
+    "## Case Summary",
+    context.caseSummary
+      ? context.caseSummary.summary_text
+      : "No reviewed case summary recorded.",
+    "",
+    "## Current Medications",
+    bulletList(
+      context.medications.map((medication) =>
+        [
+          medication.name,
+          medication.dose ? `dose: ${medication.dose}` : "",
+          medication.route ? `route: ${medication.route}` : "",
+          medication.frequency ? `frequency: ${medication.frequency}` : "",
+          medication.prescriber ? `prescriber: ${medication.prescriber}` : "",
+          medication.reason ? `reason: ${medication.reason}` : "",
+        ]
+          .filter(Boolean)
+          .join("; "),
+      ),
+    ),
+    "",
+    "## Allergies And Intolerances",
+    bulletList(
+      context.allergiesIntolerances.map((item) =>
+        [
+          `${item.title} (${item.category}, ${item.severity})`,
+          item.reaction_description,
+          item.evidence_source ? `source: ${item.evidence_source}` : "",
+        ]
+          .filter(Boolean)
+          .join("; "),
+      ),
+    ),
+    "",
+    "## Avoid / Contraindications",
+    bulletList(
+      context.avoidContraindications.map((item) =>
+        [
+          `${item.title} (${item.category}, ${item.severity})`,
+          item.reaction_description,
+          item.evidence_source ? `source: ${item.evidence_source}` : "",
+        ]
+          .filter(Boolean)
+          .join("; "),
+      ),
+    ),
+    "",
+    "## Care Team",
+    bulletList(
+      context.careTeam.map((member) =>
+        [
+          member.name,
+          member.role ?? member.specialty,
+          member.organization,
+          member.manages ? `manages: ${member.manages}` : "",
+          member.contact_notes ? `contact: ${member.contact_notes}` : "",
+        ]
+          .filter(Boolean)
+          .join("; "),
+      ),
+    ),
+    "",
+    "_This packet summarizes family/clinician-reviewed records for emergency context. It does not diagnose, predict, or recommend treatment._",
+    "",
+  ].join("\n");
+}
+
+export async function generateEmergencyPacket(
+  input: EmergencyPacketRequest,
+  supabase: SupabaseClient,
+): Promise<EmergencyPacket> {
+  const parsed = emergencyPacketRequestSchema.parse(input);
+  const profile = await requireCurrentProfile(supabase);
+  const subjectUserId = parsed.subject_user_id ?? profile.id;
+  const generatedAt = parsed.generated_at ?? new Date().toISOString();
+
+  const [
+    caseSummaryResult,
+    avoidResult,
+    medicationResult,
+    careTeamResult,
+    reviewResult,
+  ] = await Promise.all([
+    supabase
+      .from("case_summary_versions")
+      .select("*")
+      .eq("family_id", profile.family_id)
+      .eq("subject_user_id", subjectUserId)
+      .eq("status", "active")
+      .is("deleted_at", null)
+      .order("reviewed_at", { ascending: false, nullsFirst: false })
+      .order("updated_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+    supabase
+      .from("avoid_contraindications")
+      .select("*")
+      .eq("family_id", profile.family_id)
+      .eq("subject_user_id", subjectUserId)
+      .eq("active", true)
+      .is("deleted_at", null)
+      .order("category", { ascending: true })
+      .order("severity", { ascending: false })
+      .order("title", { ascending: true }),
+    supabase
+      .from("medications")
+      .select(
+        "id,name,dose,route,frequency,prescriber,status,reason,updated_at",
+      )
+      .eq("family_id", profile.family_id)
+      .eq("subject_user_id", subjectUserId)
+      .eq("status", "active")
+      .is("deleted_at", null)
+      .order("name", { ascending: true }),
+    supabase
+      .from("care_team_members")
+      .select("*")
+      .eq("family_id", profile.family_id)
+      .eq("subject_user_id", subjectUserId)
+      .eq("active", true)
+      .is("deleted_at", null)
+      .order("name", { ascending: true }),
+    supabase
+      .from("emergency_packet_reviews")
+      .select("*")
+      .eq("family_id", profile.family_id)
+      .eq("subject_user_id", subjectUserId)
+      .is("deleted_at", null)
+      .order("reviewed_at", { ascending: false })
+      .limit(1)
+      .maybeSingle(),
+  ]);
+
+  if (caseSummaryResult.error) throw caseSummaryResult.error;
+  if (avoidResult.error) throw avoidResult.error;
+  if (medicationResult.error) throw medicationResult.error;
+  if (careTeamResult.error) throw careTeamResult.error;
+  if (reviewResult.error) throw reviewResult.error;
+
+  const caseSummary = caseSummaryResult.data
+    ? normalizeCaseSummaryRow(caseSummaryResult.data as Record<string, unknown>)
+    : null;
+  const avoidItems = (
+    (avoidResult.data ?? []) as Record<string, unknown>[]
+  ).map(normalizeAvoidContraindicationRow);
+  const allergiesIntolerances = avoidItems.filter((item) =>
+    ["allergy", "medication_intolerance"].includes(item.category),
+  );
+  const avoidContraindications = avoidItems.filter(
+    (item) => !["allergy", "medication_intolerance"].includes(item.category),
+  );
+  const medications = (
+    (medicationResult.data ?? []) as Record<string, unknown>[]
+  ).map(normalizeEmergencyMedicationRow);
+  const careTeam = (
+    (careTeamResult.data ?? []) as Record<string, unknown>[]
+  ).map(normalizeCareTeamMemberRow);
+  const reviewRow = reviewResult.data as Record<string, unknown> | null;
+  const lastReviewedAt = latestTimestamp([
+    reviewRow?.reviewed_at ? String(reviewRow.reviewed_at) : null,
+    caseSummary?.reviewed_at,
+    ...avoidItems.map((item) => item.last_reviewed_at),
+    ...careTeam.map((member) => member.last_reviewed_at),
+  ]);
+
+  const context: EmergencyPacketContext = {
+    generatedAt,
+    subjectUserId,
+    lastReviewedAt,
+    caseSummary,
+    medications,
+    allergiesIntolerances,
+    avoidContraindications,
+    careTeam,
+  };
+
+  const sourceMap = [
+    caseSummary
+      ? {
+          section: "case_summary",
+          source_table: "case_summary_versions",
+          source_id: caseSummary.id,
+          reviewed_at: caseSummary.reviewed_at,
+        }
+      : null,
+    reviewRow
+      ? {
+          section: "last_reviewed",
+          source_table: "emergency_packet_reviews",
+          source_id: String(reviewRow.id),
+          reviewed_at: reviewRow.reviewed_at
+            ? String(reviewRow.reviewed_at)
+            : null,
+        }
+      : null,
+    ...medications.map((medication) => ({
+      section: "current_medications",
+      source_table: "medications",
+      source_id: medication.id,
+      reviewed_at: null,
+    })),
+    ...allergiesIntolerances.map((item) => ({
+      section: "allergies_intolerances",
+      source_table: "avoid_contraindications",
+      source_id: item.id,
+      reviewed_at: item.last_reviewed_at,
+    })),
+    ...avoidContraindications.map((item) => ({
+      section: "avoid_contraindications",
+      source_table: "avoid_contraindications",
+      source_id: item.id,
+      reviewed_at: item.last_reviewed_at,
+    })),
+    ...careTeam.map((member) => ({
+      section: "care_team",
+      source_table: "care_team_members",
+      source_id: member.id,
+      reviewed_at: member.last_reviewed_at,
+    })),
+  ].filter((item): item is NonNullable<typeof item> => item !== null);
+
+  return emergencyPacketSchema.parse({
+    id: randomUUID(),
+    packet_type: "emergency",
+    generated_at: generatedAt,
+    subject_user_id: subjectUserId,
+    last_reviewed_at: lastReviewedAt,
+    markdown: buildEmergencyPacketMarkdown(context),
+    case_summary: caseSummary,
+    current_medications: medications,
+    allergies_intolerances: allergiesIntolerances,
+    avoid_contraindications: avoidContraindications,
+    care_team: careTeam,
+    source_map: sourceMap,
   });
 }
 

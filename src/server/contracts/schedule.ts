@@ -17,6 +17,9 @@ export const taskPrioritySchema = z.enum(["low", "normal", "high", "urgent"]);
 
 export const appointmentMutationSchema = z.object({
   date_time: utcDateTimeSchema,
+  subject_user_id: uuidSchema.optional(),
+  entered_by_user_id: uuidSchema.optional(),
+  care_team_member_id: uuidSchema.optional(),
   provider: z.string().max(240).optional(),
   specialty: z.string().max(240).optional(),
   location: z.string().max(400).optional(),
@@ -77,7 +80,10 @@ export const appointmentSchema = z.object({
   id: uuidSchema,
   family_id: uuidSchema,
   user_id: uuidSchema,
+  subject_user_id: uuidSchema.nullable().optional(),
+  entered_by_user_id: uuidSchema.nullable().optional(),
   date_time: utcDateTimeSchema,
+  care_team_member_id: uuidSchema.nullable().optional(),
   provider: z.string().nullable(),
   specialty: z.string().nullable(),
   location: z.string().nullable(),

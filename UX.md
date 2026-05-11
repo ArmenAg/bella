@@ -146,6 +146,14 @@ A visit packet is generated from a date range, a diagnostic branch, a body regio
 
 The packet is short on purpose. The point is not to dump everything; the point is to hand the clinician what could not be communicated in a portal message. Every section has a reason for being included. The patient brings the packet; the clinician reads it in two minutes and asks the right questions for the remaining thirteen.
 
+### XVII-A. The Emergency Packet — Safety First, Not Visit Prep
+
+The emergency packet is separate from the visit packet. It is not built around a date range or a diagnostic question; it is a one-page, always-current ED-oriented summary for a clinician who has never met Bella and needs the safest context quickly.
+
+Its sections are fixed: calibrated case summary, current medications, allergies and intolerances, avoid/contraindication items, care team contacts and roles, and the last-reviewed timestamp. It exports as Markdown first, with PDF later. It should be readable from a phone and printable without becoming a chart dump.
+
+The safety list is the source of truth for practical do-nots: no BP cuff on the left arm, avoid IV in the left hand if possible, scar probing has flared symptoms, procedure precautions, medication intolerances, and care-context warnings. These are recorded with severity, reaction/description, source, active/inactive status, and last-reviewed date. The app does not decide what is dangerous; the family and clinicians maintain the list, and the app surfaces it faithfully in emergency and pre-procedure contexts.
+
 ### XVIII. Settings — The Family as Steward
 
 The family administers the account. The primary user can do everything. The caregiver can do almost everything. The viewer is read-only. A future clinician role is read-only with narrower scope.

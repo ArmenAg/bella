@@ -1,8 +1,12 @@
 import { describe, expect, it } from "vitest";
 import {
   MAX_PAGE_SIZE,
+  avoidContraindicationSchema,
+  careTeamMemberSchema,
+  caseSummaryVersionSchema,
   createEntryInputSchema,
   createUploadUrlInputSchema,
+  emergencyPacketRequestSchema,
   evidenceLinkFilterSchema,
   exportPacketRequestSchema,
   flareCheckpointInputSchema,
@@ -66,12 +70,89 @@ describe("shared backend contracts", () => {
 
   it("defaults export packet privacy flags conservatively", () => {
     expect(exportPacketRequestSchema.parse({})).toMatchObject({
+      packet_kind: "clinician_visit",
       flares_only: false,
       include_photos: false,
       include_procedure_summaries: true,
       include_soft_deleted: false,
       clinician_questions: [],
     });
+  });
+
+  it("validates safety and care coordination contracts", () => {
+    const familyId = "10000000-0000-4000-8000-000000000201";
+    const userId = "10000000-0000-4000-8000-000000000202";
+    const timestamp = "2026-05-10T00:00:00.000Z";
+
+    expect(emergencyPacketRequestSchema.parse({})).toEqual({});
+
+    expect(
+      careTeamMemberSchema.parse({
+        id: "10000000-0000-4000-8000-000000000203",
+        family_id: familyId,
+        user_id: userId,
+        subject_user_id: userId,
+        entered_by_user_id: userId,
+        name: "Demo clinician",
+        organization: null,
+        specialty: "Pain medicine",
+        role: null,
+        portal_url: null,
+        contact_notes: null,
+        manages: "Pain plan",
+        manages_tags: [],
+        last_visit_at: null,
+        next_visit_at: null,
+        active: true,
+        last_reviewed_at: timestamp,
+        notes: null,
+        created_at: timestamp,
+        updated_at: timestamp,
+        deleted_at: null,
+      }).subject_user_id,
+    ).toBe(userId);
+
+    expect(
+      avoidContraindicationSchema.parse({
+        id: "10000000-0000-4000-8000-000000000204",
+        family_id: familyId,
+        user_id: userId,
+        subject_user_id: userId,
+        entered_by_user_id: userId,
+        category: "physical_do_not",
+        severity: "critical",
+        title: "No BP cuff on left arm",
+        reaction_description: "Pressure can trigger a flare.",
+        evidence_source: "Family observation",
+        source_id: null,
+        active: true,
+        last_reviewed_at: timestamp,
+        notes: null,
+        created_at: timestamp,
+        updated_at: timestamp,
+        deleted_at: null,
+      }).category,
+    ).toBe("physical_do_not");
+
+    expect(
+      caseSummaryVersionSchema.parse({
+        id: "10000000-0000-4000-8000-000000000205",
+        family_id: familyId,
+        user_id: userId,
+        subject_user_id: userId,
+        entered_by_user_id: userId,
+        summary_text: "Calibrated family-reviewed narrative.",
+        calibration_note: null,
+        status: "active",
+        authored_by_text: "Family",
+        reviewed_by_text: null,
+        reviewed_at: timestamp,
+        source_note: null,
+        created_at: timestamp,
+        updated_at: timestamp,
+        deleted_at: null,
+      }).status,
+    ).toBe("active");
   });
 
   it("validates release follow-up contract additions", () => {

@@ -15,7 +15,7 @@ import { strings } from "@/lib/strings";
 export const dynamic = "force-dynamic";
 
 interface NewMedicationResponsePageProps {
-  searchParams: Promise<{ medication_id?: string }>;
+  searchParams: Promise<{ medication_id?: string; quick?: string }>;
 }
 
 export default async function NewMedicationResponsePage({
@@ -44,7 +44,16 @@ export default async function NewMedicationResponsePage({
   const medications: MedicationOption[] = medsResult.data.items.map((med) => ({
     id: med.id,
     name: med.name,
+    status: med.status,
   }));
+  const activeMedicationIds = medications
+    .filter((med) => med.status === "active")
+    .map((med) => med.id);
+  const defaultMedicationId =
+    params.medication_id ??
+    (params.quick === "1" && activeMedicationIds.length === 1
+      ? activeMedicationIds[0]
+      : undefined);
 
   const entries: EntryOption[] = entriesResult.ok
     ? entriesResult.data.items.map((entry) => ({
@@ -61,7 +70,8 @@ export default async function NewMedicationResponsePage({
         mode="create"
         medications={medications}
         entries={entries}
-        defaultMedicationId={params.medication_id}
+        defaultMedicationId={defaultMedicationId}
+        quick={params.quick === "1"}
       />
     </div>
   );

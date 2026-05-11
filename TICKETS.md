@@ -152,6 +152,11 @@ Contracts needed:
 - Medication
 - Medication response
 - Export packet request
+- Care team member
+- Avoid/contraindication item
+- Versioned case summary
+- Emergency packet request/response
+- Record attribution fields (`subject_user_id`, `entered_by_user_id`)
 
 Definition of done:
 
@@ -939,9 +944,11 @@ Generate export packets.
 
 Inputs:
 
+- subject user
 - date range
 - diagnostic branch
 - body region
+- care team member
 - flares only
 - include photos
 - include procedure summaries
@@ -955,6 +962,7 @@ Packet should include:
 
 - current working diagnosis
 - working diagnosis paragraph, not only the label
+- active versioned case summary when available
 - confirmed-by criteria for active/supported diagnostic branches
 - current meds
 - active decisions
@@ -969,6 +977,70 @@ Definition of done:
 
 - Markdown export works.
 - Output is clinician-readable.
+
+### BE-017a - Safety And Care Coordination Backend Foundation
+
+Owner: Codex
+
+Implement backend foundation for emergency/safety records.
+
+Schema/contracts:
+
+- `care_team_members`
+- `avoid_contraindications`
+- `case_summary_versions`
+- `emergency_packet_reviews`
+- `subject_user_id` and `entered_by_user_id` attribution on medical records
+- care team links from appointments, decisions, medications, sources, and procedure/test events
+
+Requirements:
+
+- RLS enabled on all new tables.
+- Soft-delete and audit hooks included.
+- Caregiver-entered records preserve who the record is about and who entered it.
+- Avoid/contraindication items include category, severity, reaction/description, evidence/source, active/inactive, and last-reviewed fields.
+- Versioned case summary stores calibrated family/clinician-authored narrative and is not treated as a diagnosis assertion.
+- No AI Q&A, automatic flare prediction, or automatic pattern interpretation.
+
+Definition of done:
+
+- Migration runs on a fresh database.
+- Shared Zod/TypeScript contracts validate.
+- Bulk export includes the new tables.
+- Visit packet can use active case summary as its working paragraph source.
+
+### BE-017b - Emergency Packet Markdown Export
+
+Owner: Codex
+
+Generate the emergency packet separately from the visit packet.
+
+Inputs:
+
+- subject user
+- generated timestamp
+
+Sections:
+
+- calibrated active case summary
+- current medications
+- allergies and medication intolerances
+- avoid/contraindication items
+- care team contacts/roles
+- last-reviewed timestamp
+
+Requirements:
+
+- Markdown first, PDF later.
+- One-page ED-oriented output.
+- Each section has a clear source table.
+- Output does not diagnose, predict, or recommend treatment.
+
+Definition of done:
+
+- Server action returns typed emergency packet data and Markdown.
+- Packet source map identifies source table/row for each section.
+- Disabled or inactive safety items are excluded from the emergency packet but remain available in structured data/export.
 
 ### FE-015 - Export Packet UI
 
@@ -1023,6 +1095,72 @@ Backend dependency:
 Definition of done:
 
 - User can request and download all app data.
+
+### FE-016a - Safety List UI
+
+Owner: Claude
+
+Build UI for avoid/contraindication records.
+
+Requirements:
+
+- Create/edit/list active and inactive safety items.
+- Support allergy, medication intolerance, procedure precaution, physical do-not, and care-context warning categories.
+- Show severity, reaction/description, evidence/source, active state, and last-reviewed date.
+- Keep disabled/inactive items visible and exportable where applicable.
+- Surface active items in pre-procedure planning contexts.
+
+Backend dependency:
+
+- BE-017a.
+
+Definition of done:
+
+- Family can maintain the safety list without editing packet text directly.
+- UI uses Codex-provided contracts and server actions.
+
+### FE-016b - Care Team UI
+
+Owner: Claude
+
+Build care team management and linking UI.
+
+Requirements:
+
+- Create/edit/list care team members.
+- Track organization, specialty/role, portal/contact notes, what they manage, last visit, and next visit.
+- Let appointments, decisions, medications, sources, and procedure/test events link to a care team member while preserving existing free-text provider fields.
+
+Backend dependency:
+
+- BE-017a.
+
+Definition of done:
+
+- Care team members can be selected where provider/prescriber/owner strings are currently repeated.
+
+### FE-016c - Emergency Packet UI
+
+Owner: Claude
+
+Build emergency packet view/download UI.
+
+Requirements:
+
+- Separate from visit packet builder.
+- Show one-page ED-oriented preview.
+- Download Markdown.
+- Display last-reviewed timestamp.
+- Include clear affordance to review safety list and case summary before export.
+- Do not add diagnostic interpretation or treatment recommendations.
+
+Backend dependency:
+
+- BE-017b.
+
+Definition of done:
+
+- Family can generate the current emergency packet quickly from Settings or Export Packets.
 
 ## Milestone 9 - Dashboard And Charts
 

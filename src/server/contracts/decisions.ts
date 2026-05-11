@@ -22,6 +22,8 @@ export const decisionOptionSchema = z.object({
 
 export const decisionMutationSchema = z.object({
   title: z.string().min(1).max(240),
+  subject_user_id: uuidSchema.optional(),
+  entered_by_user_id: uuidSchema.optional(),
   status: decisionStatusSchema,
   question: z.string().min(1).max(4000),
   options: z.array(decisionOptionSchema).default([]),
@@ -30,6 +32,7 @@ export const decisionMutationSchema = z.object({
   risks: z.string().max(12000).optional(),
   what_would_change: z.string().max(12000).optional(),
   owner: z.string().max(240).optional(),
+  owner_care_team_member_id: uuidSchema.optional(),
   target_date: dateSchema.optional(),
   final_decision: z.string().max(12000).optional(),
   rationale: z.string().max(12000).optional(),
@@ -68,6 +71,8 @@ export const decisionSchema = z.object({
   id: uuidSchema,
   family_id: uuidSchema,
   user_id: uuidSchema,
+  subject_user_id: uuidSchema.nullable().optional(),
+  entered_by_user_id: uuidSchema.nullable().optional(),
   title: z.string(),
   status: decisionStatusSchema,
   question: z.string(),
@@ -77,6 +82,7 @@ export const decisionSchema = z.object({
   risks: z.string().nullable(),
   what_would_change: z.string().nullable(),
   owner: z.string().nullable(),
+  owner_care_team_member_id: uuidSchema.nullable().optional(),
   target_date: dateSchema.nullable(),
   final_decision: z.string().nullable(),
   rationale: z.string().nullable(),

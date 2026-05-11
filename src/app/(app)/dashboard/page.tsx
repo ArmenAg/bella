@@ -7,6 +7,8 @@ import { RangeSelector } from "@/components/dashboard/range-selector";
 import { SectionCard } from "@/components/dashboard/section-card";
 import { SectionRow } from "@/components/dashboard/section-row";
 import { TrendsAccordion } from "@/components/dashboard/trends-accordion";
+import { InstallInstructionsPrompt } from "@/components/mobile/install-instructions";
+import { QuickCapturePanel } from "@/components/mobile/quick-capture-panel";
 
 import { FlareFrequencyChart } from "@/components/charts/flare-frequency-chart";
 import { RecoveryTimeChart } from "@/components/charts/recovery-time-chart";
@@ -150,9 +152,11 @@ export default async function DashboardPage({
         description={strings.dashboard.subtitle}
         actions={<RangeSelector current={range} />}
       />
+      <InstallInstructionsPrompt />
 
       {/* Row 1: Active flare (renders null when no active flare) */}
       <ActiveFlareCard />
+      <QuickCapturePanel />
 
       {/* Row 2: Today — appointments + tasks merged */}
       <SectionCard

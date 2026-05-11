@@ -49,7 +49,8 @@ Primary navigation:
 - Medications
 - Procedures & Tests
 - Source Library
-- Export Packet
+- Safety & Care Team
+- Export Packets
 - Settings
 
 ## Visual Direction
@@ -344,11 +345,45 @@ Each source:
 - Linked diagnostic nodes
 - Linked decisions
 
-### 11. Export Packet
+### 10A. Safety List, Care Team, And Emergency Packet
 
-One-click clinician summary.
+Safety and care coordination are first-class records, not notes copied into each packet.
 
-Export options:
+Safety list:
+
+- Allergies
+- Medication intolerances
+- Procedure precautions
+- Physical do-nots
+- Care-context warnings
+
+Each safety item stores severity, reaction/description, evidence/source, active/inactive state, and last-reviewed date. Examples include no BP cuff on the left arm, avoid IV in the left hand if possible, and scar probing flare history. These records surface in emergency export and pre-procedure planning; the app does not infer or rank new contraindications on its own.
+
+Care team:
+
+- Name
+- Organization
+- Specialty/role
+- Portal/contact notes
+- What they manage
+- Last visit
+- Next visit
+
+Appointments, decisions, medications, sources, procedures/events, and export packets should be able to link to a care team member while preserving existing free-text provider/prescriber fields for legacy or uncertain records.
+
+Emergency packet:
+
+- Separate from the clinician visit packet
+- One-page and ED-oriented
+- Always-current rather than date-range scoped
+- Markdown first, PDF later
+- Includes calibrated case summary, current meds, allergies/intolerances, avoid/contraindications, care team contacts/roles, and last-reviewed timestamp
+
+### 11. Export Packets
+
+Visit packets and emergency packets are distinct products.
+
+Visit packet options:
 
 - Last 7 days
 - Last 30 days
@@ -358,9 +393,9 @@ Export options:
 - Specific body region
 - Full case summary
 
-Packet contents:
+Visit packet contents:
 
-- Current working diagnosis
+- Current working case summary in calibrated language
 - Current meds
 - Active decisions
 - Upcoming appointments/tests
@@ -378,6 +413,16 @@ Output:
 - Shareable read-only view later, if needed
 
 ## Data Model Draft
+
+### Record attribution convention
+
+Medical/family records distinguish the subject from the person entering the record:
+
+- `user_id`: current legacy owner/actor field on existing tables
+- `subject_user_id`: who the record is about
+- `entered_by_user_id`: who entered or imported the record
+
+For existing records, `subject_user_id` backfills from `user_id`, and `entered_by_user_id` backfills from `created_by` where available or `user_id`. New caregiver-entered records should preserve Bella as the subject while showing the caregiver as the entering user.
 
 ### roles
 
@@ -425,6 +470,8 @@ Categories: sensory, vasomotor, sudomotor/edema, motor/trophic, cognitive, medic
 
 - id
 - user_id
+- subject_user_id
+- entered_by_user_id
 - type
 - occurred_at
 - ended_at
@@ -472,6 +519,8 @@ Initial Bella-specific triggers: BP cuff, IV placement, ring, wrist hairband, sl
 
 - id
 - user_id
+- subject_user_id
+- entered_by_user_id
 - entry_id
 - measured_at
 - site
@@ -493,11 +542,14 @@ Use this for paired temperature/color documentation. If only one side is relevan
 
 - id
 - user_id
+- subject_user_id
+- entered_by_user_id
 - type
 - occurred_at
 - title
 - summary
 - provider
+- care_team_member_id
 - location
 - source_id
 - created_at
@@ -531,6 +583,8 @@ This polymorphic pattern is convenient but does not provide database-level refer
 ### diagnoses
 
 - id
+- subject_user_id
+- entered_by_user_id
 - title
 - status
 - confidence
@@ -562,6 +616,8 @@ Direction: supports, weakens, neutral, pending.
 ### decisions
 
 - id
+- subject_user_id
+- entered_by_user_id
 - title
 - status
 - question
@@ -571,6 +627,7 @@ Direction: supports, weakens, neutral, pending.
 - risks
 - what_would_change
 - owner
+- owner_care_team_member_id
 - target_date
 - final_decision
 - rationale
@@ -581,8 +638,11 @@ Direction: supports, weakens, neutral, pending.
 ### appointments
 
 - id
+- subject_user_id
+- entered_by_user_id
 - date_time
 - provider
+- care_team_member_id
 - specialty
 - location
 - purpose
@@ -597,6 +657,8 @@ Direction: supports, weakens, neutral, pending.
 ### medications
 
 - id
+- subject_user_id
+- entered_by_user_id
 - name
 - dose
 - route
@@ -604,6 +666,7 @@ Direction: supports, weakens, neutral, pending.
 - start_date
 - stop_date
 - prescriber
+- prescriber_care_team_member_id
 - reason
 - status
 - notes
@@ -614,6 +677,8 @@ Direction: supports, weakens, neutral, pending.
 ### medication_responses
 
 - id
+- subject_user_id
+- entered_by_user_id
 - medication_id
 - entry_id
 - taken_at
@@ -632,16 +697,99 @@ Direction: supports, weakens, neutral, pending.
 ### sources
 
 - id
+- subject_user_id
+- entered_by_user_id
 - title
 - source_type
 - source_date
 - provider
+- care_team_member_id
 - file_path
 - summary
 - citation
 - created_at
 - updated_at
 - deleted_at
+
+### care_team_members
+
+- id
+- user_id
+- subject_user_id
+- entered_by_user_id
+- name
+- organization
+- specialty
+- role
+- portal_url
+- contact_notes
+- manages
+- manages_tags
+- last_visit_at
+- next_visit_at
+- active
+- last_reviewed_at
+- notes
+- created_at
+- updated_at
+- deleted_at
+
+Use `care_team_member_id` links from appointments, decisions, medications, sources, and procedure/test events. Keep free-text provider fields where needed; the linked care team member is the structured source.
+
+### avoid_contraindications
+
+- id
+- user_id
+- subject_user_id
+- entered_by_user_id
+- category: allergy, medication_intolerance, procedure_precaution, physical_do_not, care_context_warning
+- severity: info, low, moderate, high, critical
+- title
+- reaction_description
+- evidence_source
+- source_id
+- active
+- last_reviewed_at
+- notes
+- created_at
+- updated_at
+- deleted_at
+
+This is the source of truth for emergency export safety items and pre-procedure planning warnings.
+
+### case_summary_versions
+
+- id
+- user_id
+- subject_user_id
+- entered_by_user_id
+- summary_text
+- calibration_note
+- status: draft, active, superseded, retired
+- authored_by_text
+- reviewed_by_text
+- reviewed_at
+- source_note
+- created_at
+- updated_at
+- deleted_at
+
+This stores the working case summary paragraph in calibrated language. It is versioned, editable, auditable, and usable by both the visit packet and emergency packet. It is not a diagnosis assertion and should not replace diagnostic-node evidence.
+
+### emergency_packet_reviews
+
+- id
+- user_id
+- subject_user_id
+- entered_by_user_id
+- reviewed_by_user_id
+- reviewed_at
+- notes
+- created_at
+- updated_at
+- deleted_at
+
+This gives the always-current emergency packet a clear last-reviewed timestamp without requiring a generated packet to be persisted.
 
 ### tasks
 
@@ -720,12 +868,20 @@ Build the first version in this order:
    - Linked entries/events/sources
    - Merge/split node history
 
-9. **Export Packet**
-   - Generate markdown first
-   - PDF later
-   - Include photo comparison panels and temperature deltas
+9. **Safety & Care Coordination**
+   - Avoid/contraindication list
+   - Care team directory
+   - Versioned case summary
+   - Emergency packet Markdown
 
-10. **Bulk Export**
+10. **Export Packets**
+
+- Generate markdown first
+- PDF later
+- Keep visit packet and emergency packet distinct
+- Include photo comparison panels and temperature deltas where relevant
+
+11. **Bulk Export**
 
 - Export structured JSON/CSV
 - Export uploaded files

@@ -71,7 +71,7 @@ export function MobileNav() {
 
   return (
     <>
-      <header className="sticky top-0 z-30 flex h-12 items-center justify-between gap-2 border-b border-border bg-background/95 px-3 backdrop-blur lg:hidden">
+      <header className="sticky top-0 z-30 flex min-h-[calc(3rem+var(--safe-top))] items-center justify-between gap-2 border-b border-border bg-background/95 pb-0 pl-[max(var(--safe-left),0.75rem)] pr-[max(var(--safe-right),0.75rem)] pt-[var(--safe-top)] backdrop-blur lg:hidden">
         <span className="text-sm font-semibold">{strings.app.name}</span>
         <div className="flex items-center gap-1.5">
           <Button asChild size="sm" className="gap-1.5">
@@ -94,7 +94,7 @@ export function MobileNav() {
 
       <nav
         aria-label="Primary"
-        className="fixed bottom-0 left-0 right-0 z-30 grid grid-cols-5 border-t border-border bg-background/95 backdrop-blur lg:hidden"
+        className="fixed bottom-0 left-0 right-0 z-30 grid min-h-[calc(var(--mobile-bottom-nav-height)+var(--safe-bottom))] grid-cols-5 border-t border-border bg-background/95 pb-[var(--safe-bottom)] pl-[var(--safe-left)] pr-[var(--safe-right)] backdrop-blur lg:hidden"
       >
         {bottomItems.map((item) => {
           const Icon = item.icon;
@@ -143,7 +143,10 @@ export function MobileNav() {
               <span className="truncate">More</span>
             </button>
           </SheetTrigger>
-          <SheetContent side="right" className="w-72 p-0">
+          <SheetContent
+            side="right"
+            className="w-72 p-0 pb-[var(--safe-bottom)] pr-[var(--safe-right)] pt-[var(--safe-top)]"
+          >
             <SheetHeader>
               <SheetTitle>{strings.app.name}</SheetTitle>
             </SheetHeader>

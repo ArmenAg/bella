@@ -23,6 +23,7 @@ import { DestructiveConfirm } from "@/components/feedback/destructive-confirm";
 import { Field } from "@/components/entries/field";
 import { PainSegmented } from "@/components/entries/pain-segmented";
 import { ToggleChip } from "@/components/entries/toggle-chip";
+import { CollapsibleSection } from "@/components/entries/collapsible-section";
 
 import {
   createMedicationResponse,
@@ -32,6 +33,7 @@ import {
 import { medicationResponseMutationSchema } from "@/server/contracts/medications";
 import type {
   CreateMedicationResponseInput,
+  Medication,
   MedicationResponse,
   UpdateMedicationResponseInput,
 } from "@/server/contracts";
@@ -58,6 +60,7 @@ const NONE_VALUE = "__none__";
 export interface MedicationOption {
   id: string;
   name: string;
+  status?: Medication["status"];
 }
 
 export interface EntryOption {
@@ -72,6 +75,7 @@ export interface ResponseFormProps {
   medications: MedicationOption[];
   entries: EntryOption[];
   defaultMedicationId?: string;
+  quick?: boolean;
 }
 
 function nowIso(): string {
@@ -81,6 +85,7 @@ function nowIso(): string {
 function buildDefaults(
   response: MedicationResponse | undefined,
   defaultMedicationId: string | undefined,
+  captureOpenedAt: string,
 ): MedicationResponseFormValues {
   if (response) {
     return {
@@ -102,7 +107,7 @@ function buildDefaults(
   }
   return {
     medication_id: defaultMedicationId,
-    taken_at: nowIso(),
+    taken_at: captureOpenedAt,
   };
 }
 
@@ -142,18 +147,34 @@ function normalizePayload(
 }
 
 export function MedicationResponseForm(props: ResponseFormProps) {
-  const { mode, response, medications, entries, defaultMedicationId } = props;
+  const {
+    mode,
+    response,
+    medications,
+    entries,
+    defaultMedicationId,
+    quick = false,
+  } = props;
   const router = useRouter();
   const formStrings = strings.medications.response;
+  const isQuickCreate = quick && mode === "create";
 
   const [submitting, setSubmitting] = React.useState(false);
   const [deleting, setDeleting] = React.useState(false);
   const [confirmDelete, setConfirmDelete] = React.useState(false);
   const [serverError, setServerError] = React.useState<string | null>(null);
+  const captureOpenedAtRef = React.useRef<string | null>(null);
+  if (captureOpenedAtRef.current === null) {
+    captureOpenedAtRef.current = nowIso();
+  }
 
   const form = useForm<MedicationResponseFormValues>({
     resolver: zodResolver(medicationResponseMutationSchema),
-    defaultValues: buildDefaults(response, defaultMedicationId),
+    defaultValues: buildDefaults(
+      response,
+      defaultMedicationId,
+      captureOpenedAtRef.current,
+    ),
     mode: "onTouched",
   });
 
@@ -216,9 +237,90 @@ export function MedicationResponseForm(props: ResponseFormProps) {
   };
 
   const validationSummary = firstZodError(errors);
+  const sortedMedications = React.useMemo(() => {
+    const statusOrder: Record<Medication["status"], number> = {
+      active: 0,
+      planned: 1,
+      paused: 2,
+      stopped: 3,
+    };
+    return [...medications].sort((a, b) => {
+      const statusDelta =
+        (a.status ? statusOrder[a.status] : 4) -
+        (b.status ? statusOrder[b.status] : 4);
+      if (statusDelta !== 0) return statusDelta;
+      return a.name.localeCompare(b.name);
+    });
+  }, [medications]);
+
+  const renderPainAfterFields = () => (
+    <>
+      <Field
+        id="resp-pain-30"
+        label={formStrings.painAfter30m}
+        optional
+        error={errors.pain_after_30m?.message}
+      >
+        <Controller
+          control={control}
+          name="pain_after_30m"
+          render={({ field }) => (
+            <PainSegmented
+              id="resp-pain-30"
+              value={field.value ?? undefined}
+              onChange={(next) => field.onChange(next)}
+              ariaLabel={formStrings.painAfter30m}
+            />
+          )}
+        />
+      </Field>
+      <Field
+        id="resp-pain-60"
+        label={formStrings.painAfter60m}
+        optional
+        error={errors.pain_after_60m?.message}
+      >
+        <Controller
+          control={control}
+          name="pain_after_60m"
+          render={({ field }) => (
+            <PainSegmented
+              id="resp-pain-60"
+              value={field.value ?? undefined}
+              onChange={(next) => field.onChange(next)}
+              ariaLabel={formStrings.painAfter60m}
+            />
+          )}
+        />
+      </Field>
+      <Field
+        id="resp-pain-120"
+        label={formStrings.painAfter120m}
+        optional
+        error={errors.pain_after_120m?.message}
+      >
+        <Controller
+          control={control}
+          name="pain_after_120m"
+          render={({ field }) => (
+            <PainSegmented
+              id="resp-pain-120"
+              value={field.value ?? undefined}
+              onChange={(next) => field.onChange(next)}
+              ariaLabel={formStrings.painAfter120m}
+            />
+          )}
+        />
+      </Field>
+    </>
+  );
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      className="mb-16 flex flex-col gap-5 lg:mb-0"
+    >
       {serverError ? (
         <Alert variant="destructive">
           <AlertTitle>{strings.common.errorTitle}</AlertTitle>
@@ -261,7 +363,7 @@ export function MedicationResponseForm(props: ResponseFormProps) {
                     <SelectItem value={NONE_VALUE}>
                       {formStrings.medicationNone}
                     </SelectItem>
-                    {medications.map((med) => (
+                    {sortedMedications.map((med) => (
                       <SelectItem key={med.id} value={med.id}>
                         {med.name}
                       </SelectItem>
@@ -376,63 +478,16 @@ export function MedicationResponseForm(props: ResponseFormProps) {
               )}
             />
           </Field>
-          <Field
-            id="resp-pain-30"
-            label={formStrings.painAfter30m}
-            optional
-            error={errors.pain_after_30m?.message}
-          >
-            <Controller
-              control={control}
-              name="pain_after_30m"
-              render={({ field }) => (
-                <PainSegmented
-                  id="resp-pain-30"
-                  value={field.value ?? undefined}
-                  onChange={(next) => field.onChange(next)}
-                  ariaLabel={formStrings.painAfter30m}
-                />
-              )}
-            />
-          </Field>
-          <Field
-            id="resp-pain-60"
-            label={formStrings.painAfter60m}
-            optional
-            error={errors.pain_after_60m?.message}
-          >
-            <Controller
-              control={control}
-              name="pain_after_60m"
-              render={({ field }) => (
-                <PainSegmented
-                  id="resp-pain-60"
-                  value={field.value ?? undefined}
-                  onChange={(next) => field.onChange(next)}
-                  ariaLabel={formStrings.painAfter60m}
-                />
-              )}
-            />
-          </Field>
-          <Field
-            id="resp-pain-120"
-            label={formStrings.painAfter120m}
-            optional
-            error={errors.pain_after_120m?.message}
-          >
-            <Controller
-              control={control}
-              name="pain_after_120m"
-              render={({ field }) => (
-                <PainSegmented
-                  id="resp-pain-120"
-                  value={field.value ?? undefined}
-                  onChange={(next) => field.onChange(next)}
-                  ariaLabel={formStrings.painAfter120m}
-                />
-              )}
-            />
-          </Field>
+          {isQuickCreate ? (
+            <CollapsibleSection
+              title={formStrings.painSection}
+              hint={`${formStrings.painAfter30m}, ${formStrings.painAfter60m}, ${formStrings.painAfter120m}`}
+            >
+              {renderPainAfterFields()}
+            </CollapsibleSection>
+          ) : (
+            renderPainAfterFields()
+          )}
         </CardContent>
       </Card>
 
@@ -543,7 +598,7 @@ export function MedicationResponseForm(props: ResponseFormProps) {
         </CardContent>
       </Card>
 
-      <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="sticky bottom-[calc(var(--mobile-bottom-nav-height)+var(--safe-bottom))] -mx-4 flex flex-col-reverse gap-2 border-t border-border bg-background/95 px-4 pb-[max(var(--safe-bottom),12px)] pt-3 backdrop-blur sm:-mx-6 sm:px-6 sm:flex-row sm:items-center sm:justify-between lg:static lg:bottom-auto lg:mx-0 lg:bg-transparent lg:px-0 lg:pb-4 lg:backdrop-blur-none">
         <div className="flex items-center gap-2">
           {mode === "edit" ? (
             <Button

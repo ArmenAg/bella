@@ -52,9 +52,9 @@ function nowIsoForInput(): string {
   return toLocalDateTimeInputValue(new Date().toISOString());
 }
 
-function buildDefaults(): StartFlareFormValues {
+function buildDefaults(captureOpenedAt: string): StartFlareFormValues {
   return {
-    occurred_at: new Date().toISOString(),
+    occurred_at: captureOpenedAt,
     title: "Flare",
     pain_current: undefined,
     pain_peak: undefined,
@@ -63,7 +63,7 @@ function buildDefaults(): StartFlareFormValues {
     symptoms: [],
     triggers: [],
     notes: undefined,
-    client_recorded_at: undefined,
+    client_recorded_at: captureOpenedAt,
   };
 }
 
@@ -88,10 +88,14 @@ export function FlareStartForm({
   const router = useRouter();
   const [submitting, setSubmitting] = React.useState(false);
   const [serverError, setServerError] = React.useState<string | null>(null);
+  const captureOpenedAtRef = React.useRef<string | null>(null);
+  if (captureOpenedAtRef.current === null) {
+    captureOpenedAtRef.current = new Date().toISOString();
+  }
 
   const form = useForm<StartFlareFormValues>({
     resolver: zodResolver(startFlareInputSchema),
-    defaultValues: buildDefaults(),
+    defaultValues: buildDefaults(captureOpenedAtRef.current),
     mode: "onTouched",
   });
 
@@ -164,7 +168,11 @@ export function FlareStartForm({
   const startStrings = strings.flare.start;
 
   return (
-    <form onSubmit={onSubmit} noValidate className="flex flex-col gap-5">
+    <form
+      onSubmit={onSubmit}
+      noValidate
+      className="mb-16 flex flex-col gap-5 lg:mb-0"
+    >
       {serverError ? (
         <Alert variant="destructive">
           <AlertTitle>{strings.common.errorTitle}</AlertTitle>
@@ -266,6 +274,22 @@ export function FlareStartForm({
               />
             </Field>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card>
+        <CardHeader>
+          <CardTitle>{startStrings.notes}</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Field id="flare-notes" label={startStrings.notes} optional>
+            <Textarea
+              id="flare-notes"
+              rows={4}
+              placeholder={startStrings.notesPlaceholder}
+              {...register("notes")}
+            />
+          </Field>
         </CardContent>
       </Card>
 
@@ -476,23 +500,7 @@ export function FlareStartForm({
         </CardContent>
       </Card>
 
-      <Card>
-        <CardHeader>
-          <CardTitle>{startStrings.notes}</CardTitle>
-        </CardHeader>
-        <CardContent>
-          <Field id="flare-notes" label={startStrings.notes} optional>
-            <Textarea
-              id="flare-notes"
-              rows={4}
-              placeholder={startStrings.notesPlaceholder}
-              {...register("notes")}
-            />
-          </Field>
-        </CardContent>
-      </Card>
-
-      <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-end">
+      <div className="sticky bottom-[calc(var(--mobile-bottom-nav-height)+var(--safe-bottom))] -mx-4 flex flex-col-reverse gap-2 border-t border-border bg-background/95 px-4 pb-[max(var(--safe-bottom),12px)] pt-3 backdrop-blur sm:-mx-6 sm:px-6 sm:flex-row sm:items-center sm:justify-end lg:static lg:bottom-auto lg:mx-0 lg:bg-transparent lg:px-0 lg:pb-4 lg:backdrop-blur-none">
         <Button type="submit" disabled={submitting}>
           {submitting ? (
             <>

@@ -38,6 +38,8 @@ export const evidenceLinkedTypeSchema = z.enum([
 
 export const diagnosisMutationSchema = z.object({
   parent_diagnosis_id: uuidSchema.optional(),
+  subject_user_id: uuidSchema.optional(),
+  entered_by_user_id: uuidSchema.optional(),
   title: z.string().min(1).max(240),
   status: diagnosisStatusSchema,
   confidence: diagnosisConfidenceSchema,
@@ -101,6 +103,8 @@ export const diagnosisNodeSchema = z.object({
   id: uuidSchema,
   family_id: uuidSchema,
   user_id: uuidSchema,
+  subject_user_id: uuidSchema.nullable().optional(),
+  entered_by_user_id: uuidSchema.nullable().optional(),
   parent_diagnosis_id: uuidSchema.nullable(),
   title: z.string(),
   status: diagnosisStatusSchema,

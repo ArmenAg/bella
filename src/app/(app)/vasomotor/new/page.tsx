@@ -7,7 +7,14 @@ import { strings } from "@/lib/strings";
 
 export const dynamic = "force-dynamic";
 
-export default async function NewVasomotorPage() {
+interface NewVasomotorPageProps {
+  searchParams: Promise<{ quick?: string }>;
+}
+
+export default async function NewVasomotorPage({
+  searchParams,
+}: NewVasomotorPageProps) {
+  const params = await searchParams;
   const activeFlare = await loadActiveFlare();
 
   return (
@@ -21,6 +28,7 @@ export default async function NewVasomotorPage() {
         activeFlareEntryId={activeFlare?.entry.id ?? null}
         defaultContext={activeFlare ? "active_flare" : "baseline"}
         defaultLinkToFlare={Boolean(activeFlare)}
+        quick={params.quick === "1"}
         redirectOnSuccess="/vasomotor"
       />
     </div>

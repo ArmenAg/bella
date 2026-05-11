@@ -188,6 +188,40 @@ export function FlareCheckpointForm({
         </Alert>
       ) : null}
 
+      <Field
+        id="checkpoint-pain"
+        label={checkpointStrings.painScore}
+        optional
+        error={errors.pain_score?.message}
+      >
+        <Controller
+          control={control}
+          name="pain_score"
+          render={({ field }) => (
+            <PainSegmented
+              id="checkpoint-pain"
+              value={field.value ?? undefined}
+              onChange={(next) => field.onChange(next)}
+              ariaLabel={checkpointStrings.painScore}
+            />
+          )}
+        />
+      </Field>
+
+      <Field
+        id="checkpoint-notes"
+        label={checkpointStrings.notes}
+        optional
+        error={errors.notes?.message}
+      >
+        <Textarea
+          id="checkpoint-notes"
+          rows={3}
+          placeholder={checkpointStrings.notesPlaceholder}
+          {...register("notes")}
+        />
+      </Field>
+
       <Field label={checkpointStrings.type}>
         <Controller
           control={control}
@@ -244,40 +278,6 @@ export function FlareCheckpointForm({
           </p>
         </div>
       </div>
-
-      <Field
-        id="checkpoint-pain"
-        label={checkpointStrings.painScore}
-        optional
-        error={errors.pain_score?.message}
-      >
-        <Controller
-          control={control}
-          name="pain_score"
-          render={({ field }) => (
-            <PainSegmented
-              id="checkpoint-pain"
-              value={field.value ?? undefined}
-              onChange={(next) => field.onChange(next)}
-              ariaLabel={checkpointStrings.painScore}
-            />
-          )}
-        />
-      </Field>
-
-      <Field
-        id="checkpoint-notes"
-        label={checkpointStrings.notes}
-        optional
-        error={errors.notes?.message}
-      >
-        <Textarea
-          id="checkpoint-notes"
-          rows={3}
-          placeholder={checkpointStrings.notesPlaceholder}
-          {...register("notes")}
-        />
-      </Field>
 
       <div className="flex justify-end">
         <Button type="submit" disabled={submitting}>

@@ -86,6 +86,8 @@ export interface VasomotorFormProps {
   hideCancel?: boolean;
   /** Hide the destructive remove button (only meaningful in edit mode). */
   hideDelete?: boolean;
+  /** Optimizes create flow for quick mobile photo capture. */
+  quick?: boolean;
   /** When set, redirect on success to this href instead of calling onSaved. */
   redirectOnSuccess?: string;
   className?: string;
@@ -95,7 +97,10 @@ function nowIsoForInput(): string {
   return toLocalDateTimeInputValue(new Date().toISOString());
 }
 
-function buildDefaults(props: VasomotorFormProps): VasomotorFormValues {
+function buildDefaults(
+  props: VasomotorFormProps,
+  captureOpenedAt: string,
+): VasomotorFormValues {
   if (props.measurement) {
     const m = props.measurement;
     return {
@@ -119,7 +124,7 @@ function buildDefaults(props: VasomotorFormProps): VasomotorFormValues {
       props.defaultLinkToFlare && props.activeFlareEntryId
         ? props.activeFlareEntryId
         : undefined,
-    measured_at: new Date().toISOString(),
+    measured_at: captureOpenedAt,
     site: "",
     left_temp_c: undefined,
     right_temp_c: undefined,
@@ -163,13 +168,19 @@ export function VasomotorForm(props: VasomotorFormProps) {
     onCancel,
     hideCancel,
     hideDelete,
+    quick = false,
     redirectOnSuccess,
     className,
   } = props;
   const router = useRouter();
+  const isQuickCreate = quick && mode === "create";
 
   const leftUploaderRef = React.useRef<AttachmentUploaderHandle>(null);
   const rightUploaderRef = React.useRef<AttachmentUploaderHandle>(null);
+  const captureOpenedAtRef = React.useRef<string | null>(null);
+  if (captureOpenedAtRef.current === null) {
+    captureOpenedAtRef.current = new Date().toISOString();
+  }
 
   const [leftPending, setLeftPending] = React.useState(false);
   const [rightPending, setRightPending] = React.useState(false);
@@ -183,7 +194,7 @@ export function VasomotorForm(props: VasomotorFormProps) {
 
   const form = useForm<VasomotorFormValues>({
     resolver: zodResolver(vasomotorFormSchema),
-    defaultValues: buildDefaults(props),
+    defaultValues: buildDefaults(props, captureOpenedAtRef.current),
     mode: "onTouched",
   });
 
@@ -332,14 +343,14 @@ export function VasomotorForm(props: VasomotorFormProps) {
       className={cn("flex flex-col gap-5", className)}
     >
       {serverError ? (
-        <Alert variant="destructive">
+        <Alert variant="destructive" className="order-first">
           <AlertTitle>{strings.common.errorTitle}</AlertTitle>
           <AlertDescription>{serverError}</AlertDescription>
         </Alert>
       ) : null}
 
       {validationSummary ? (
-        <Alert variant="warning">
+        <Alert variant="warning" className="order-first">
           <AlertTitle>{strings.errors.validation}</AlertTitle>
           <AlertDescription>{validationSummary}</AlertDescription>
         </Alert>
@@ -442,7 +453,7 @@ export function VasomotorForm(props: VasomotorFormProps) {
         </CardContent>
       </Card>
 
-      <Card>
+      <Card className={cn(isQuickCreate && "-order-1")}>
         <CardHeader>
           <CardTitle>
             {formStrings.leftPhoto} · {formStrings.rightPhoto}
@@ -640,7 +651,7 @@ export function VasomotorForm(props: VasomotorFormProps) {
         </CardContent>
       </Card>
 
-      <div className="flex flex-col-reverse gap-2 border-t border-border pt-4 sm:flex-row sm:items-center sm:justify-between">
+      <div className="sticky bottom-[calc(var(--mobile-bottom-nav-height)+var(--safe-bottom))] -mx-4 flex flex-col-reverse gap-2 border-t border-border bg-background/95 px-4 pb-[max(var(--safe-bottom),12px)] pt-3 backdrop-blur sm:-mx-6 sm:px-6 sm:flex-row sm:items-center sm:justify-between lg:static lg:bottom-auto lg:mx-0 lg:bg-transparent lg:px-0 lg:pb-4 lg:backdrop-blur-none">
         <div className="flex items-center gap-2">
           {mode === "edit" && !hideDelete ? (
             <Button

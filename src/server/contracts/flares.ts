@@ -34,6 +34,8 @@ export const startFlareInputSchema = z.object({
   triggers: z.array(entryTriggerInputSchema).default([]),
   notes: z.string().max(20000).optional(),
   client_recorded_at: utcDateTimeSchema.optional(),
+  subject_user_id: uuidSchema.optional(),
+  entered_by_user_id: uuidSchema.optional(),
 });
 
 export const flareCheckpointInputSchema = z.object({
@@ -43,6 +45,8 @@ export const flareCheckpointInputSchema = z.object({
   pain_score: painScoreSchema.optional(),
   symptoms: z.array(entrySymptomInputSchema).default([]),
   notes: z.string().max(12000).optional(),
+  subject_user_id: uuidSchema.optional(),
+  entered_by_user_id: uuidSchema.optional(),
 });
 
 export const updateFlareInputSchema = z.object({
@@ -69,6 +73,8 @@ export const flareCheckpointDTOSchema = z.object({
   id: uuidSchema,
   family_id: uuidSchema,
   user_id: uuidSchema,
+  subject_user_id: uuidSchema.nullable().optional(),
+  entered_by_user_id: uuidSchema.nullable().optional(),
   entry_id: uuidSchema,
   checkpoint_type: flareCheckpointTypeSchema,
   checkpoint_at: utcDateTimeSchema,
