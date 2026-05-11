@@ -43,7 +43,6 @@ import type {
 
 import {
   fromLocalDateTimeInputValue,
-  nowIso,
   nowIsoForInput,
   toLocalDateTimeInputValue,
 } from "@/lib/format";
