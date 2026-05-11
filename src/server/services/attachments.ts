@@ -20,6 +20,7 @@ import {
 } from "@/server/contracts";
 import { recordSoftDeleteReason } from "./audit";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { NotFoundError, UnsupportedMediaTypeError } from "./errors";
 
 const ALLOWED_MIME_SET = new Set<string>(allowedMimeTypes);
 const asciiDecoder = new TextDecoder("ascii");
@@ -89,7 +90,9 @@ export function sniffMimeFromBytes(bytes: Uint8Array): string | null {
 
 export function assertAllowedMimeType(mimeType: string) {
   if (!ALLOWED_MIME_SET.has(mimeType)) {
-    throw new Error(`Unsupported attachment mime type: ${mimeType}`);
+    throw new UnsupportedMediaTypeError(
+      `Unsupported attachment mime type: ${mimeType}`,
+    );
   }
 }
 
@@ -202,7 +205,7 @@ export async function getSignedAttachmentUrl(
   }
 
   if (!attachment) {
-    throw new Error("Attachment not found");
+    throw new NotFoundError("Attachment not found");
   }
 
   const row = attachment as { file_path: string; bucket_id: string };

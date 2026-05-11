@@ -308,6 +308,13 @@
     "signedOutTitle": "Sign in to continue",
     "signedOutBody": "Bella Care Tracker is private. Use a magic link from your invited email to sign in. Single-user mode is available for local development."
   },
+  "login": {
+    "emailLabel": "Email",
+    "passwordLabel": "Password",
+    "demoNotice": "Local demo login is prefilled. Use this only with the local Supabase fixture database.",
+    "submit": "Sign in",
+    "submitPending": "Signing in"
+  },
   "commandPalette": {
     "title": "Command palette",
     "description": "Jump to any page or quickly create an entry.",

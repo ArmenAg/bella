@@ -4,6 +4,7 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { z } from "zod";
 import { createSupabaseServerClient } from "@/server/supabase/client";
+import { AuthenticationRequiredError } from "@/server/services/errors";
 import { toActionResult, type ActionResult } from "./result";
 
 const signInInputSchema = z.object({
@@ -17,11 +18,19 @@ export type LoginFormState = {
   error?: string;
 };
 
+const SAFE_NEXT_PATTERN = /^\/[A-Za-z0-9_\-./?&=]*$/;
+
 function safeNext(value: FormDataEntryValue | null) {
   if (typeof value !== "string") {
     return "/dashboard";
   }
   if (!value.startsWith("/") || value.startsWith("//")) {
+    return "/dashboard";
+  }
+  if (value.includes("\\")) {
+    return "/dashboard";
+  }
+  if (!SAFE_NEXT_PATTERN.test(value)) {
     return "/dashboard";
   }
   return value;
@@ -40,7 +49,7 @@ export async function signInWithPassword(
     }
 
     if (!data.user) {
-      throw new Error("Authentication required");
+      throw new AuthenticationRequiredError("Authentication required");
     }
 
     revalidatePath("/", "layout");

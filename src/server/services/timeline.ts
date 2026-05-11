@@ -608,6 +608,7 @@ export function buildTimelinePage(
     items: pageItems,
     next_cursor: overflow ? overflow.occurred_at : null,
     page_size: pageSize,
+    source_truncated: sourceCapsHit.length > 0 ? true : undefined,
     metadata: {
       source_row_limit: TIMELINE_SOURCE_ROW_LIMIT,
       source_caps_hit: sourceCapsHit,

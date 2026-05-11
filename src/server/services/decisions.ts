@@ -16,6 +16,7 @@ import {
 } from "@/server/contracts";
 import { recordSoftDeleteReason } from "./audit";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
+import { NotFoundError } from "./errors";
 
 type DecisionRow = Record<string, unknown>;
 type DecisionEvidenceLinkRow = Record<string, unknown>;
@@ -149,7 +150,7 @@ export async function getDecision(
   }
 
   if (!data) {
-    throw new Error("Decision not found");
+    throw new NotFoundError("Decision not found");
   }
 
   return normalizeDecisionRow(data as DecisionRow);

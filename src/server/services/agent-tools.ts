@@ -32,6 +32,7 @@ import {
 } from "./ai-import";
 import { assertCanWrite, requireCurrentProfile } from "./auth";
 import { getDecision, listDecisions } from "./decisions";
+import { NotFoundError } from "./errors";
 import { getEntry, listEntries } from "./entries";
 import {
   getMedication,
@@ -319,7 +320,7 @@ async function assertDraftBelongsToThread(
     .single();
 
   if (error) throw error;
-  if (!data) throw new Error("AI import draft not found for this agent thread");
+  if (!data) throw new NotFoundError("AI import draft not found for this agent thread");
 }
 
 async function createDraft(
