@@ -88,6 +88,7 @@
       "family": "Family users",
       "security": "Security",
       "privacy": "Privacy",
+      "mobile": "Mobile app",
       "data": "Your data"
     },
     "profile": {
@@ -120,6 +121,46 @@
       "caregiver": "Caregiver",
       "viewer": "Viewer",
       "clinician_readonly": "Clinician (read-only)"
+    }
+  },
+  "mobile": {
+    "install": {
+      "title": "Add Bella to Home Screen",
+      "body": "Open Share, choose Add to Home Screen, and name it Bella.",
+      "dismiss": "Not now",
+      "settingsBody": "Install Bella from Safari for a full-screen Home Screen app.",
+      "stepSafari": "Open Bella in Safari using the stable HTTPS address.",
+      "stepShare": "Use Share, then Add to Home Screen.",
+      "stepName": "Name it Bella and open it from the Home Screen.",
+      "installed": "Home Screen mode",
+      "browser": "Browser tab mode"
+    },
+    "update": {
+      "title": "Update available",
+      "body": "Reload to use the latest app shell.",
+      "action": "Reload"
+    },
+    "flags": {
+      "title": "Mobile feature flags",
+      "installPrompt": "Install prompt",
+      "offlineCapture": "Offline capture",
+      "webPush": "Web Push",
+      "enabled": "Enabled",
+      "disabled": "Disabled",
+      "boundaryNote": "Flags hide unfinished UI only. Server validation still applies."
+    },
+    "quickCapture": {
+      "title": "Quick capture",
+      "pain": "Pain",
+      "flare": "Flare",
+      "log": "Note",
+      "medication": "Med",
+      "photo": "Photo"
+    },
+    "offline": {
+      "title": "Offline",
+      "body": "Open the app again when the connection is back.",
+      "action": "Back to dashboard"
     }
   },
   "painBook": {
@@ -384,11 +425,14 @@
     "active": {
       "summaryTitle": "Active flare",
       "startedAt": "Started",
+      "elapsed": "Elapsed",
       "peak": "Peak",
       "now": "Now",
       "regions": "Regions",
       "triggers": "Triggers",
       "checkpointsTitle": "Checkpoints",
+      "latestCheckpoint": "Latest checkpoint",
+      "noCheckpointsShort": "None yet",
       "noCheckpoints": "No checkpoints yet. Capture one below.",
       "addCheckpoint": "Add checkpoint",
       "addCheckpointSubtitle": "Quick capture of pain, body, symptoms, and notes.",

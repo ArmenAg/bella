@@ -29,6 +29,8 @@ export const vasomotorMeasurementMutationSchema = z.object({
   notes: z.string().max(12000).optional(),
   left_attachment_id: uuidSchema.optional(),
   right_attachment_id: uuidSchema.optional(),
+  subject_user_id: uuidSchema.optional(),
+  entered_by_user_id: uuidSchema.optional(),
 });
 
 export const createVasomotorMeasurementInputSchema =
@@ -51,6 +53,8 @@ export const vasomotorMeasurementDTOSchema = z.object({
   id: uuidSchema,
   family_id: uuidSchema,
   user_id: uuidSchema,
+  subject_user_id: uuidSchema.nullable().optional(),
+  entered_by_user_id: uuidSchema.nullable().optional(),
   entry_id: uuidSchema.nullable(),
   measured_at: utcDateTimeSchema,
   site: z.string(),

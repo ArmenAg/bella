@@ -63,6 +63,10 @@ select public.assert_condition(
         'apple_health_imports',
         'apple_health_samples',
         'apple_health_daily_summaries',
+        'care_team_members',
+        'avoid_contraindications',
+        'case_summary_versions',
+        'emergency_packet_reviews',
         'audit_log'
       )
       and not exists (

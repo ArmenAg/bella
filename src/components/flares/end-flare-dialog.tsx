@@ -125,7 +125,7 @@ export function EndFlareDialog({
         if (!submitting) onOpenChange(next);
       }}
     >
-      <DialogContent>
+      <DialogContent className="max-h-[calc(100dvh-2rem)] overflow-y-auto">
         <DialogHeader>
           <DialogTitle>{endStrings.title}</DialogTitle>
           <DialogDescription>{endStrings.subtitle}</DialogDescription>

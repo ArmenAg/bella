@@ -72,6 +72,7 @@ export interface EntryFormProps {
   bodyRegions: BodyRegionDTO[];
   symptoms: SymptomDTO[];
   triggers: TriggerDTO[];
+  quick?: boolean;
 }
 
 const PAIN_TYPE_ORDER: EntryType[] = [
@@ -85,6 +86,7 @@ const PAIN_TYPE_ORDER: EntryType[] = [
 function buildDefaults(
   variant: EntryFormVariant,
   entry: EntryDTO | undefined,
+  captureOpenedAt: string,
 ): EntryFormValues {
   if (entry) {
     return {
@@ -117,7 +119,7 @@ function buildDefaults(
   const isPain = variant === "pain";
   return {
     type: isPain ? "baseline" : "freeform",
-    occurred_at: nowIso(),
+    occurred_at: captureOpenedAt,
     ended_at: undefined,
     title: "",
     pain_current: undefined,
@@ -131,7 +133,7 @@ function buildDefaults(
     is_flare: false,
     flare_status: undefined,
     recovery_minutes: undefined,
-    client_recorded_at: undefined,
+    client_recorded_at: captureOpenedAt,
     body_region_ids: [],
     symptoms: [],
     triggers: [],
@@ -139,12 +141,28 @@ function buildDefaults(
 }
 
 export function EntryForm(props: EntryFormProps) {
-  const { variant, mode, entry, bodyRegions, symptoms, triggers } = props;
+  const {
+    variant,
+    mode,
+    entry,
+    bodyRegions,
+    symptoms,
+    triggers,
+    quick = false,
+  } = props;
   const router = useRouter();
   const isPain = variant === "pain";
+  const isQuickCreate = quick && mode === "create";
+  const isQuickPainCreate = isQuickCreate && isPain;
+  const isQuickLogCreate = isQuickCreate && !isPain;
 
   const listHref = isPain ? "/pain-book" : "/log-book";
   const formStrings = isPain ? strings.painBook.form : strings.logBook.form;
+
+  const captureOpenedAtRef = React.useRef<string | null>(null);
+  if (captureOpenedAtRef.current === null) {
+    captureOpenedAtRef.current = new Date().toISOString();
+  }
 
   const uploaderRef = React.useRef<AttachmentUploaderHandle>(null);
   const [pendingUploads, setPendingUploads] = React.useState(false);
@@ -155,7 +173,7 @@ export function EntryForm(props: EntryFormProps) {
 
   const form = useForm<EntryFormValues>({
     resolver: zodResolver(entryBaseMutationSchema),
-    defaultValues: buildDefaults(variant, entry),
+    defaultValues: buildDefaults(variant, entry, captureOpenedAtRef.current),
     mode: "onTouched",
   });
 
@@ -331,6 +349,53 @@ export function EntryForm(props: EntryFormProps) {
 
   const validationSummary = firstZodError(errors);
 
+  const renderPainCurrentField = () => (
+    <Field
+      id="entry-pain-current"
+      label={strings.painBook.form.painCurrent}
+      optional
+      error={errors.pain_current?.message}
+    >
+      <Controller
+        control={control}
+        name="pain_current"
+        render={({ field }) => (
+          <PainSegmented
+            id="entry-pain-current"
+            value={field.value ?? undefined}
+            onChange={(next) => field.onChange(next)}
+            ariaLabel={strings.painBook.form.painCurrent}
+          />
+        )}
+      />
+    </Field>
+  );
+
+  const renderNotesField = (rows = 6) => (
+    <Field
+      id="entry-notes"
+      label={isPain ? strings.painBook.form.notes : strings.logBook.form.notes}
+      optional
+      error={errors.notes?.message}
+    >
+      <Label htmlFor="entry-notes" className="sr-only">
+        {isPain ? strings.painBook.form.notes : strings.logBook.form.notes}
+      </Label>
+      <Textarea
+        id="entry-notes"
+        rows={rows}
+        placeholder={
+          isPain
+            ? strings.painBook.form.notesPlaceholder
+            : strings.logBook.form.notesPlaceholder
+        }
+        maxLength={20000}
+        aria-invalid={errors.notes ? true : undefined}
+        {...register("notes")}
+      />
+    </Field>
+  );
+
   return (
     <form
       onSubmit={handleFormSubmit}
@@ -356,6 +421,9 @@ export function EntryForm(props: EntryFormProps) {
           <CardTitle>{formStrings.summarySection}</CardTitle>
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
+          {isQuickPainCreate ? renderPainCurrentField() : null}
+          {isQuickLogCreate ? renderNotesField(4) : null}
+
           <Field
             id="entry-title"
             label={formStrings.title}
@@ -534,25 +602,7 @@ export function EntryForm(props: EntryFormProps) {
             <CardTitle>{strings.painBook.form.painSection}</CardTitle>
           </CardHeader>
           <CardContent className="flex flex-col gap-5">
-            <Field
-              id="entry-pain-current"
-              label={strings.painBook.form.painCurrent}
-              optional
-              error={errors.pain_current?.message}
-            >
-              <Controller
-                control={control}
-                name="pain_current"
-                render={({ field }) => (
-                  <PainSegmented
-                    id="entry-pain-current"
-                    value={field.value ?? undefined}
-                    onChange={(next) => field.onChange(next)}
-                    ariaLabel={strings.painBook.form.painCurrent}
-                  />
-                )}
-              />
-            </Field>
+            {isQuickPainCreate ? null : renderPainCurrentField()}
             <CollapsibleSection
               title={strings.painBook.form.disclosure.painExtras}
               hint={strings.painBook.form.disclosure.painExtrasHint}
@@ -875,44 +925,23 @@ export function EntryForm(props: EntryFormProps) {
         </CollapsibleSection>
       ) : null}
 
-      <CollapsibleSection
-        title={
-          isPain
-            ? strings.painBook.form.disclosure.notes
-            : strings.logBook.form.disclosure.notes
-        }
-        hint={
-          isPain
-            ? strings.painBook.form.disclosure.notesHint
-            : strings.logBook.form.disclosure.notesHint
-        }
-        defaultOpen={notesOpen}
-      >
-        <Field
-          id="entry-notes"
-          label={
-            isPain ? strings.painBook.form.notes : strings.logBook.form.notes
+      {isQuickLogCreate ? null : (
+        <CollapsibleSection
+          title={
+            isPain
+              ? strings.painBook.form.disclosure.notes
+              : strings.logBook.form.disclosure.notes
           }
-          optional
-          error={errors.notes?.message}
+          hint={
+            isPain
+              ? strings.painBook.form.disclosure.notesHint
+              : strings.logBook.form.disclosure.notesHint
+          }
+          defaultOpen={notesOpen}
         >
-          <Label htmlFor="entry-notes" className="sr-only">
-            {isPain ? strings.painBook.form.notes : strings.logBook.form.notes}
-          </Label>
-          <Textarea
-            id="entry-notes"
-            rows={6}
-            placeholder={
-              isPain
-                ? strings.painBook.form.notesPlaceholder
-                : strings.logBook.form.notesPlaceholder
-            }
-            maxLength={20000}
-            aria-invalid={errors.notes ? true : undefined}
-            {...register("notes")}
-          />
-        </Field>
-      </CollapsibleSection>
+          {renderNotesField()}
+        </CollapsibleSection>
+      )}
 
       <CollapsibleSection
         title={
@@ -947,7 +976,7 @@ export function EntryForm(props: EntryFormProps) {
 
       <div
         className={cn(
-          "sticky bottom-14 -mx-4 flex flex-col-reverse gap-2 border-t border-border bg-background/95 px-4 pb-[max(env(safe-area-inset-bottom),12px)] pt-3 backdrop-blur sm:-mx-6 sm:px-6 sm:flex-row sm:items-center sm:justify-between",
+          "sticky bottom-[calc(var(--mobile-bottom-nav-height)+var(--safe-bottom))] -mx-4 flex flex-col-reverse gap-2 border-t border-border bg-background/95 px-4 pb-[max(var(--safe-bottom),12px)] pt-3 backdrop-blur sm:-mx-6 sm:px-6 sm:flex-row sm:items-center sm:justify-between",
           "lg:static lg:mx-0 lg:bottom-auto lg:px-0 lg:pb-4 lg:bg-transparent lg:backdrop-blur-none",
         )}
       >

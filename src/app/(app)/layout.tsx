@@ -34,7 +34,7 @@ export default async function AppShellLayout({
               <DesktopNav />
               <div className="flex min-h-screen flex-1 flex-col">
                 <MobileNav />
-                <main className="flex flex-1 items-center justify-center px-4 pb-24 pt-4 sm:px-6 lg:px-8 lg:pb-10 lg:pt-6">
+                <main className="flex flex-1 items-center justify-center px-4 pb-[calc(var(--mobile-bottom-nav-height)+var(--safe-bottom)+1rem)] pt-4 sm:px-6 lg:px-8 lg:pb-10 lg:pt-6">
                   <div className="w-full max-w-md">
                     <EmptyState
                       title={strings.auth.signedOutTitle}
@@ -65,7 +65,7 @@ export default async function AppShellLayout({
             <div className="flex min-h-screen flex-1 flex-col">
               <MobileNav />
               <OnboardingGate>
-                <main className="flex-1 px-4 pb-24 pt-4 sm:px-6 lg:px-8 lg:pt-6 lg:pb-10">
+                <main className="flex-1 px-4 pb-[calc(var(--mobile-bottom-nav-height)+var(--safe-bottom)+1rem)] pt-4 sm:px-6 lg:px-8 lg:pb-10 lg:pt-6">
                   <div className="mx-auto flex w-full max-w-5xl flex-col gap-4">
                     <ActiveFlareBanner />
                     {children}

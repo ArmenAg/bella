@@ -11,6 +11,8 @@ import { SectionCard } from "@/components/dashboard/section-card";
 import { SectionRow } from "@/components/dashboard/section-row";
 import { TrendsAccordion } from "@/components/dashboard/trends-accordion";
 import { UpcomingPacketCta } from "@/components/dashboard/upcoming-packet-cta";
+import { InstallInstructionsPrompt } from "@/components/mobile/install-instructions";
+import { QuickCapturePanel } from "@/components/mobile/quick-capture-panel";
 
 import { FlareFrequencyChart } from "@/components/charts/flare-frequency-chart";
 import { RecoveryTimeChart } from "@/components/charts/recovery-time-chart";
@@ -230,6 +232,7 @@ export default async function DashboardPage({
         description={strings.dashboard.subtitle}
         actions={<RangeSelector current={range} />}
       />
+      <InstallInstructionsPrompt />
 
       {/* Instrument cluster: six glanceable metrics, single horizontal row on
           desktop, stacks gracefully on mobile. */}
@@ -255,6 +258,7 @@ export default async function DashboardPage({
 
       {/* Row 1: Active flare (renders null when no active flare) */}
       <ActiveFlareCard />
+      <QuickCapturePanel />
 
       {/* Row 2: Today — appointments + tasks merged */}
       <SectionCard

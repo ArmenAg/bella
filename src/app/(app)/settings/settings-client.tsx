@@ -6,10 +6,13 @@ import {
   DownloadCloud,
   KeyRound,
   Shield,
+  Smartphone,
   Trash2,
   UserRound,
   Users,
 } from "lucide-react";
+import { MobileFeatureFlagsStatus } from "@/components/mobile/mobile-feature-flags-status";
+import { InstallInstructionsSettings } from "@/components/mobile/install-instructions";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
 import {
@@ -178,6 +181,19 @@ export function SettingsClient({ profile }: SettingsClientProps) {
               </Link>
             </Button>
           </div>
+        </CardContent>
+      </Card>
+
+      <Card className="md:col-span-2">
+        <CardHeader>
+          <CardTitle className="flex items-center gap-2">
+            <Smartphone aria-hidden="true" className="h-4 w-4 text-primary" />
+            {strings.settings.sections.mobile}
+          </CardTitle>
+        </CardHeader>
+        <CardContent className="flex flex-col gap-5">
+          <InstallInstructionsSettings />
+          <MobileFeatureFlagsStatus />
         </CardContent>
       </Card>
 

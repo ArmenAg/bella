@@ -12,6 +12,7 @@ export * from "./metrics";
 export * from "./medications";
 export * from "./procedures";
 export * from "./reference";
+export * from "./safety";
 export * from "./schedule";
 export * from "./sources";
 export * from "./timeline";

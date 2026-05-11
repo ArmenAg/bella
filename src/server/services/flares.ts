@@ -106,16 +106,16 @@ async function getFlareSession(
   return flareSessionDTOSchema.parse({ entry, checkpoints });
 }
 
-async function assertNoActiveFlareForCurrentUser(
+async function assertNoActiveFlareForSubject(
   familyId: string,
-  userId: string,
+  subjectUserId: string,
   supabase: SupabaseClient,
 ) {
   const { data, error } = await supabase
     .from("entries")
     .select("id")
     .eq("family_id", familyId)
-    .eq("user_id", userId)
+    .eq("subject_user_id", subjectUserId)
     .eq("is_flare", true)
     .eq("flare_status", "active")
     .is("deleted_at", null)
@@ -126,7 +126,7 @@ async function assertNoActiveFlareForCurrentUser(
   }
 
   if ((data ?? []).length > 0) {
-    throw new ConflictError("Active flare already exists for this user");
+    throw new ConflictError("Active flare already exists for this subject");
   }
 }
 
@@ -137,6 +137,25 @@ async function insertCheckpoint(
   const parsed = flareCheckpointInputSchema.parse(input);
   const profile = await requireCurrentProfile(supabase);
   assertCanWrite(profile);
+  let subjectUserId = parsed.subject_user_id;
+
+  if (!subjectUserId) {
+    const { data: entry, error: entryError } = await supabase
+      .from("entries")
+      .select("subject_user_id")
+      .eq("id", parsed.entry_id)
+      .is("deleted_at", null)
+      .single();
+
+    if (entryError) {
+      throw entryError;
+    }
+
+    subjectUserId =
+      typeof entry?.subject_user_id === "string"
+        ? entry.subject_user_id
+        : profile.id;
+  }
 
   const { data, error } = await supabase
     .from("flare_checkpoints")
@@ -144,6 +163,7 @@ async function insertCheckpoint(
       ...parsed,
       family_id: profile.family_id,
       user_id: profile.id,
+      subject_user_id: subjectUserId,
       symptoms: parsed.symptoms,
     })
     .select("*")
@@ -163,9 +183,10 @@ export async function startFlare(
   const parsed = startFlareInputSchema.parse(input);
   const profile = await requireCurrentProfile(supabase);
   assertCanWrite(profile);
-  await assertNoActiveFlareForCurrentUser(
+  const subjectUserId = parsed.subject_user_id ?? profile.id;
+  await assertNoActiveFlareForSubject(
     profile.family_id,
-    profile.id,
+    subjectUserId,
     supabase,
   );
 
@@ -181,6 +202,8 @@ export async function startFlare(
       is_flare: true,
       flare_status: "active",
       client_recorded_at: parsed.client_recorded_at,
+      subject_user_id: subjectUserId,
+      entered_by_user_id: parsed.entered_by_user_id,
       body_region_ids: parsed.body_region_ids,
       symptoms: parsed.symptoms,
       triggers: parsed.triggers,
@@ -196,6 +219,8 @@ export async function startFlare(
       pain_score: parsed.pain_current ?? parsed.pain_peak,
       symptoms: parsed.symptoms,
       notes: parsed.notes,
+      subject_user_id: subjectUserId,
+      entered_by_user_id: parsed.entered_by_user_id,
     },
     supabase,
   );

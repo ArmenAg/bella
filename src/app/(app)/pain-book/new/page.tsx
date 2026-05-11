@@ -6,7 +6,14 @@ import { strings } from "@/lib/strings";
 
 export const dynamic = "force-dynamic";
 
-export default async function NewPainEntryPage() {
+interface NewPainEntryPageProps {
+  searchParams: Promise<{ quick?: string }>;
+}
+
+export default async function NewPainEntryPage({
+  searchParams,
+}: NewPainEntryPageProps) {
+  const params = await searchParams;
   const reference = await listReferenceData();
 
   return (
@@ -21,6 +28,7 @@ export default async function NewPainEntryPage() {
           bodyRegions={reference.data.body_regions}
           symptoms={reference.data.symptoms}
           triggers={reference.data.triggers}
+          quick={params.quick === "1"}
         />
       )}
     </div>

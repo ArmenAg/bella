@@ -58,6 +58,7 @@ export default async function EditMedicationResponsePage({
   const medications: MedicationOption[] = medsResult.data.items.map((med) => ({
     id: med.id,
     name: med.name,
+    status: med.status,
   }));
 
   const entries: EntryOption[] = entriesResult.ok

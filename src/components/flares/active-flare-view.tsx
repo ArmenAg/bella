@@ -93,6 +93,8 @@ export function ActiveFlareView({
       ),
     [session.checkpoints],
   );
+  const latestCheckpoint = sortedCheckpoints[0];
+  const checkpointTypeLabels = strings.flare.checkpoint.checkpointTypes;
 
   return (
     <div className="flex flex-col gap-5">
@@ -118,6 +120,35 @@ export function ActiveFlareView({
           ) : null}
         </CardHeader>
         <CardContent className="flex flex-col gap-4">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
+            <div className="rounded-md border border-border bg-muted/35 px-3 py-2">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                {activeStrings.elapsed}
+              </p>
+              <p className="mt-0.5 text-sm font-medium">
+                {formatRelative(entry.occurred_at)}
+              </p>
+            </div>
+            <div className="rounded-md border border-border bg-muted/35 px-3 py-2">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                {activeStrings.now}
+              </p>
+              <p className="mt-0.5 text-sm font-medium">
+                {entry.pain_current != null ? entry.pain_current : "--"}
+              </p>
+            </div>
+            <div className="rounded-md border border-border bg-muted/35 px-3 py-2">
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                {activeStrings.latestCheckpoint}
+              </p>
+              <p className="mt-0.5 text-sm font-medium">
+                {latestCheckpoint
+                  ? `${checkpointTypeLabels[latestCheckpoint.checkpoint_type]} · ${formatRelative(latestCheckpoint.checkpoint_at)}`
+                  : activeStrings.noCheckpointsShort}
+              </p>
+            </div>
+          </div>
+
           <div className="flex flex-wrap gap-1.5">
             {entry.pain_peak != null ? (
               <Badge variant="destructive">
@@ -221,8 +252,9 @@ export function ActiveFlareView({
         <div className="flex flex-col gap-2 sm:flex-row sm:justify-end">
           <Button
             type="button"
-            variant="destructive"
+            variant="outline"
             onClick={() => setEndOpen(true)}
+            className="text-destructive hover:text-destructive"
           >
             {activeStrings.endFlare}
           </Button>
