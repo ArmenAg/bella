@@ -726,10 +726,11 @@ Build the first version in this order:
    - Include photo comparison panels and temperature deltas
 
 10. **Bulk Export**
-   - Export structured JSON/CSV
-   - Export uploaded files
-   - Export generated visit packets
-   - Package as zip
+
+- Export structured JSON/CSV
+- Export uploaded files
+- Export generated visit packets
+- Package as zip
 
 ## Later Enhancements
 
