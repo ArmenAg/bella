@@ -68,7 +68,7 @@ export function QuickCapturePanel() {
       aria-label={strings.mobile.quickCapture.title}
       className="lg:hidden"
     >
-      <div className="grid grid-cols-5 gap-2">
+      <div className="grid grid-cols-5 gap-1.5 sm:gap-2">
         {ACTIONS.map((action) => {
           const Icon = action.icon;
           return (
@@ -76,12 +76,12 @@ export function QuickCapturePanel() {
               key={action.id}
               href={action.href}
               className={cn(
-                "flex min-h-14 flex-col items-center justify-center gap-1 rounded-md border px-1.5 py-2 text-center text-[11px] font-medium leading-tight transition-colors hover:bg-muted",
+                "flex min-h-14 min-w-0 flex-col items-center justify-center gap-1 rounded-md border px-1 py-2 text-center text-[10px] font-medium leading-tight transition-colors hover:bg-muted sm:px-1.5 sm:text-[11px]",
                 TONE_CLASSES[action.tone ?? "default"],
               )}
             >
               <Icon aria-hidden="true" className="h-4 w-4" />
-              <span>{action.label}</span>
+              <span className="max-w-full break-words">{action.label}</span>
             </Link>
           );
         })}

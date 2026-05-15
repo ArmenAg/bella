@@ -5,6 +5,7 @@ import type { AgentMessage } from "@/server/contracts";
 import { formatRelative } from "@/lib/format";
 import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
+import { AgentMarkdown } from "./agent-markdown";
 
 export function AgentMessageBubble({ message }: { message: AgentMessage }) {
   if (message.role === "system" || message.role === "tool") {
@@ -28,12 +29,12 @@ export function AgentMessageBubble({ message }: { message: AgentMessage }) {
       ) : null}
       <div
         className={cn(
-          "flex max-w-[88%] flex-col gap-1 rounded-md border px-3 py-2 text-sm leading-6",
+          "flex flex-col gap-1 rounded-md border px-3 py-2 text-sm leading-6",
           isUser
-            ? "border-primary/20 bg-primary/5 text-foreground"
+            ? "max-w-[min(82%,42rem)] border-primary/20 bg-primary/5 text-foreground"
             : isFailed
-              ? "border-destructive/30 bg-destructive/5 text-foreground"
-              : "border-border bg-card text-foreground",
+              ? "max-w-[min(100%,56rem)] border-destructive/30 bg-destructive/5 text-foreground"
+              : "max-w-[min(100%,56rem)] border-border bg-card text-foreground",
         )}
       >
         <div className="flex items-center justify-between gap-2 text-[11px] uppercase tracking-wider text-muted-foreground">
@@ -55,9 +56,15 @@ export function AgentMessageBubble({ message }: { message: AgentMessage }) {
             {formatRelative(message.created_at)}
           </time>
         </div>
-        <div className="whitespace-pre-wrap break-words text-sm leading-6">
-          {message.content || (isUser ? "" : strings.agent.chat.thinking)}
-        </div>
+        {isUser ? (
+          <div className="whitespace-pre-wrap break-words text-sm leading-6">
+            {message.content}
+          </div>
+        ) : (
+          <AgentMarkdown
+            content={message.content || strings.agent.chat.thinking}
+          />
+        )}
       </div>
       {isUser ? (
         <div className="flex h-7 w-7 shrink-0 items-center justify-center rounded-md bg-muted text-muted-foreground">

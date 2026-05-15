@@ -346,7 +346,7 @@ export function CommandPalette() {
                 : undefined
             }
             className={cn(
-              "flex h-11 w-full bg-transparent text-sm leading-6 text-foreground",
+              "flex h-11 min-w-0 w-full bg-transparent text-base leading-6 text-foreground sm:text-sm",
               "placeholder:text-muted-foreground",
               "focus-visible:outline-none",
             )}

@@ -40,7 +40,9 @@ export function PageHeader({
         ) : null}
       </div>
       {actions ? (
-        <div className="flex flex-wrap items-center gap-2">{actions}</div>
+        <div className="flex min-w-0 flex-wrap items-center gap-2 sm:justify-end">
+          {actions}
+        </div>
       ) : null}
     </div>
   );

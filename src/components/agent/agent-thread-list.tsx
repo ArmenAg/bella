@@ -4,13 +4,14 @@ import * as React from "react";
 import { Archive, MessageSquare, Plus } from "lucide-react";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
-import { ToggleChip } from "@/components/entries/toggle-chip";
 import { DestructiveConfirm } from "@/components/feedback/destructive-confirm";
 import type { AgentThread } from "@/server/contracts";
 import { formatRelative } from "@/lib/format";
 import { strings } from "@/lib/strings";
 import { cn } from "@/lib/utils";
 import type { ThreadFilter } from "./agent-types";
+
+const THREAD_FILTERS: ThreadFilter[] = ["active", "archived", "all"];
 
 interface AgentThreadListProps {
   threads: AgentThread[];
@@ -46,7 +47,7 @@ export function AgentThreadList({
   );
 
   return (
-    <div className="flex h-full flex-col gap-3">
+    <div className="flex h-full min-h-0 flex-col gap-3">
       <div className="flex items-center justify-between gap-2">
         <h2 className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
           {strings.agent.threads.title}
@@ -71,25 +72,32 @@ export function AgentThreadList({
         ) : null}
       </div>
 
-      <div className="flex flex-wrap items-center gap-1.5">
-        <ToggleChip
-          active={filter === "active"}
-          onToggle={() => onChangeFilter("active")}
-        >
-          {strings.agent.threads.filterActive}
-        </ToggleChip>
-        <ToggleChip
-          active={filter === "archived"}
-          onToggle={() => onChangeFilter("archived")}
-        >
-          {strings.agent.threads.filterArchived}
-        </ToggleChip>
-        <ToggleChip
-          active={filter === "all"}
-          onToggle={() => onChangeFilter("all")}
-        >
-          {strings.agent.threads.filterAll}
-        </ToggleChip>
+      <div className="inline-flex w-fit items-center gap-0.5 rounded-md bg-background p-0.5">
+        {THREAD_FILTERS.map((option) => {
+          const active = filter === option;
+          const label =
+            option === "active"
+              ? strings.agent.threads.filterActive
+              : option === "archived"
+                ? strings.agent.threads.filterArchived
+                : strings.agent.threads.filterAll;
+          return (
+            <button
+              key={option}
+              type="button"
+              aria-pressed={active}
+              onClick={() => onChangeFilter(option)}
+              className={cn(
+                "rounded-sm px-2 py-1 text-xs font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring",
+                active
+                  ? "bg-card text-foreground shadow-sm"
+                  : "text-muted-foreground hover:text-foreground",
+              )}
+            >
+              {label}
+            </button>
+          );
+        })}
       </div>
 
       <div className="flex flex-1 flex-col gap-1.5 overflow-y-auto pr-1">
@@ -105,7 +113,7 @@ export function AgentThreadList({
             <p>{error}</p>
           </div>
         ) : threads.length === 0 ? (
-          <div className="rounded-md border border-dashed border-border bg-card/40 px-3 py-4 text-center">
+          <div className="px-3 py-8 text-center">
             <MessageSquare
               aria-hidden="true"
               className="mx-auto mb-2 h-4 w-4 text-muted-foreground"
@@ -166,10 +174,8 @@ function ThreadRow({
   return (
     <div
       className={cn(
-        "group flex items-start gap-2 rounded-md border border-transparent px-2 py-2 transition-colors",
-        active
-          ? "border-primary/20 bg-primary/5"
-          : "hover:border-border hover:bg-muted/60",
+        "group flex items-start gap-2 rounded-md px-2 py-2 transition-colors",
+        active ? "bg-card" : "hover:bg-card/70",
       )}
     >
       <button

@@ -9,6 +9,7 @@ import {
   Loader2,
   Menu,
   MessageSquare,
+  PanelRightClose,
   ShieldCheck,
   Wrench,
 } from "lucide-react";
@@ -58,6 +59,8 @@ function filterToActionFilter(filter: ThreadFilter) {
   return { page_size: 50, status: filter };
 }
 
+type InspectorTab = "drafts" | "audit";
+
 export function AgentWorkspace({
   initialThreads,
   initialFilter,
@@ -87,6 +90,9 @@ export function AgentWorkspace({
   const [archiveBusy, setArchiveBusy] = React.useState(false);
   const [mobileTab, setMobileTab] = React.useState<MobileTab>("chat");
   const [threadsSheetOpen, setThreadsSheetOpen] = React.useState(false);
+  const [inspectorOpen, setInspectorOpen] = React.useState(false);
+  const [inspectorTab, setInspectorTab] =
+    React.useState<InspectorTab>("drafts");
 
   const messagesScrollRef = React.useRef<HTMLDivElement | null>(null);
 
@@ -223,13 +229,28 @@ export function AgentWorkspace({
     () => drafts.filter((d) => d.status === "proposed"),
     [drafts],
   );
+  const hasInspectorContent = drafts.length > 0 || toolCalls.length > 0;
+
+  React.useEffect(() => {
+    if (proposedDrafts.length > 0) {
+      setInspectorOpen(true);
+      setInspectorTab("drafts");
+    }
+  }, [proposedDrafts.length]);
+
+  React.useEffect(() => {
+    if (!hasInspectorContent) setInspectorOpen(false);
+  }, [hasInspectorContent]);
 
   return (
-    <div className="flex flex-col gap-4">
-      <Alert variant="info">
-        <ShieldCheck aria-hidden="true" />
-        <AlertDescription>{strings.agent.boundary}</AlertDescription>
-      </Alert>
+    <div className="flex flex-col gap-3">
+      <div className="flex min-w-0 items-center gap-2 text-xs leading-5 text-muted-foreground">
+        <ShieldCheck
+          aria-hidden="true"
+          className="h-3.5 w-3.5 shrink-0 text-primary"
+        />
+        <span>{strings.agent.boundary}</span>
+      </div>
 
       {sendError ? (
         <Alert variant="destructive">
@@ -239,8 +260,17 @@ export function AgentWorkspace({
       ) : null}
 
       {/* Desktop layout */}
-      <div className="hidden gap-4 lg:grid lg:grid-cols-[260px_1fr_360px]">
-        <aside className="rounded-md border border-border bg-card p-3">
+      <div
+        className={cn(
+          "hidden h-[calc(100svh-12rem)] min-h-[560px] min-w-0 overflow-hidden rounded-md border border-border bg-card lg:grid",
+          inspectorOpen && hasInspectorContent
+            ? "lg:grid-cols-[232px_minmax(0,1fr)_320px]"
+            : hasInspectorContent
+              ? "lg:grid-cols-[232px_minmax(0,1fr)_56px]"
+              : "lg:grid-cols-[232px_minmax(0,1fr)]",
+        )}
+      >
+        <aside className="min-h-0 border-r border-border bg-muted/20 p-3">
           <AgentThreadList
             threads={threads}
             filter={filter}
@@ -257,7 +287,7 @@ export function AgentWorkspace({
           />
         </aside>
 
-        <section className="flex min-h-[640px] flex-col rounded-md border border-border bg-card">
+        <section className="flex min-h-0 min-w-0 flex-col bg-card">
           <ChatPanel
             threadId={activeThreadId}
             messages={messages}
@@ -273,29 +303,46 @@ export function AgentWorkspace({
           />
         </section>
 
-        <aside className="flex min-h-[640px] flex-col rounded-md border border-border bg-card p-3">
-          <RailTabs
-            toolCalls={toolCalls}
-            drafts={drafts}
-            proposedDrafts={proposedDrafts}
-            hasThread={Boolean(activeThreadId)}
-          />
-        </aside>
+        {hasInspectorContent ? (
+          inspectorOpen ? (
+            <aside className="flex min-h-0 flex-col border-l border-border bg-background/70 p-3">
+              <RailTabs
+                value={inspectorTab}
+                onValueChange={setInspectorTab}
+                onCollapse={() => setInspectorOpen(false)}
+                toolCalls={toolCalls}
+                drafts={drafts}
+                proposedDrafts={proposedDrafts}
+                hasThread={Boolean(activeThreadId)}
+              />
+            </aside>
+          ) : (
+            <CollapsedInspector
+              draftsCount={drafts.length}
+              proposedDraftsCount={proposedDrafts.length}
+              toolCallsCount={toolCalls.length}
+              onOpenTab={(nextTab) => {
+                setInspectorTab(nextTab);
+                setInspectorOpen(true);
+              }}
+            />
+          )
+        ) : null}
       </div>
 
       {/* Mobile layout */}
-      <div className="flex flex-col gap-3 lg:hidden">
+      <div className="flex min-w-0 flex-col gap-3 lg:hidden">
         <div className="flex items-center justify-between gap-2">
           <Button
             variant="outline"
             size="sm"
             onClick={() => setThreadsSheetOpen(true)}
-            className="gap-1.5"
+            className="shrink-0 gap-1.5"
           >
             <Menu aria-hidden="true" className="h-3.5 w-3.5" />
             {strings.agent.threads.title}
           </Button>
-          <Badge variant="muted" className="truncate">
+          <Badge variant="muted" className="min-w-0 flex-1 truncate">
             {threads.find((t) => t.id === activeThreadId)?.title ??
               (activeThreadId
                 ? strings.agent.threads.untitled
@@ -491,10 +538,10 @@ function ChatPanel({
     <div className="flex flex-1 flex-col">
       <div
         ref={messagesScrollRef}
-        className="flex-1 space-y-3 overflow-y-auto px-3 py-3"
+        className="flex-1 space-y-4 overflow-y-auto px-4 py-4 lg:px-5"
       >
         {visibleMessages.length === 0 ? (
-          <div className="rounded-md border border-dashed border-border bg-card/40 px-4 py-8 text-center">
+          <div className="px-4 py-10 text-center">
             <p className="text-sm font-medium text-foreground">
               {strings.agent.chat.emptyThreadTitle}
             </p>
@@ -524,6 +571,9 @@ function ChatPanel({
 }
 
 interface RailTabsProps {
+  value: InspectorTab;
+  onValueChange: (value: InspectorTab) => void;
+  onCollapse: () => void;
   toolCalls: AgentToolCall[];
   drafts: AiImportDraft[];
   proposedDrafts: AiImportDraft[];
@@ -531,23 +581,43 @@ interface RailTabsProps {
 }
 
 function RailTabs({
+  value,
+  onValueChange,
+  onCollapse,
   toolCalls,
   drafts,
   proposedDrafts,
   hasThread,
 }: RailTabsProps) {
   return (
-    <Tabs defaultValue="drafts" className="flex h-full flex-col">
-      <TabsList>
-        <TabsTrigger value="drafts">
-          <ClipboardList aria-hidden="true" className="mr-1 h-3 w-3" />
-          {strings.agent.rail.tabs.drafts} ({proposedDrafts.length})
-        </TabsTrigger>
-        <TabsTrigger value="audit">
-          <Wrench aria-hidden="true" className="mr-1 h-3 w-3" />
-          {strings.agent.rail.tabs.audit} ({toolCalls.length})
-        </TabsTrigger>
-      </TabsList>
+    <Tabs
+      value={value}
+      onValueChange={(next) => onValueChange(next as InspectorTab)}
+      className="flex h-full min-h-0 flex-col"
+    >
+      <div className="flex items-center gap-2">
+        <TabsList className="h-8 flex-1 border-0 bg-muted/60">
+          <TabsTrigger value="drafts" className="flex-1">
+            <ClipboardList aria-hidden="true" className="mr-1 h-3 w-3" />
+            {strings.agent.rail.tabs.drafts} ({proposedDrafts.length})
+          </TabsTrigger>
+          <TabsTrigger value="audit" className="flex-1">
+            <Wrench aria-hidden="true" className="mr-1 h-3 w-3" />
+            {strings.agent.rail.tabs.audit} ({toolCalls.length})
+          </TabsTrigger>
+        </TabsList>
+        <Button
+          type="button"
+          variant="ghost"
+          size="icon"
+          className="h-8 w-8 shrink-0 text-muted-foreground"
+          onClick={onCollapse}
+          aria-label="Collapse inspector"
+          title="Collapse inspector"
+        >
+          <PanelRightClose aria-hidden="true" className="h-4 w-4" />
+        </Button>
+      </div>
       <TabsContent value="drafts" className="flex-1 overflow-y-auto">
         <DraftsPanel
           drafts={drafts}
@@ -562,6 +632,58 @@ function RailTabs({
   );
 }
 
+function CollapsedInspector({
+  draftsCount,
+  proposedDraftsCount,
+  toolCallsCount,
+  onOpenTab,
+}: {
+  draftsCount: number;
+  proposedDraftsCount: number;
+  toolCallsCount: number;
+  onOpenTab: (tab: InspectorTab) => void;
+}) {
+  return (
+    <aside className="flex min-h-0 flex-col items-center gap-2 border-l border-border bg-background/70 px-2 py-3">
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className={cn(
+          "relative h-9 w-9 text-muted-foreground",
+          proposedDraftsCount > 0 && "text-primary hover:text-primary",
+        )}
+        onClick={() => onOpenTab("drafts")}
+        aria-label={`Open drafts (${draftsCount})`}
+        title={`Open drafts (${draftsCount})`}
+      >
+        <ClipboardList aria-hidden="true" className="h-4 w-4" />
+        {draftsCount > 0 ? (
+          <span className="absolute -right-1 -top-1 flex min-w-4 items-center justify-center rounded-full bg-primary px-1 text-[10px] font-medium leading-4 text-primary-foreground">
+            {draftsCount}
+          </span>
+        ) : null}
+      </Button>
+      <Button
+        type="button"
+        variant="ghost"
+        size="icon"
+        className="relative h-9 w-9 text-muted-foreground"
+        onClick={() => onOpenTab("audit")}
+        aria-label={`Open audit (${toolCallsCount})`}
+        title={`Open audit (${toolCallsCount})`}
+      >
+        <Wrench aria-hidden="true" className="h-4 w-4" />
+        {toolCallsCount > 0 ? (
+          <span className="absolute -right-1 -top-1 flex min-w-4 items-center justify-center rounded-full bg-muted px-1 text-[10px] font-medium leading-4 text-muted-foreground">
+            {toolCallsCount}
+          </span>
+        ) : null}
+      </Button>
+    </aside>
+  );
+}
+
 function DraftsPanel({
   drafts,
   proposedDrafts,
@@ -573,14 +695,14 @@ function DraftsPanel({
 }) {
   if (!hasThread) {
     return (
-      <div className="rounded-md border border-dashed border-border bg-card/40 px-3 py-4 text-center text-xs text-muted-foreground">
+      <div className="px-3 py-8 text-center text-xs leading-5 text-muted-foreground">
         {strings.agent.chat.noThreadBody}
       </div>
     );
   }
   if (drafts.length === 0) {
     return (
-      <div className="rounded-md border border-dashed border-border bg-card/40 px-3 py-4 text-center text-xs text-muted-foreground">
+      <div className="px-3 py-8 text-center text-xs leading-5 text-muted-foreground">
         {strings.agent.drafts.empty}
       </div>
     );
@@ -613,14 +735,14 @@ function AuditPanel({
 }) {
   if (!hasThread) {
     return (
-      <div className="rounded-md border border-dashed border-border bg-card/40 px-3 py-4 text-center text-xs text-muted-foreground">
+      <div className="px-3 py-8 text-center text-xs leading-5 text-muted-foreground">
         {strings.agent.chat.noThreadBody}
       </div>
     );
   }
   if (toolCalls.length === 0) {
     return (
-      <div className="rounded-md border border-dashed border-border bg-card/40 px-3 py-4 text-center text-xs text-muted-foreground">
+      <div className="px-3 py-8 text-center text-xs leading-5 text-muted-foreground">
         {strings.agent.tools.empty}
       </div>
     );

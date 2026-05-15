@@ -1,6 +1,5 @@
 import { ErrorState } from "@/components/feedback/error-state";
 import { canWrite } from "@/lib/auth";
-import { PageHeader } from "@/components/shell/page-header";
 import { loadShellProfile } from "@/components/shell/profile-loader";
 import { AgentWorkspace } from "@/components/agent/agent-workspace";
 import { listAgentThreads } from "@/server/actions/agent";
@@ -35,12 +34,8 @@ export default async function AgentPage({ searchParams }: AgentPageProps) {
 
   if (!threadsResult.ok) {
     return (
-      <div className="flex flex-col gap-6">
-        <PageHeader
-          eyebrow={strings.agent.navLabel}
-          title={strings.agent.title}
-          description={strings.agent.subtitle}
-        />
+      <div className="flex flex-col gap-4 lg:relative lg:left-1/2 lg:w-[min(calc(100vw-19rem),88rem)] lg:-translate-x-1/2">
+        <AgentPageHeader />
         <ErrorState message={threadsResult.error.message} />
       </div>
     );
@@ -53,12 +48,8 @@ export default async function AgentPage({ searchParams }: AgentPageProps) {
       : (threads[0]?.id ?? null);
 
   return (
-    <div className="flex flex-col gap-6">
-      <PageHeader
-        eyebrow={strings.agent.navLabel}
-        title={strings.agent.title}
-        description={strings.agent.subtitle}
-      />
+    <div className="flex flex-col gap-4 lg:relative lg:left-1/2 lg:w-[min(calc(100vw-19rem),88rem)] lg:-translate-x-1/2">
+      <AgentPageHeader />
       <AgentWorkspace
         initialThreads={threads}
         initialFilter={filter}
@@ -66,5 +57,23 @@ export default async function AgentPage({ searchParams }: AgentPageProps) {
         canWrite={writable}
       />
     </div>
+  );
+}
+
+function AgentPageHeader() {
+  return (
+    <header className="flex min-w-0 flex-col gap-2 border-b border-border pb-3 sm:flex-row sm:items-center sm:justify-between">
+      <div className="min-w-0">
+        <p className="text-[11px] font-medium uppercase tracking-wider text-muted-foreground">
+          {strings.agent.navLabel}
+        </p>
+        <h1 className="text-xl font-semibold tracking-tight text-foreground">
+          Agent
+        </h1>
+      </div>
+      <p className="max-w-2xl text-sm leading-6 text-muted-foreground sm:text-right">
+        {strings.agent.subtitle}
+      </p>
+    </header>
   );
 }

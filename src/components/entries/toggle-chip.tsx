@@ -27,7 +27,7 @@ export function ToggleChip({
       disabled={disabled}
       aria-pressed={active}
       className={cn(
-        "inline-flex items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors",
+        "inline-flex max-w-full min-w-0 items-center gap-1 rounded-md border px-2.5 py-1 text-xs font-medium transition-colors",
         "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",
         "disabled:cursor-not-allowed disabled:opacity-60",
         active
