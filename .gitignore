@@ -20,3 +20,4 @@ data/bootstrap/*.md
 data/import-inbox/*
 !data/import-inbox/.gitkeep
 !data/import-inbox/README.md
+.vercel
