@@ -21,8 +21,7 @@ import {
 } from "./agent-tools";
 
 export const AGENT_SYSTEM_PROMPT_VERSION = "ai-agent-v1";
-const DEFAULT_AGENT_MODEL =
-  process.env.OPENAI_AGENT_MODEL ?? "gpt-5.4-mini";
+const DEFAULT_AGENT_MODEL = process.env.OPENAI_AGENT_MODEL ?? "gpt-5.4-mini";
 const MAX_TOOL_TURNS = 6;
 const MAX_TOOL_OUTPUT_CHARS = 40000;
 
@@ -30,8 +29,7 @@ export class AgentToolArgumentsError extends Error {
   readonly toolName: string | null;
 
   constructor(toolName: string | null, cause: unknown) {
-    const causeMessage =
-      cause instanceof Error ? cause.message : String(cause);
+    const causeMessage = cause instanceof Error ? cause.message : String(cause);
     const label = toolName ?? "<unknown tool>";
     super(
       `Failed to parse arguments for agent tool "${label}": ${causeMessage}`,

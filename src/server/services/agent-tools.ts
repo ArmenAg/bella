@@ -320,7 +320,8 @@ async function assertDraftBelongsToThread(
     .single();
 
   if (error) throw error;
-  if (!data) throw new NotFoundError("AI import draft not found for this agent thread");
+  if (!data)
+    throw new NotFoundError("AI import draft not found for this agent thread");
 }
 
 async function createDraft(

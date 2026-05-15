@@ -10,10 +10,7 @@ import { Button } from "@/components/ui/button";
 import { PainSegmented } from "@/components/entries/pain-segmented";
 
 import { addFlareCheckpoint } from "@/server/actions/flares";
-import type {
-  FlareCheckpointInput,
-  FlareSessionDTO,
-} from "@/server/contracts";
+import type { FlareCheckpointInput, FlareSessionDTO } from "@/server/contracts";
 
 import { strings } from "@/lib/strings";
 import { userFacingErrorMessage } from "@/lib/result";

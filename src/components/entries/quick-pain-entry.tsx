@@ -278,10 +278,17 @@ export function QuickPainEntry({
 
           {/* 4. Save */}
           <div className="flex items-center justify-end">
-            <Button type="submit" disabled={submitting} className="w-full lg:w-auto">
+            <Button
+              type="submit"
+              disabled={submitting}
+              className="w-full lg:w-auto"
+            >
               {submitting ? (
                 <>
-                  <Loader2 aria-hidden="true" className="h-4 w-4 animate-spin" />
+                  <Loader2
+                    aria-hidden="true"
+                    className="h-4 w-4 animate-spin"
+                  />
                   {quickStrings.saving}
                 </>
               ) : (
@@ -308,7 +315,9 @@ export function QuickPainEntry({
         <SheetContent side="right" className="flex flex-col gap-3">
           <SheetHeader>
             <SheetTitle>{quickStrings.moreSheetTitle}</SheetTitle>
-            <SheetDescription>{quickStrings.moreSheetDescription}</SheetDescription>
+            <SheetDescription>
+              {quickStrings.moreSheetDescription}
+            </SheetDescription>
           </SheetHeader>
           <div className="flex-1 overflow-y-auto px-4 pb-4">
             <div className="flex flex-wrap gap-1.5">

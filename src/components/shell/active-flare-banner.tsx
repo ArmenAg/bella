@@ -124,7 +124,9 @@ export function ActiveFlareBanner({ className }: { className?: string }) {
                   ? `${chip.label} — ${bannerActionStrings.alreadyLogged}`
                   : chip.label
               }
-              title={alreadyLogged ? bannerActionStrings.alreadyLogged : undefined}
+              title={
+                alreadyLogged ? bannerActionStrings.alreadyLogged : undefined
+              }
               className={cn(
                 "inline-flex h-7 items-center gap-1 rounded-md border px-2 text-xs font-medium transition-colors",
                 "focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-1",

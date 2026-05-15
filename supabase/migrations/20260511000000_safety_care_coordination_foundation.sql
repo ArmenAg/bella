@@ -283,14 +283,17 @@ as $$
 declare
   linked_member_id uuid;
 begin
-  linked_member_id := case tg_table_name
-    when 'appointments' then new.care_team_member_id
-    when 'decisions' then new.owner_care_team_member_id
-    when 'medications' then new.prescriber_care_team_member_id
-    when 'sources' then new.care_team_member_id
-    when 'events' then new.care_team_member_id
-    else null
-  end;
+  if tg_table_name = 'appointments' then
+    linked_member_id := new.care_team_member_id;
+  elsif tg_table_name = 'decisions' then
+    linked_member_id := new.owner_care_team_member_id;
+  elsif tg_table_name = 'medications' then
+    linked_member_id := new.prescriber_care_team_member_id;
+  elsif tg_table_name in ('sources', 'events') then
+    linked_member_id := new.care_team_member_id;
+  else
+    linked_member_id := null;
+  end if;
 
   if linked_member_id is not null and not exists (
     select 1

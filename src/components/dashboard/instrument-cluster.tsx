@@ -137,7 +137,8 @@ export function InstrumentCluster({
       >
         <Icon aria-hidden="true" className="h-3 w-3" />
         <span>
-          {isUp ? cluster.flares30d.up : cluster.flares30d.down} {flaresInPrior30d}
+          {isUp ? cluster.flares30d.up : cluster.flares30d.down}{" "}
+          {flaresInPrior30d}
         </span>
       </span>
     );
@@ -161,15 +162,13 @@ export function InstrumentCluster({
   // 5) Open decisions
   const openDecisionsValue = openDecisionsCount;
   const openDecisionsSub =
-    openDecisionsCount === 0
-      ? null
-      : overdueDecisionsCount > 0
-        ? (
-          <span className="text-destructive">
-            {overdueDecisionsCount} {cluster.openDecisions.overdueSuffix}
-          </span>
-        )
-        : cluster.openDecisions.noneOverdue;
+    openDecisionsCount === 0 ? null : overdueDecisionsCount > 0 ? (
+      <span className="text-destructive">
+        {overdueDecisionsCount} {cluster.openDecisions.overdueSuffix}
+      </span>
+    ) : (
+      cluster.openDecisions.noneOverdue
+    );
 
   // 6) Stale review (or fallback to open tasks)
   let staleLabel: string = cluster.staleReview.label;
@@ -231,4 +230,3 @@ export function InstrumentCluster({
     </div>
   );
 }
-
